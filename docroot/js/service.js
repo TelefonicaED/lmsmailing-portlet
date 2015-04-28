@@ -1,0 +1,1 @@
+Liferay.Service.register("Liferay.Service.lmsmail", "com.tls.liferaylms.mail.service", "lmsmailing-portlet");
