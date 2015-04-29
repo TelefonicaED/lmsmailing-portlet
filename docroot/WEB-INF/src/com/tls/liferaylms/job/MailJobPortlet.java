@@ -44,7 +44,7 @@ import com.tls.liferaylms.util.MailStringPool;
  */
 public class MailJobPortlet extends MVCPortlet {
 	Log log = LogFactoryUtil.getLog(MailJobPortlet.class);
-
+ 
 	protected String viewJSP;
 	protected String editJSP;
 
