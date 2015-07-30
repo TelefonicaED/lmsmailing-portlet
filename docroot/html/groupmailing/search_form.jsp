@@ -3,7 +3,7 @@
 // long courseId=ParamUtil.getLong(request, "courseId",0);
 // long roleId=ParamUtil.getLong(request, "roleId",0);
 %>
- 
+
 <liferay-portlet:renderURL var="buscarURL">
 	<liferay-portlet:param name="jspPage" value="/html/groupmailing/newMail.jsp" />
 <%-- 	<portlet:param name="courseId" value="<%=Long.toString(courseId) %>" /> --%>
