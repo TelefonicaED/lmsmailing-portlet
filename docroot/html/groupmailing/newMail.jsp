@@ -1,3 +1,6 @@
+<%@page import="com.liferay.portal.kernel.util.ListUtil"%>
+<%@page import="com.liferay.portal.kernel.dao.orm.QueryUtil"%>
+<%@page import="com.liferay.lms.service.LmsPrefsLocalServiceUtil"%>
 <%@page import="com.tls.liferaylms.util.JavaScriptUtil"%>
 <%@page import="com.liferay.portal.kernel.util.HttpUtil"%>
 <%@page import="com.liferay.portal.kernel.portlet.LiferayWindowState"%>
@@ -10,13 +13,33 @@
 	String body=""; 
 	String extractCodeFromEditor = renderResponse.getNamespace() + "extractCodeFromEditor()";
 	String criteria = request.getParameter("criteria");
+	
+	boolean backToEdit = ParamUtil.getBoolean(request, "backToEdit");
+	String redirectOfEdit = ParamUtil.getString(request, "redirectOfEdit");
+	String firstName = ParamUtil.getString(request,"firstName");
+	String lastName = ParamUtil.getString(request,"lastName");
+	String screenName = ParamUtil.getString(request,"screenName");	
+	String emailAddress = ParamUtil.getString(request,"emailAddress");
+	boolean andSearch = ParamUtil.getBoolean(request,"andSearch",true);
+	boolean searchForm = ParamUtil.getBoolean(request,"searchForm",false);
 
 	if (criteria == null) criteria = "";	
 	
 	PortletURL portletURL = renderResponse.createRenderURL();
 	portletURL.setParameter("jspPage","/html/groupmailing/newMail.jsp");
 	portletURL.setParameter("criteria", criteria); 
-	String name = ParamUtil.getString(request, "name",null);
+// 	String name = ParamUtil.getString(request, "name",null);
+	portletURL.setParameter("firstName", firstName); 
+	portletURL.setParameter("lastName", lastName);
+	portletURL.setParameter("screenName", screenName);
+	portletURL.setParameter("emailAddress", emailAddress);
+	portletURL.setParameter("andSearch",Boolean.toString(andSearch));
+// 	portletURL.setParameter("courseId",Long.toString(courseId));
+// 	portletURL.setParameter("roleId",Long.toString(roleId));
+	portletURL.setParameter("backToEdit",Boolean.toString(backToEdit));
+	if(backToEdit) {
+		portletURL.setParameter("backToEdit",redirectOfEdit);
+	}
 %>
 
 <script type="text/javascript">
@@ -136,8 +159,8 @@
 
 <aui:form name="form_to" >
 	<aui:field-wrapper name="mailto">
-		<aui:input checked="<%= true %>" inlineLabel="all" name="radio_to" type="radio" value="all" label="all"  onClick="<%=renderResponse.getNamespace()+\"changeSelection()\" %>" />
-		<aui:input inlineLabel="student" name="radio_to" type="radio" value="student" label="student" onClick="<%=renderResponse.getNamespace()+\"changeSelection()\" %>"  />
+		<aui:input checked="<%= !searchForm %>" inlineLabel="all" name="radio_to" type="radio" value="all" label="all"  onClick="<%=renderResponse.getNamespace()+\"changeSelection()\" %>" />
+		<aui:input checked="<%= searchForm %>" inlineLabel="student" name="radio_to" type="radio" value="student" label="student" onClick="<%=renderResponse.getNamespace()+\"changeSelection()\" %>"  />
 	</aui:field-wrapper>
 </aui:form>
 
@@ -160,12 +183,43 @@
 </div> --%>
 <!-- Fin de comentario de buscador a medias -->	
 
-<div id="<portlet:namespace />student_search" class="aui-helper-hidden" > 
+<div id="<portlet:namespace />student_search" class="aui-helper-hidden" >
+
+	<jsp:include page="/html/groupmailing/search_form.jsp" />
 	
 	<liferay-ui:search-container iteratorURL="<%=portletURL%>" emptyResultsMessage="there-are-no-results" delta="15" deltaConfigurable="true" >
 
 	   	<liferay-ui:search-container-results>
 			<%
+			String middleName = null;
+			
+			if (Validator.isNull(firstName)) {
+				firstName = null;
+			}
+			else {
+				firstName = addWildcards(firstName);
+			}
+			
+			if (Validator.isNull(lastName)) {
+				lastName = null;
+			}
+			else {
+				lastName = addWildcards(lastName);
+			}
+			
+			if (Validator.isNull(screenName)) {
+				screenName = null;
+			}
+			else {
+				screenName = addWildcards(screenName);
+			}
+			
+			if (Validator.isNull(emailAddress)) {
+				emailAddress = null;
+			}
+			else {
+				emailAddress = addWildcards(emailAddress);
+			}
 			
 			OrderByComparator obc = new UserFirstNameComparator(true);
 			
@@ -176,12 +230,23 @@
 				params.put("usersGroups", new Long(themeDisplay.getScopeGroupId()));
 			}
 			
-			List<User> userListPage = UserLocalServiceUtil.search(themeDisplay.getCompanyId(), criteria, 0, params, searchContainer.getStart(), searchContainer.getEnd(), obc);
-			int userCount = UserLocalServiceUtil.searchCount(themeDisplay.getCompanyId(), criteria, 0, params);
-					
-			pageContext.setAttribute("results", userListPage);
-		    pageContext.setAttribute("total", userCount);
+// 			List<User> userListPage = UserLocalServiceUtil.search(themeDisplay.getCompanyId(), criteria, 0, params, searchContainer.getStart(), searchContainer.getEnd(), obc);
+// 			int userCount = UserLocalServiceUtil.searchCount(themeDisplay.getCompanyId(), criteria, 0, params);
 			
+			List<User> userListPage = UserLocalServiceUtil.search(themeDisplay.getCompanyId(), firstName, middleName, lastName, screenName, emailAddress, 0, params, andSearch, QueryUtil.ALL_POS, QueryUtil.ALL_POS, obc);
+			
+			int userCount =  UserLocalServiceUtil.searchCount(themeDisplay.getCompanyId(), firstName, middleName, lastName, screenName, emailAddress, 0, params, andSearch);
+			long usersLimit = LmsPrefsLocalServiceUtil.getLmsPrefs(themeDisplay.getCompanyId()).getUsersResults();
+			
+			if (userListPage.size() > usersLimit){
+				pageContext.setAttribute("results", null);
+			    pageContext.setAttribute("total", 0);
+			   	searchContainer.setEmptyResultsMessage(LanguageUtil.format(pageContext,"there-are-many-results", new Object[]{usersLimit}));
+			}
+			else{
+				pageContext.setAttribute("results", ListUtil.subList(userListPage, searchContainer.getStart(), searchContainer.getEnd()));
+			    pageContext.setAttribute("total", userCount);
+			}
 			%>
 		</liferay-ui:search-container-results>
 		
@@ -266,6 +331,7 @@
 			};
 
 			AUI().ready('aui-io-request','querystring-parse','aui-parse-content',<portlet:namespace />ajaxMode<%= searchContainer.getId(request, renderResponse.getNamespace()) %>SearchContainer);
+			AUI().ready( function() { if(<%= searchForm %>){ <portlet:namespace />changeSelection(); } } );
 		//-->
 		</script>
 
@@ -338,3 +404,14 @@
 	</aui:form>
 
 </div>
+
+<%!
+	public static String addWildcards(String value)
+	{
+		if (value == null) return null;
+		if (value.length() == 1) return "%" + value + "%";
+		if (value.charAt(0) != '%') value = "%" + value;
+		if (value.charAt(value.length() - 1) != '%') value = value + "%";
+		return value;
+	}
+%>
