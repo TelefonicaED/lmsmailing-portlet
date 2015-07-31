@@ -58,17 +58,7 @@
 	}
 </script>
 
-
-
-<c:choose>
-	<c:when test="${empty mailjob}">
-		<form action="${saveURL}" method="POST">
-	</c:when>
-	<c:otherwise>
-		<form action="${updateURL}" method="POST">
-			<input type="hidden" value="${mailjob.idJob}" name="idJob" >
-	</c:otherwise>
-</c:choose>
+<form method="POST" name="fm" id="fm">
 	<div>
 		<liferay-ui:message key="template" />
 		<select name="idTemplate" id="idTemplate"  >
@@ -169,7 +159,9 @@
 		</span>
 		<span class="aui-field-content">
 			<label class="aui-field-label"><liferay-ui:message key="days" /></label>
-			<input type="text" value="${days}" name="days" id="days" >			
+			
+			<input type="text" value="${days}" name="days" id="days" >
+						
 			<select id="dateShift" name="dateShift">
 				<option value="-1"><liferay-ui:message key="before" /></option>
 				<option <c:if test="${time eq 1}"> selected="selected"</c:if> value="1"><liferay-ui:message key="after" /></option>
@@ -178,7 +170,33 @@
 	</div>
 </div>
 <aui:button-row>
-		<input type="submit" name="<liferay-ui:message key="submit" />">
+		<input type="button" name="<liferay-ui:message key="submit" />" value="<liferay-ui:message key="submit" />" onClick="javascript:validateForm();">
 	<aui:button onClick="${cancel}" type="cancel" />
 </aui:button-row>
 </form>
+
+
+<script type="text/javascript" >
+function validateForm() {
+	var f = document.getElementById('fm');
+	<c:choose>
+		<c:when test="${empty mailjob}">
+			f.action = '${saveURL}';
+		</c:when>
+		<c:otherwise>
+			f.action = '${updateURL}';
+			var inpt = document.createElement('input');
+			inpt.type='hidden';
+			inpt.name='idJob';
+			inpt.value='${mailjob.idJob}';
+			f.appendChild(inpt);
+		</c:otherwise>
+	</c:choose>
+	if (!/^([0-9])*$/.test(document.getElementById('days').value)) {
+		alert('<%=LanguageUtil.get(pageContext, "mail.job.form.days.numeric")%>');
+		return false;
+	} else {
+		f.submit();
+	}
+}
+</script>
