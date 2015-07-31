@@ -19,7 +19,7 @@ import com.liferay.portal.model.Group;
 import com.liferay.portal.model.User;
 import com.liferay.portal.service.GroupLocalServiceUtil;
 import com.liferay.portal.service.UserLocalServiceUtil;
-import com.tls.liferaylms.job.ProcessMailJob;
+import com.liferay.util.mail.MailEngine;
 import com.tls.liferaylms.mail.model.AuditSendMails;
 import com.tls.liferaylms.mail.service.AuditSendMailsLocalServiceUtil;
 
@@ -122,7 +122,8 @@ public class LmsMailMessageListener implements MessageListener {
 	
 				
 				MailMessage mailm = new MailMessage(from, to, calculatedsubject, calculatedBody ,true);
-				MailServiceUtil.sendEmail(mailm);
+//				MailServiceUtil.sendEmail(mailm);
+				MailEngine.send(mailm);
 			}
 		}
 		else if(toMail.contains("all")){
