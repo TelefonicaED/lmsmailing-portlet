@@ -19,7 +19,7 @@ import com.liferay.portal.model.Group;
 import com.liferay.portal.model.User;
 import com.liferay.portal.service.GroupLocalServiceUtil;
 import com.liferay.portal.service.UserLocalServiceUtil;
-import com.tls.liferaylms.job.ProcessMailJob;
+import com.liferay.util.mail.MailEngine;
 import com.tls.liferaylms.mail.model.AuditSendMails;
 import com.tls.liferaylms.mail.service.AuditSendMailsLocalServiceUtil;
 
@@ -122,7 +122,8 @@ public class LmsMailMessageListener implements MessageListener {
 	
 				
 				MailMessage mailm = new MailMessage(from, to, calculatedsubject, calculatedBody ,true);
-				MailServiceUtil.sendEmail(mailm);
+//				MailServiceUtil.sendEmail(mailm);
+				MailEngine.send(mailm);
 			}
 		}
 		else if(toMail.contains("all")){
@@ -195,7 +196,7 @@ public class LmsMailMessageListener implements MessageListener {
 		res = res.replace ("[@url]", 		"<a href=\""+url+"\">"+portal+"</a>");
 		res = res.replace ("[@urlcourse]", 	"<a href=\""+urlcourse+"\">"+community+"</a>");	
 
-		//Para poner la url desde la p�gina para que se vean los correos.
+		//Para poner la url desde la pï¿½gina para que se vean los correos.
 		res = changeToURL(res, url);
 		
 		return res;
@@ -204,7 +205,7 @@ public class LmsMailMessageListener implements MessageListener {
 	private String changeToURL(String text, String url){
 		String res ="";
 
-		//Para im�genes
+		//Para imï¿½genes
 		res = text.replaceAll("src=\"/image/image_gallery", "src=\""+url+"/image/image_gallery");
 		
 		return res;
