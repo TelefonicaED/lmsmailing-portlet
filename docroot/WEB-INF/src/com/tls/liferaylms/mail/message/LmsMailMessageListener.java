@@ -3,22 +3,32 @@ package com.tls.liferaylms.mail.message;
 import java.util.Date;
 import java.util.Locale;
 
+import javax.mail.MessagingException;
+import javax.mail.Session;
+import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeBodyPart;
+import javax.mail.internet.MimeMessage;
+import javax.mail.internet.MimeMultipart;
 
 import com.liferay.counter.service.CounterLocalServiceUtil;
 import com.liferay.mail.service.MailServiceUtil;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.mail.Account;
 import com.liferay.portal.kernel.mail.MailMessage;
 import com.liferay.portal.kernel.messaging.Message;
 import com.liferay.portal.kernel.messaging.MessageListener;
+import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.PrefsPropsUtil;
 import com.liferay.portal.kernel.util.PropsKeys;
+import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.Group;
 import com.liferay.portal.model.User;
 import com.liferay.portal.service.GroupLocalServiceUtil;
 import com.liferay.portal.service.UserLocalServiceUtil;
+import com.liferay.util.mail.LiferayMimeMessage;
 import com.liferay.util.mail.MailEngine;
 import com.tls.liferaylms.mail.model.AuditSendMails;
 import com.tls.liferaylms.mail.service.AuditSendMailsLocalServiceUtil;
@@ -122,18 +132,68 @@ public class LmsMailMessageListener implements MessageListener {
 	
 				
 				MailMessage mailm = new MailMessage(from, to, calculatedsubject, calculatedBody ,true);
-//				MailServiceUtil.sendEmail(mailm);
 				MailEngine.send(mailm);
 			}
 		}
-		else if(toMail.contains("all")){
-			if(_log.isDebugEnabled())_log.debug("All");
+		else if(toMail.contains("all"))
+		{
+			if(_log.isDebugEnabled())_log.debug("All-Start:"+Long.toString(groupId));
 			
 			
 			java.util.List<User> users = UserLocalServiceUtil.getGroupUsers(groupId);
 
 			int sendMails = 0;
-			
+			long totalMails=0;
+			Session session=MailEngine.getSession();
+			boolean smtpAuth = GetterUtil.getBoolean(
+					_getSMTPProperty(session, "auth"), false);
+				String smtpHost = _getSMTPProperty(session, "host");
+				int smtpPort = GetterUtil.getInteger(
+					_getSMTPProperty(session, "port"), Account.PORT_SMTP);
+				String smtpuser = _getSMTPProperty(session, "user");
+				String password = _getSMTPProperty(session, "password");
+				Transport transport=null;
+				String protocol = GetterUtil.getString(
+						session.getProperty("mail.transport.protocol"),
+						Account.PROTOCOL_SMTP);
+
+					transport = session.getTransport(protocol);
+				if (smtpAuth && Validator.isNotNull(smtpuser) &&
+					Validator.isNotNull(password)) {
+
+				
+					if(_log.isDebugEnabled())_log.debug("Connecting to SMTP Server");
+					try
+					{
+						_log.debug("Connecting to SMTP Server:"+protocol+":"+smtpHost+":"+smtpPort+":"+smtpuser+":"+password);
+						transport.connect(smtpHost, smtpPort, smtpuser, password);
+						_log.debug("Connected to SMTP Server:"+protocol+":"+smtpHost+":"+smtpPort+":"+smtpuser+":"+password);
+						
+					}
+					catch(MessagingException me)
+					{
+						me.printStackTrace();
+						throw new Exception(me);
+					}
+				}
+				else
+				{
+					if(_log.isDebugEnabled())_log.debug("Connecting to SMTP Server");
+					try
+					{
+						_log.debug("Connecting to SMTP Server:"+protocol+":"+smtpHost+":"+smtpPort);
+						transport.connect(smtpHost, smtpPort, null, null);
+						
+						_log.debug("Connected to SMTP Server:"+protocol+":"+smtpHost+":"+smtpPort);
+						
+					}
+					catch(MessagingException me)
+					{
+						me.printStackTrace();
+						throw new Exception(me);
+					}
+				}
+					
 			for (User user : users) {
 				
 				if(user.isActive()){
@@ -151,28 +211,27 @@ public class LmsMailMessageListener implements MessageListener {
 					}
 					
 					InternetAddress to = new InternetAddress(user.getEmailAddress(), user.getFullName());
-
-					if(_log.isDebugEnabled())_log.debug("Language::"+user.getLocale());
+					totalMails++;
+					if(_log.isDebugEnabled())
+					{
+						_log.debug("User::"+user.getEmailAddress()+"  number:"+Long.toString(totalMails));
+					
+					}
 					String calculatedBody = LanguageUtil.get(user.getLocale(),"mail.header");
 					calculatedBody += createMessage(body, portal, community, user.getFullName(), UserLocalServiceUtil.getUserById(userId).getFullName(),url,urlcourse);
 					calculatedBody += LanguageUtil.get(user.getLocale(),"mail.footer");
 	
 					String calculatedsubject = createMessage(subject, portal, community, user.getFullName(), UserLocalServiceUtil.getUserById(userId).getFullName(),url,urlcourse);
-					
-	//					System.out.println("----------------------");
-	//					System.out.println(" from: "+from);
-	//				System.out.println(" to: "+to + " "+user.getFullName());
-	//					System.out.println(" subject: "+subject);
-	//					System.out.println(" body: \n"+body);
-	//					System.out.println("----------------------");
-	
+
 					
 					MailMessage mailm = new MailMessage(from, to, calculatedsubject, calculatedBody ,true);
-					MailServiceUtil.sendEmail(mailm);
-					
+					sendMail(mailm,transport,session);
 					sendMails++;
 				}
 			}
+			transport.close();
+			if(_log.isDebugEnabled())_log.debug("All-End");
+			
 		}
 		
 		//Guardar una auditoria del envio de emails.
@@ -184,8 +243,42 @@ public class LmsMailMessageListener implements MessageListener {
 		AuditSendMailsLocalServiceUtil.addAuditSendMails(auditSendMails); 
 
 	}
+		
+		private static String _getSMTPProperty(Session session, String suffix) {
+			String protocol = GetterUtil.getString(
+				session.getProperty("mail.transport.protocol"));
+
+			if (protocol.equals(Account.PROTOCOL_SMTPS)) {
+				return session.getProperty("mail.smtps." + suffix);
+			}
+			else {
+				return session.getProperty("mail.smtp." + suffix);
+			}
+		}
 	
-	
+	private void sendMail(MailMessage mailm, Transport transport,Session session) throws MessagingException 
+	{
+		javax.mail.Message message = new MimeMessage(session);
+		message.setFrom(mailm.getFrom());
+		message.setRecipients(javax.mail.Message.RecipientType.TO,mailm.getTo());
+		message.setSubject(mailm.getSubject());
+		MimeMultipart messageMultipart = new MimeMultipart(
+				"alternative");
+		if (mailm.isHTMLFormat()) {
+		
+			message.setContent(mailm.getBody(), "text/html;charset=\"UTF-8\"");
+
+			
+		}
+		else {
+		
+			message.setContent(mailm.getBody(),"text/plain;charset=\"UTF-8\"");
+
+		}
+		transport.sendMessage(message, mailm.getTo());
+		
+	}
+
 	private String createMessage(String text, String portal, String community, String student, String teacher, String url, String urlcourse){
 		String res = "";
 	

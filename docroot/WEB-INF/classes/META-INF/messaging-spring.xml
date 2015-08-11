@@ -11,6 +11,7 @@
   <bean id="destination.lmsmailing"            
       class="com.liferay.portal.kernel.messaging.ParallelDestination">
     <property name="name" value="lms/mailing" />
+    <property name="workersMaxSize" value="10" />
   </bean>
   <bean id="messagingConfigurator"
       class="com.liferay.portal.kernel.messaging.config.PluginMessagingConfigurator">                 
