@@ -137,7 +137,7 @@ public class LmsMailMessageListener implements MessageListener {
 		}
 		else if(toMail.contains("all"))
 		{
-			if(_log.isDebugEnabled())_log.debug("All-Start:"+Long.toString(groupId));
+			_log.info("All-Start:"+Long.toString(groupId)+":"+scopeGroup.getName());
 			
 			
 			java.util.List<User> users = UserLocalServiceUtil.getGroupUsers(groupId);
@@ -230,7 +230,8 @@ public class LmsMailMessageListener implements MessageListener {
 				}
 			}
 			transport.close();
-			if(_log.isDebugEnabled())_log.debug("All-End");
+			
+			_log.info("All-End:"+Long.toString(groupId)+":"+scopeGroup.getName()+": Total Mails:"+totalMails);
 			
 		}
 		
