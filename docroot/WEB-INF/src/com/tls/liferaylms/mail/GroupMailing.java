@@ -50,7 +50,6 @@ public class GroupMailing extends MVCPortlet{
 			Message message=new Message();
 			
 			message.put("templateId",idTemplate);
-			
 			message.put("to", "all");
 			
 			message.put("subject", 	template.getSubject());
