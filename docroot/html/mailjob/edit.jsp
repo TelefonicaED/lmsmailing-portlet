@@ -3,10 +3,8 @@
 
 <portlet:actionURL var="saveURL" name="save">
 </portlet:actionURL>
-
 <portlet:actionURL var="updateURL" name="update">
 </portlet:actionURL>
-
 <portlet:renderURL var="cancel" />
 
 <script type="text/javascript">
