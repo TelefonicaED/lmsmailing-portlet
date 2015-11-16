@@ -87,13 +87,14 @@ public class ManageTemplates extends MVCPortlet {
 		}
 	}
 	
+	//Para imágenes
 	private String changeToURL(String text, String url){
-		String res ="";
-
-		//Para imágenes
-		res = text.replaceAll("src=\"/image/image_gallery", "src=\""+url+"/image/image_gallery");
-		
-		return res;
+	
+		text =  text.contains("img") ? 
+				text.replace("src=\"/", "src=\"" + url + StringPool.SLASH) : 
+				text;
+				
+		return text;
 	}
 	
 	@Override

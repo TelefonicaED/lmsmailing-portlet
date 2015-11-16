@@ -10,6 +10,7 @@ import com.liferay.portal.kernel.messaging.Message;
 import com.liferay.portal.kernel.messaging.MessageBusUtil;
 import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.util.ParamUtil;
+import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.model.User;
 import com.liferay.portal.service.UserLocalServiceUtil;
@@ -54,7 +55,7 @@ public class GroupMailing extends MVCPortlet{
 			message.put("to", "all");
 			
 			message.put("subject", 	template.getSubject());
-			message.put("body", 	template.getBody());
+			message.put("body", 	changeToURL(template.getBody(), themeDisplay.getURLPortal()));
 			message.put("groupId", 	themeDisplay.getScopeGroupId());
 			message.put("userId",  	themeDisplay.getUserId());
 			message.put("testing", 	testing);
@@ -104,7 +105,7 @@ public class GroupMailing extends MVCPortlet{
 			message.put("to", "all");
 			
 			message.put("subject", 	subject);
-			message.put("body", 	body);
+			message.put("body", 	changeToURL(body, themeDisplay.getURLPortal()));
 			message.put("groupId", 	themeDisplay.getScopeGroupId());
 			message.put("userId",  	themeDisplay.getUserId());
 			message.put("testing", 	testing);
@@ -135,7 +136,7 @@ public class GroupMailing extends MVCPortlet{
 					message.put("to", user.getEmailAddress());
 					message.put("userName", user.getFullName());
 					message.put("subject", 	subject);
-					message.put("body", 	body);
+					message.put("body", 	changeToURL(body, themeDisplay.getURLPortal()));
 					message.put("groupId", 	themeDisplay.getScopeGroupId());
 					message.put("userId",  	themeDisplay.getUserId());
 					message.put("testing", 	testing);
@@ -159,6 +160,16 @@ public class GroupMailing extends MVCPortlet{
 		}
 		
 		actionResponse.setRenderParameter("jspPage", "/html/groupmailing/view.jsp");
+	}
+	
+	//Para imágenes
+	private String changeToURL(String text, String url){
+		
+		text =  text.contains("img") ? 
+				text.replace("src=\"/", "src=\"" + url + StringPool.SLASH) : 
+				text;
+		
+		return text;
 	}
 	
 }
