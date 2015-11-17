@@ -1,3 +1,9 @@
+<%@page import="com.liferay.lms.model.LmsPrefs"%>
+<%@page import="com.liferay.portal.service.RoleLocalServiceUtil"%>
+<%@page import="com.liferay.portal.kernel.dao.orm.CustomSQLParam"%>
+<%@page import="com.liferay.portal.util.comparator.UserLastNameComparator"%>
+<%@page import="com.liferay.lms.service.CourseLocalServiceUtil"%>
+<%@page import="com.liferay.lms.model.Course"%>
 <%@page import="com.liferay.portal.kernel.util.ListUtil"%>
 <%@page import="com.liferay.portal.kernel.dao.orm.QueryUtil"%>
 <%@page import="com.liferay.lms.service.LmsPrefsLocalServiceUtil"%>
@@ -10,6 +16,8 @@
 <%@ include file="/init.jsp" %>
 
 <%
+	LmsPrefs prefs=LmsPrefsLocalServiceUtil.getLmsPrefs(themeDisplay.getCompanyId());
+
 	String body=""; 
 	String extractCodeFromEditor = renderResponse.getNamespace() + "extractCodeFromEditor()";
 	String criteria = request.getParameter("criteria");
@@ -22,8 +30,19 @@
 	String emailAddress = ParamUtil.getString(request,"emailAddress");
 	boolean andSearch = ParamUtil.getBoolean(request,"andSearch",true);
 	boolean searchForm = ParamUtil.getBoolean(request,"searchForm",false);
-
-	if (criteria == null) criteria = "";	
+	long courseId=0;
+	Course course=null;
+	
+	try{
+		course=CourseLocalServiceUtil.getCourseByGroupCreatedId(themeDisplay.getScopeGroupId());
+		courseId=course.getCourseId();
+	}catch(Exception e){}
+	
+	if (criteria == null) criteria = "";
+	if (firstName == null) firstName = "";
+	if (lastName == null) lastName = "";
+	if (screenName == null) screenName = "";
+	if (emailAddress == null) emailAddress = "";
 	
 	PortletURL portletURL = renderResponse.createRenderURL();
 	portletURL.setParameter("jspPage","/html/groupmailing/newMail.jsp");
@@ -34,7 +53,7 @@
 	portletURL.setParameter("screenName", screenName);
 	portletURL.setParameter("emailAddress", emailAddress);
 	portletURL.setParameter("andSearch",Boolean.toString(andSearch));
-// 	portletURL.setParameter("courseId",Long.toString(courseId));
+ 	portletURL.setParameter("courseId",Long.toString(courseId));
 // 	portletURL.setParameter("roleId",Long.toString(roleId));
 	portletURL.setParameter("backToEdit",Boolean.toString(backToEdit));
 	if(backToEdit) {
@@ -191,62 +210,47 @@
 
 	   	<liferay-ui:search-container-results>
 			<%
+			List<User> userListPage  = null;
 			String middleName = null;
-			
-			if (Validator.isNull(firstName)) {
-				firstName = null;
-			}
-			else {
-				firstName = addWildcards(firstName);
-			}
-			
-			if (Validator.isNull(lastName)) {
-				lastName = null;
-			}
-			else {
-				lastName = addWildcards(lastName);
-			}
-			
-			if (Validator.isNull(screenName)) {
-				screenName = null;
-			}
-			else {
-				screenName = addWildcards(screenName);
+			OrderByComparator obc = new   UserLastNameComparator(true);			
+			LinkedHashMap userParams = new LinkedHashMap();
+			int userCount = 0;
+
+			if (Validator.isNotNull(course)){
+				userParams.put("notInCourseRoleTeach", new CustomSQLParam("WHERE User_.userId NOT IN "
+			              + " (SELECT UserGroupRole.userId " + "  FROM UserGroupRole "
+			              + "  WHERE  (UserGroupRole.groupId = ?) AND (UserGroupRole.roleId = ?))", new Long[] {
+			              course.getGroupCreatedId(),
+			              RoleLocalServiceUtil.getRole(prefs.getTeacherRole()).getRoleId() }));
+			           
+			  	userParams.put("notInCourseRoleEdit", new CustomSQLParam("WHERE User_.userId NOT IN "
+			              + " (SELECT UserGroupRole.userId " + "  FROM UserGroupRole "
+			              + "  WHERE  (UserGroupRole.groupId = ?) AND (UserGroupRole.roleId = ?))", new Long[] {
+			              course.getGroupCreatedId(),
+			              RoleLocalServiceUtil.getRole(prefs.getEditorRole()).getRoleId() }));
+			  	
+			  	userParams.put("usersGroups", new Long(themeDisplay.getScopeGroupId()));
 			}
 			
-			if (Validator.isNull(emailAddress)) {
-				emailAddress = null;
+			if ((firstName.trim().length()==0) || (lastName.trim().length()==0) ||
+				(screenName.trim().length()==0)|| (emailAddress.trim().length()==0)){
+				
+				userListPage  = UserLocalServiceUtil.search(themeDisplay.getCompanyId(), firstName, StringPool.BLANK, 
+															lastName, screenName, emailAddress, 0, userParams, true, 
+															searchContainer.getStart(), searchContainer.getEnd(), obc);
+				
+				userCount	  = UserLocalServiceUtil.searchCount(themeDisplay.getCompanyId(), firstName, StringPool.BLANK,
+																 lastName, screenName, emailAddress, 0, userParams, true);
+				
+			}else{
+				userListPage  = UserLocalServiceUtil.search(themeDisplay.getCompanyId(), criteria, 0, userParams, 
+															searchContainer.getStart(), searchContainer.getEnd(), obc);
+				userCount 	  = UserLocalServiceUtil.searchCount(themeDisplay.getCompanyId(), criteria, 0, userParams);
 			}
-			else {
-				emailAddress = addWildcards(emailAddress);
-			}
-			
-			OrderByComparator obc = new UserFirstNameComparator(true);
-			
-			LinkedHashMap<String,Object> params = new LinkedHashMap<String,Object>();
-			
-			Group guest = GroupLocalServiceUtil.getGroup(themeDisplay.getCompanyId(), GroupConstants.GUEST);
-			if(themeDisplay.getScopeGroup().getGroupId()!=guest.getGroupId()){
-				params.put("usersGroups", new Long(themeDisplay.getScopeGroupId()));
-			}
-			
-// 			List<User> userListPage = UserLocalServiceUtil.search(themeDisplay.getCompanyId(), criteria, 0, params, searchContainer.getStart(), searchContainer.getEnd(), obc);
-// 			int userCount = UserLocalServiceUtil.searchCount(themeDisplay.getCompanyId(), criteria, 0, params);
-			
-			List<User> userListPage = UserLocalServiceUtil.search(themeDisplay.getCompanyId(), firstName, middleName, lastName, screenName, emailAddress, 0, params, andSearch, QueryUtil.ALL_POS, QueryUtil.ALL_POS, obc);
-			
-			int userCount =  UserLocalServiceUtil.searchCount(themeDisplay.getCompanyId(), firstName, middleName, lastName, screenName, emailAddress, 0, params, andSearch);
-			long usersLimit = LmsPrefsLocalServiceUtil.getLmsPrefs(themeDisplay.getCompanyId()).getUsersResults();
-			
-			if (userListPage.size() > usersLimit){
-				pageContext.setAttribute("results", null);
-			    pageContext.setAttribute("total", 0);
-			   	searchContainer.setEmptyResultsMessage(LanguageUtil.format(pageContext,"there-are-many-results", new Object[]{usersLimit}));
-			}
-			else{
-				pageContext.setAttribute("results", ListUtil.subList(userListPage, searchContainer.getStart(), searchContainer.getEnd()));
-			    pageContext.setAttribute("total", userCount);
-			}
+				
+			pageContext.setAttribute("results", userListPage);
+			pageContext.setAttribute("total", userCount);
+	
 			%>
 		</liferay-ui:search-container-results>
 		
