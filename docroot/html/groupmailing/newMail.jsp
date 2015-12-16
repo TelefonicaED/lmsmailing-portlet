@@ -1,3 +1,5 @@
+<%@page import="com.liferay.portal.service.TeamLocalServiceUtil"%>
+<%@page import="com.liferay.portal.model.Team"%>
 <%@page import="com.liferay.lms.model.LmsPrefs"%>
 <%@page import="com.liferay.portal.service.RoleLocalServiceUtil"%>
 <%@page import="com.liferay.portal.kernel.dao.orm.CustomSQLParam"%>
@@ -61,6 +63,10 @@
 	}
 %>
 
+<%
+
+java.util.List<Team> userTeams=TeamLocalServiceUtil.getGroupTeams(themeDisplay.getScopeGroupId());
+%>
 <script type="text/javascript">
 
 	YUI.add('<portlet:namespace />user-model', function(A) {
@@ -136,19 +142,37 @@
 					}
 				);
 				window.<portlet:namespace />selectedUsers.reset();
+				if (document.getElementById('team_selector'))
+					document.getElementById('team_selector').style.display='none';
 				A.one('#<portlet:namespace />to').val ('');
 				A.one('#<portlet:namespace />selected_users').setContent('<liferay-ui:message key="all"/>');
 				A.one('#<portlet:namespace />student_search').hide();
 				A.one('#<portlet:namespace />search_box').hide();
 			}
 			else if (A.one('input:radio[name=<portlet:namespace />radio_to]:checked').get('value')=='student') {
+				if (document.getElementById('team_selector'))
+					document.getElementById('team_selector').style.display='none';
 				A.one('#<portlet:namespace />selected_users').setContent('');
 				A.one('#<portlet:namespace />student_search').show();
 				A.one('#<portlet:namespace />search_box').show();
-			}
-			
-		});
-		
+
+			}else if (A.one('input:radio[name=<portlet:namespace />radio_to]:checked').get('value')=='teams') {
+				if (document.getElementById('team_selector')){
+					document.getElementById('team_selector').style.display='block';
+					A.one('#<portlet:namespace />to').val("team_" + A.one('#<portlet:namespace />teamId').get('value'));
+				}
+				A.one('#<portlet:namespace />selected_users').setContent('');
+				A.one('#<portlet:namespace />student_search').hide();
+				A.one('#<portlet:namespace />search_box').hide();
+			}			
+		});		
+	}
+	
+	function changeTeam(){
+		var selects = document.getElementById("<portlet:namespace />teamId");
+		var selectedValue = selects.options[selects.selectedIndex].value;
+		var to = document.getElementById("<portlet:namespace />to");
+		to.value = "team_" + selectedValue;
 	}
 
 	AUI().ready('node-base','<portlet:namespace />user-model', function(A) {
@@ -180,6 +204,16 @@
 	<aui:field-wrapper name="mailto">
 		<aui:input checked="<%= !searchForm %>" inlineLabel="all" name="radio_to" type="radio" value="all" label="all"  onClick="<%=renderResponse.getNamespace()+\"changeSelection()\" %>" />
 		<aui:input checked="<%= searchForm %>" inlineLabel="student" name="radio_to" type="radio" value="student" label="student" onClick="<%=renderResponse.getNamespace()+\"changeSelection()\" %>"  />
+	<%if(userTeams!=null&& userTeams.size()>0){%>
+		<aui:input inlineLabel="teams" name="radio_to" type="radio" value="teams" label="teams" onClick="<%=renderResponse.getNamespace()+\"changeSelection()\" %>"  />
+		<div id="team_selector" style="display: none">
+			<aui:select name="teamId" label="team" onChange="javascript:changeTeam();">
+			<%for(Team team:userTeams){ %>
+				<aui:option label="<%=team.getName() %>" value="<%=team.getTeamId() %>"></aui:option>
+			<%}%>	
+			</aui:select>
+		</div>	
+	<%}%> 
 	</aui:field-wrapper>
 </aui:form>
 

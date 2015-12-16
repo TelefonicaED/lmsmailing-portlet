@@ -87,7 +87,7 @@ public class ManageTemplates extends MVCPortlet {
 		}
 	}
 	
-	//Para imágenes
+	//Para imï¿½genes
 	private String changeToURL(String text, String url){
 	
 		text =  text.contains("img") ? 
@@ -186,7 +186,7 @@ public class ManageTemplates extends MVCPortlet {
 						
 						if(isHeader){isHeader=false;continue;}
 						
-						System.out.println(" currLine : " + currLine.toString() );
+						if(_log.isDebugEnabled()) _log.debug("currLine : " + currLine.toString() );
 						
 						String subject="", body="";
 						
@@ -198,8 +198,8 @@ public class ManageTemplates extends MVCPortlet {
 							body = currLine[1];
 						}
 						
-						System.out.println(" subject : " + subject );
-						System.out.println(" body : " + body );
+						if(_log.isDebugEnabled()) _log.debug("subject : " + subject );
+						if(_log.isDebugEnabled()) _log.debug("body : " + body );
 						
 						if (!"".equals(subject) || !"".equals(body) ){
 							

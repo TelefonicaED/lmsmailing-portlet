@@ -11,9 +11,9 @@
 				<action-key>VIEW</action-key>
 			
 			</supports>
-			<community-defaults>
+			<site-member-defaults>
 				<action-key>VIEW</action-key>
-			</community-defaults>
+			</site-member-defaults>
 			<guest-defaults>
 				<action-key>VIEW</action-key>
 			</guest-defaults>
@@ -36,9 +36,9 @@
 				<action-key>UPDATE</action-key>
 				<action-key>VIEW</action-key>
 			</supports>
-			<community-defaults>
+			<site-member-defaults>
 				<action-key>VIEW</action-key>
-			</community-defaults>
+			</site-member-defaults>
 			<guest-defaults>
 			</guest-defaults>
 			<guest-unsupported>
@@ -62,9 +62,9 @@
 				<action-key>VIEW</action-key>
 				<action-key>ACCEPTMAIL</action-key>
 			</supports>
-			<community-defaults>
+			<site-member-defaults>
 				<action-key>VIEW</action-key>
-			</community-defaults>
+			</site-member-defaults>
 			<guest-defaults>
 			</guest-defaults>
 			<guest-unsupported>
