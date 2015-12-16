@@ -127,7 +127,7 @@ public class GroupMailing extends MVCPortlet{
 			message.put("url", 		themeDisplay.getURLPortal());
 			message.put("urlcourse",themeDisplay.getURLPortal()+themeDisplay.getPathFriendlyURLPublic()+themeDisplay.getScopeGroup().getFriendlyURL());
 				
-//			MessageBusUtil.sendMessage("lms/mailing", message);
+			MessageBusUtil.sendMessage("lms/mailing", message);
 		}else if (to.contains("team_")){
 			
 			String teamId = to.replace("team_", "");
@@ -157,7 +157,7 @@ public class GroupMailing extends MVCPortlet{
 				message.put("url", 		themeDisplay.getURLPortal());
 				message.put("urlcourse",themeDisplay.getURLPortal()+themeDisplay.getPathFriendlyURLPublic()+themeDisplay.getScopeGroup().getFriendlyURL());
 					
-//				MessageBusUtil.sendMessage("lms/mailing", message);
+				MessageBusUtil.sendMessage("lms/mailing", message);
 			}
 		}else {
 			
@@ -190,7 +190,7 @@ public class GroupMailing extends MVCPortlet{
 					message.put("url", 		themeDisplay.getURLPortal());
 					message.put("urlcourse",themeDisplay.getURLPortal()+themeDisplay.getPathFriendlyURLPublic()+themeDisplay.getScopeGroup().getFriendlyURL());
 						
-//					MessageBusUtil.sendMessage("lms/mailing", message);
+					MessageBusUtil.sendMessage("lms/mailing", message);
 					
 				}
 				
