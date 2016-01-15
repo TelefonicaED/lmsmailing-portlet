@@ -1,18 +1,26 @@
 package com.tls.liferaylms.mail.message;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Locale;
 
 import javax.mail.MessagingException;
 import javax.mail.Session;
 import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 
 import com.liferay.counter.service.CounterLocalServiceUtil;
+import com.liferay.lms.model.Course;
+import com.liferay.lms.model.LmsPrefs;
+import com.liferay.lms.service.CourseLocalServiceUtil;
+import com.liferay.lms.service.LmsPrefsLocalServiceUtil;
 import com.liferay.mail.service.MailServiceUtil;
+import com.liferay.portal.kernel.dao.orm.CustomSQLParam;
+import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -21,14 +29,18 @@ import com.liferay.portal.kernel.mail.MailMessage;
 import com.liferay.portal.kernel.messaging.Message;
 import com.liferay.portal.kernel.messaging.MessageListener;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.PrefsPropsUtil;
 import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.Group;
+import com.liferay.portal.model.Team;
 import com.liferay.portal.model.User;
 import com.liferay.portal.service.GroupLocalServiceUtil;
+import com.liferay.portal.service.RoleLocalServiceUtil;
+import com.liferay.portal.service.TeamLocalServiceUtil;
 import com.liferay.portal.service.UserLocalServiceUtil;
-import com.liferay.util.mail.LiferayMimeMessage;
+import com.liferay.portal.util.comparator.UserLastNameComparator;
 import com.liferay.util.mail.MailEngine;
 import com.tls.liferaylms.mail.model.AuditSendMails;
 import com.tls.liferaylms.mail.service.AuditSendMailsLocalServiceUtil;
@@ -64,6 +76,9 @@ public class LmsMailMessageListener implements MessageListener {
 		
 		String toMail = message.getString("to");
 		String userName = message.getString("userName");
+		boolean ownTeam = message.getBoolean("ownTeam");
+		boolean isOmniadmin = message.getBoolean("isOmniadmin");
+		
 		
 		User sender = UserLocalServiceUtil.getUser(userId);
 		Group scopeGroup = GroupLocalServiceUtil.getGroup(groupId);
@@ -111,7 +126,6 @@ public class LmsMailMessageListener implements MessageListener {
 			User userSender = UserLocalServiceUtil.getUserById(userId);
 			User user = UserLocalServiceUtil.getUserByEmailAddress(userSender.getCompanyId(), toMail);
 			if(user!=null && user.isActive()){
-				
 				InternetAddress to = new InternetAddress(toMail, userName);
 
 				if(_log.isDebugEnabled())_log.debug("Language::"+user.getLocale());
@@ -138,10 +152,52 @@ public class LmsMailMessageListener implements MessageListener {
 		else if(toMail.contains("all"))
 		{
 			_log.info("All-Start:"+Long.toString(groupId)+":"+scopeGroup.getName());
-			
-			
-			java.util.List<User> users = UserLocalServiceUtil.getGroupUsers(groupId);
+			if(_log.isDebugEnabled())_log.debug("ownTeam: "+ownTeam);			
+			java.util.List<User> users = new ArrayList<User>();
+			if (ownTeam){
+				List<Team> userTeams = TeamLocalServiceUtil.getUserTeams(userId);
+				Course course = CourseLocalServiceUtil.getCourseByGroupCreatedId(groupId);
+				LmsPrefs prefs=LmsPrefsLocalServiceUtil.getLmsPrefs(companyId);
+				
+				OrderByComparator obc = new   UserLastNameComparator(true);			
+				LinkedHashMap userParams = new LinkedHashMap();
+				int userCount = 0;
 
+				if (Validator.isNotNull(course)){
+					userParams.put("notInCourseRoleTeach", new CustomSQLParam("WHERE User_.userId NOT IN "
+				              + " (SELECT UserGroupRole.userId " + "  FROM UserGroupRole "
+				              + "  WHERE  (UserGroupRole.groupId = ?) AND (UserGroupRole.roleId = ?))", new Long[] {
+				              course.getGroupCreatedId(),
+				              RoleLocalServiceUtil.getRole(prefs.getTeacherRole()).getRoleId() }));
+				           
+				  	userParams.put("notInCourseRoleEdit", new CustomSQLParam("WHERE User_.userId NOT IN "
+				              + " (SELECT UserGroupRole.userId " + "  FROM UserGroupRole "
+				              + "  WHERE  (UserGroupRole.groupId = ?) AND (UserGroupRole.roleId = ?))", new Long[] {
+				              course.getGroupCreatedId(),
+				              RoleLocalServiceUtil.getRole(prefs.getEditorRole()).getRoleId() }));
+				  	
+				  	if (ownTeam && !isOmniadmin && (userTeams!=null) && (userTeams.size()>0)){
+				  		
+				  		StringBuffer teamIds = new StringBuffer();
+				  		teamIds.append(userTeams.get(0).getTeamId());
+				  		if (userTeams.size() > 1){
+					  		for(int i = 1; i<userTeams.size(); i++){
+					  			teamIds.append(",");
+					  			teamIds.append(userTeams.get(i).getTeamId());
+					  		}
+				  		}
+				  		
+				  		userParams.put("inMyTeams", new CustomSQLParam("WHERE User_.userId IN "
+					              + " (SELECT distinct(Users_Teams.userId) FROM Users_Teams WHERE Users_Teams.teamId in ("+teamIds.toString()+ "))",null ));
+				  	}
+				  	
+				  	userParams.put("usersGroups", groupId);
+				}
+				
+				users  = UserLocalServiceUtil.search(companyId, null, 0, userParams, QueryUtil.ALL_POS, QueryUtil.ALL_POS, obc);
+				
+			}else users = UserLocalServiceUtil.getGroupUsers(groupId);
+			
 			int sendMails = 0;
 			long totalMails=0;
 			Session session=MailEngine.getSession();
@@ -200,7 +256,7 @@ public class LmsMailMessageListener implements MessageListener {
 				
 					if(nUsers > 0 && sendMails == nUsers ){
 						try {
-							System.out.println(" Delay " + millis +" milliseconds. Users: "+nUsers);
+							if(_log.isDebugEnabled())_log.debug(" Delay " + millis +" milliseconds. Users: "+nUsers);
 						    Thread.sleep(millis);
 						} catch(InterruptedException ex) {
 						    Thread.currentThread().interrupt();

@@ -58,7 +58,6 @@ public class MailTemplateLocalServiceImpl
 		DynamicQuery consulta = DynamicQueryFactoryUtil.forClass(MailTemplate.class)
 					.add(PropertyFactoryUtil.forName("groupId").eq(new Long(groupId)));
 			
-//System.out.println("groupId: "+groupId);
 		return mailTemplatePersistence.findWithDynamicQuery(consulta);		
 	}
 	
@@ -89,7 +88,6 @@ public class MailTemplateLocalServiceImpl
 		else{	
 			consulta.add(criterio1);
 		}
-//System.out.println("groupId: "+groupId+", companyId: "+globalGroupId);
 		return mailTemplatePersistence.findWithDynamicQuery(consulta);		
 	}
 }

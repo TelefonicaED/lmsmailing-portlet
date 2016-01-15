@@ -5,6 +5,7 @@ import java.util.List;
 
 import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
+import javax.portlet.PortletPreferences;
 import javax.portlet.ProcessAction;
 
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
@@ -16,11 +17,14 @@ import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.StringPool;
+import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.model.User;
+import com.liferay.portal.security.permission.PermissionChecker;
 import com.liferay.portal.service.UserLocalServiceUtil;
 import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portal.util.comparator.UserFirstNameComparator;
+import com.liferay.portlet.PortletPreferencesFactoryUtil;
 import com.liferay.util.bridges.mvc.MVCPortlet;
 import com.tls.liferaylms.mail.model.MailTemplate;
 import com.tls.liferaylms.mail.service.MailTemplateLocalServiceUtil;
@@ -53,12 +57,23 @@ public class GroupMailing extends MVCPortlet{
 		MailTemplate template = MailTemplateLocalServiceUtil.getMailTemplate(idTemplate);
 
 		if(template != null){
+			PermissionChecker permissionChecker = themeDisplay.getPermissionChecker();
+			PortletPreferences preferences = null;
+			String portletResource = ParamUtil.getString(actionRequest, "portletResource");
+			if (Validator.isNotNull(portletResource)) {
+				preferences = PortletPreferencesFactoryUtil.getPortletSetup(actionRequest, portletResource);
+			}else{
+				preferences = actionRequest.getPreferences();
+			}
+			boolean ownTeam = (preferences.getValue("ownTeam", "false")).compareTo("true") == 0;
 			
 			Message message=new Message();
 			
 			message.put("templateId",idTemplate);
 			
 			message.put("to", "all");
+			message.put("ownTeam", ownTeam);
+			message.put("isOmniadmin", permissionChecker.isOmniadmin());
 			
 			message.put("subject", 	template.getSubject());
 			message.put("body", 	changeToURL(template.getBody(), themeDisplay.getURLPortal()));
@@ -108,12 +123,24 @@ public class GroupMailing extends MVCPortlet{
 		if(to.isEmpty()){
 			
 			if (_log.isDebugEnabled()) _log.debug("Enviamos a todos los usuarios");
+			
+			PermissionChecker permissionChecker = themeDisplay.getPermissionChecker();
+			PortletPreferences preferences = null;
+			String portletResource = ParamUtil.getString(actionRequest, "portletResource");
+			if (Validator.isNotNull(portletResource)) {
+				preferences = PortletPreferencesFactoryUtil.getPortletSetup(actionRequest, portletResource);
+			}else{
+				preferences = actionRequest.getPreferences();
+			}
+			boolean ownTeam = (preferences.getValue("ownTeam", "false")).compareTo("true") == 0;
 
 			Message message=new Message();
-			
+						
 			message.put("templateId",-1);
 			
 			message.put("to", "all");
+			message.put("ownTeam", ownTeam);
+			message.put("isOmniadmin", permissionChecker.isOmniadmin());
 			
 			message.put("subject", 	subject);
 			message.put("body", 	changeToURL(body, themeDisplay.getURLPortal()));

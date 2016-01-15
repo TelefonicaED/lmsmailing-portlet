@@ -1,3 +1,5 @@
+<%@page import="com.liferay.portlet.PortletPreferencesFactoryUtil"%>
+<%@page import="javax.portlet.PortletPreferences"%>
 <%@page import="com.liferay.portal.service.TeamLocalServiceUtil"%>
 <%@page import="com.liferay.portal.model.Team"%>
 <%@page import="com.liferay.lms.model.LmsPrefs"%>
@@ -64,8 +66,19 @@
 %>
 
 <%
-
-java.util.List<Team> userTeams=TeamLocalServiceUtil.getGroupTeams(themeDisplay.getScopeGroupId());
+PortletPreferences preferences = null;
+String portletResource = ParamUtil.getString(request, "portletResource");
+if (Validator.isNotNull(portletResource)) {
+	preferences = PortletPreferencesFactoryUtil.getPortletSetup(request, portletResource);
+}else{
+	preferences = renderRequest.getPreferences();
+}
+boolean ownTeam = (preferences.getValue("ownTeam", "false")).compareTo("true") == 0;
+java.util.List<Team> userTeams= new ArrayList<Team>();
+if (ownTeam && !permissionChecker.isOmniadmin())
+	userTeams=TeamLocalServiceUtil.getUserTeams(themeDisplay.getUserId(), themeDisplay.getScopeGroupId());
+else
+	userTeams=TeamLocalServiceUtil.getGroupTeams(themeDisplay.getScopeGroupId());
 %>
 <script type="text/javascript">
 
@@ -262,6 +275,21 @@ java.util.List<Team> userTeams=TeamLocalServiceUtil.getGroupTeams(themeDisplay.g
 			              + "  WHERE  (UserGroupRole.groupId = ?) AND (UserGroupRole.roleId = ?))", new Long[] {
 			              course.getGroupCreatedId(),
 			              RoleLocalServiceUtil.getRole(prefs.getEditorRole()).getRoleId() }));
+			  	
+			  	if (ownTeam && !permissionChecker.isOmniadmin() && (userTeams!=null) && (userTeams.size()>0)){
+			  		
+			  		StringBuffer teamIds = new StringBuffer();
+			  		teamIds.append(userTeams.get(0).getTeamId());
+			  		if (userTeams.size() > 1){
+				  		for(int i = 1; i<userTeams.size(); i++){
+				  			teamIds.append(",");
+				  			teamIds.append(userTeams.get(i).getTeamId());
+				  		}
+			  		}
+			  		
+			  		userParams.put("inMyTeams", new CustomSQLParam("WHERE User_.userId IN "
+				              + " (SELECT distinct(Users_Teams.userId) FROM Users_Teams WHERE Users_Teams.teamId in ("+teamIds.toString()+ "))",null ));
+			  	}
 			  	
 			  	userParams.put("usersGroups", new Long(themeDisplay.getScopeGroupId()));
 			}
