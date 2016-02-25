@@ -152,7 +152,7 @@
 			<select name="ref_state" id="ref_state">
 				<option <c:if test="${mailjob.dateReferenceDate eq 0}"> selected="selected"</c:if> value="0"><liferay-ui:message key="groupmailing.init-date" /></option>
 				<option <c:if test="${mailjob.dateReferenceDate eq 1}"> selected="selected"</c:if> value="1"><liferay-ui:message key="groupmailing.end-date" /></option>
-				<option <c:if test="${mailjob.dateReferenceDate eq 0}"> selected="selected"</c:if> value="2"><liferay-ui:message key="groupmailing.inscription-date" /></option>
+				<option <c:if test="${mailjob.dateReferenceDate eq 2}"> selected="selected"</c:if> value="2"><liferay-ui:message key="groupmailing.inscription-date" /></option>
 			</select>
 		</span>
 		<span class="aui-field-content">
