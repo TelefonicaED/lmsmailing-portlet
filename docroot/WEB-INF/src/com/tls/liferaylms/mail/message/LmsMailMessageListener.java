@@ -18,6 +18,7 @@ import com.liferay.lms.model.Course;
 import com.liferay.lms.model.LmsPrefs;
 import com.liferay.lms.service.CourseLocalServiceUtil;
 import com.liferay.lms.service.LmsPrefsLocalServiceUtil;
+import com.liferay.lms.service.ModuleLocalServiceUtil;
 import com.liferay.mail.service.MailServiceUtil;
 import com.liferay.portal.kernel.dao.orm.CustomSQLParam;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
@@ -60,6 +61,7 @@ public class LmsMailMessageListener implements MessageListener {
 	}
 
 	protected void doReceive(Message message) throws Exception {
+		_log.debug("LmsMailMessageListener doReceive");
 		String subject = message.getString("subject");
 		String body = message.getString("body");
 		long groupId = message.getLong("groupId");
@@ -79,6 +81,7 @@ public class LmsMailMessageListener implements MessageListener {
 		boolean ownTeam = message.getBoolean("ownTeam");
 		boolean isOmniadmin = message.getBoolean("isOmniadmin");
 		
+;
 		
 		User sender = UserLocalServiceUtil.getUser(userId);
 		Group scopeGroup = GroupLocalServiceUtil.getGroup(groupId);
@@ -103,7 +106,7 @@ public class LmsMailMessageListener implements MessageListener {
 		
 		InternetAddress from = new InternetAddress(fromAddress, fromName);
 		
-		//System.out.print("toMail: "+toMail+", userName: "+userName);
+		_log.debug("toMail: "+toMail+", userName: "+userName);
 		
 		if ("true".equals(testing)) {
 			if(_log.isDebugEnabled())_log.debug("Test");
@@ -143,7 +146,7 @@ public class LmsMailMessageListener implements MessageListener {
 					log.debug(" body: \n"+calculatedBody);
 					log.debug("----------------------");
 				}
-	
+						
 				
 				MailMessage mailm = new MailMessage(from, to, calculatedsubject, calculatedBody ,true);
 				MailEngine.send(mailm);
@@ -196,7 +199,11 @@ public class LmsMailMessageListener implements MessageListener {
 				
 				users  = UserLocalServiceUtil.search(companyId, null, 0, userParams, QueryUtil.ALL_POS, QueryUtil.ALL_POS, obc);
 				
-			}else users = UserLocalServiceUtil.getGroupUsers(groupId);
+			}else {
+				
+				users = UserLocalServiceUtil.getGroupUsers(groupId);
+				System.out.println("users     "+users.size());
+			}
 			
 			int sendMails = 0;
 			long totalMails=0;
@@ -246,14 +253,11 @@ public class LmsMailMessageListener implements MessageListener {
 					catch(MessagingException me)
 					{
 						me.printStackTrace();
-						throw new Exception(me);
+						//throw new Exception(me);
 					}
 				}
-					
 			for (User user : users) {
-				
 				if(user.isActive()){
-				
 					if(nUsers > 0 && sendMails == nUsers ){
 						try {
 							if(_log.isDebugEnabled())_log.debug(" Delay " + millis +" milliseconds. Users: "+nUsers);
@@ -279,9 +283,21 @@ public class LmsMailMessageListener implements MessageListener {
 	
 					String calculatedsubject = createMessage(subject, portal, community, user.getFullName(), UserLocalServiceUtil.getUserById(userId).getFullName(),url,urlcourse);
 
+					if(log.isDebugEnabled()){
+						log.debug("\n----------------------");
+						log.debug(" from: "+from);
+						log.debug(" to: "+toMail + " "+userName);
+						log.debug(" subject: "+calculatedsubject);
+						log.debug(" body: \n"+calculatedBody);
+						log.debug("----------------------");
+					}
 					
 					MailMessage mailm = new MailMessage(from, to, calculatedsubject, calculatedBody ,true);
-					sendMail(mailm,transport,session);
+					try{
+						sendMail(mailm,transport,session);
+					}catch(Exception meEx){
+						meEx.printStackTrace();
+					}
 					sendMails++;
 				}
 			}
@@ -338,7 +354,6 @@ public class LmsMailMessageListener implements MessageListener {
 
 	private String createMessage(String text, String portal, String community, String student, String teacher, String url, String urlcourse){
 		String res = "";
-	
 		res = text.replace("[@portal]", 	portal);
 		res = res.replace ("[@course]", 	community);
 		res = res.replace ("[@student]", 	student);

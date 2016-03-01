@@ -8,6 +8,7 @@ import javax.portlet.ActionResponse;
 import javax.portlet.PortletPreferences;
 import javax.portlet.ProcessAction;
 
+import com.liferay.lms.service.ModuleLocalServiceUtil;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -104,6 +105,7 @@ public class GroupMailing extends MVCPortlet{
 		
 		String subject 	= ParamUtil.getString(actionRequest, "subject", "");
 		String body 	= ParamUtil.getString(actionRequest, "body", "");
+
 		String testing 	= ParamUtil.getString(actionRequest, "testing", "false");
 		
 		String to 	= ParamUtil.getString(actionRequest, "to", "");
@@ -135,9 +137,7 @@ public class GroupMailing extends MVCPortlet{
 			boolean ownTeam = (preferences.getValue("ownTeam", "false")).compareTo("true") == 0;
 
 			Message message=new Message();
-						
 			message.put("templateId",-1);
-			
 			message.put("to", "all");
 			message.put("ownTeam", ownTeam);
 			message.put("isOmniadmin", permissionChecker.isOmniadmin());
@@ -169,7 +169,7 @@ public class GroupMailing extends MVCPortlet{
 				Message message=new Message();
 				
 				message.put("templateId",-1);
-				
+
 				message.put("to", user.getEmailAddress());
 				message.put("userName", user.getFullName());
 				message.put("subject", 	subject);
@@ -183,7 +183,6 @@ public class GroupMailing extends MVCPortlet{
 				
 				message.put("url", 		themeDisplay.getURLPortal());
 				message.put("urlcourse",themeDisplay.getURLPortal()+themeDisplay.getPathFriendlyURLPublic()+themeDisplay.getScopeGroup().getFriendlyURL());
-					
 				MessageBusUtil.sendMessage("lms/mailing", message);
 			}
 		}else {
@@ -210,7 +209,7 @@ public class GroupMailing extends MVCPortlet{
 					message.put("groupId", 	themeDisplay.getScopeGroupId());
 					message.put("userId",  	themeDisplay.getUserId());
 					message.put("testing", 	testing);
-					
+
 					message.put("portal", 	themeDisplay.getCompany().getName());
 					message.put("community",themeDisplay.getScopeGroupName());
 					

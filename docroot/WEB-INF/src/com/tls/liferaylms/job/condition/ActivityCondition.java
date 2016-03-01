@@ -33,6 +33,7 @@ public class ActivityCondition extends MainCondition{
 	@Override
 	public Set<User> getUsersToSend() {
 		List<User> groupUsers = null;
+		if(log.isDebugEnabled())log.debug(getMailJob().getGroupId());
 		try {
 			groupUsers = UserLocalServiceUtil.getGroupUsers(getMailJob().getGroupId());
 		} catch (SystemException e) {
@@ -61,14 +62,17 @@ public class ActivityCondition extends MainCondition{
 				if(log.isDebugEnabled())e.printStackTrace();
 				if(log.isErrorEnabled())log.error(e.getMessage());
 			}
-			
-			String[] ids = getMailJob().getConditionStatus().split(StringPool.COMMA);
+			String[] ids = new String[0];
+			if(getMailJob().getConditionStatus().length()!=0) ids=  getMailJob().getConditionStatus().split(StringPool.COMMA);
+			if(log.isDebugEnabled())log.debug("----------------------------- "+getMailJob().getConditionStatus().length());
+
 			
 			for(String sid : ids){
-				
+				if(log.isDebugEnabled())log.debug("----------------------------- "+sid);
 				int id = -1;
 				try{
-					id = (int)Integer.valueOf(sid);
+						id = (int)Integer.valueOf(sid);
+				
 				}catch(NumberFormatException nfe){
 					if(log.isDebugEnabled())nfe.printStackTrace();
 					if(log.isErrorEnabled())log.error(nfe.getMessage());

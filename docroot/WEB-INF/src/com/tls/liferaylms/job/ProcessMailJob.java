@@ -33,12 +33,10 @@ public class ProcessMailJob implements MessageListener{
 	@Override
 	public void receive(Message arg0) throws MessageListenerException {
 		if(log.isDebugEnabled())log.debug(MailStringPool.INIT+this.getClass().getName());
-		
 		List<MailJob> mailJobs = MailJobLocalServiceUtil.getNotProcessedMailJobs();
 		
 		for(MailJob mailJob : mailJobs){
 			if(log.isDebugEnabled())log.debug(mailJob.getConditionClassName());
-			
 			Condition condition = null;
 			try {
 				condition = ConditionUtil.instance(mailJob.getConditionClassName(), mailJob);
