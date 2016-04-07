@@ -270,30 +270,33 @@ public class LmsMailMessageListener implements MessageListener {
 						
 					}
 					
-					InternetAddress to = new InternetAddress(user.getEmailAddress(), user.getFullName());
-					totalMails++;
-					if(_log.isDebugEnabled())
-					{
-						_log.debug("User::"+user.getEmailAddress()+"  number:"+Long.toString(totalMails));
 					
-					}
-					String calculatedBody = LanguageUtil.get(user.getLocale(),"mail.header");
-					calculatedBody += createMessage(body, portal, community, user.getFullName(), UserLocalServiceUtil.getUserById(userId).getFullName(),url,urlcourse);
-					calculatedBody += LanguageUtil.get(user.getLocale(),"mail.footer");
-	
-					String calculatedsubject = createMessage(subject, portal, community, user.getFullName(), UserLocalServiceUtil.getUserById(userId).getFullName(),url,urlcourse);
-
-					if(log.isDebugEnabled()){
-						log.debug("\n----------------------");
-						log.debug(" from: "+from);
-						log.debug(" to: "+toMail + " "+userName);
-						log.debug(" subject: "+calculatedsubject);
-						log.debug(" body: \n"+calculatedBody);
-						log.debug("----------------------");
-					}
-					
-					MailMessage mailm = new MailMessage(from, to, calculatedsubject, calculatedBody ,true);
 					try{
+						
+						InternetAddress to = new InternetAddress(user.getEmailAddress(), user.getFullName());
+						totalMails++;
+						if(_log.isDebugEnabled())
+						{
+							_log.debug("User::"+user.getEmailAddress()+"  number:"+Long.toString(totalMails));
+						
+						}
+						String calculatedBody = LanguageUtil.get(user.getLocale(),"mail.header");
+						calculatedBody += createMessage(body, portal, community, user.getFullName(), UserLocalServiceUtil.getUserById(userId).getFullName(),url,urlcourse);
+						calculatedBody += LanguageUtil.get(user.getLocale(),"mail.footer");
+		
+						String calculatedsubject = createMessage(subject, portal, community, user.getFullName(), UserLocalServiceUtil.getUserById(userId).getFullName(),url,urlcourse);
+
+						if(log.isDebugEnabled()){
+							log.debug("\n----------------------");
+							log.debug(" from: "+from);
+							log.debug(" to: "+toMail + " "+userName);
+							log.debug(" subject: "+calculatedsubject);
+							log.debug(" body: \n"+calculatedBody);
+							log.debug("----------------------");
+						}
+						
+						MailMessage mailm = new MailMessage(from, to, calculatedsubject, calculatedBody ,true);
+						
 						sendMail(mailm,transport,session);
 					}catch(Exception meEx){
 						meEx.printStackTrace();
