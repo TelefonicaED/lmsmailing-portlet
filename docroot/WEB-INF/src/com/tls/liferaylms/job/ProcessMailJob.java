@@ -101,29 +101,31 @@ public class ProcessMailJob implements MessageListener{
 				if(users!=null&&mailTemplate!=null&&company!=null&&group!=null){
 					for(User user : users){
 						log.debug(user.getFullName());
-						
-						//UserGroupRoleLocalServiceUtil.
-						
-						Message message=new Message();
-						
-						message.put("templateId",mailTemplate.getIdTemplate());
-						
-						message.put("to", user.getEmailAddress());
-						
-						message.put("subject", 	mailTemplate.getSubject());
-						message.put("body", 	mailTemplate.getBody());
-						message.put("groupId", 	mailJob.getGroupId());
-						message.put("userId",  	mailJob.getUserId());
-						message.put("testing", 	StringPool.FALSE);
-						
-						message.put("portal", 	companyName);
-						message.put("community",group.getName());
-						
-						String portalUrl = PortalUtil.getPortalURL(company.getVirtualHostname(), PortalUtil.getPortalPort(false), false);
-						message.put("url", 		portalUrl);
-						message.put("urlcourse",portalUrl+PortalUtil.getPathFriendlyURLPublic()+group.getFriendlyURL());
-							
-						MessageBusUtil.sendMessage("lms/mailing", message);
+						try{
+
+							Message message=new Message();
+
+							message.put("templateId",mailTemplate.getIdTemplate());
+
+							message.put("to", user.getEmailAddress());
+
+							message.put("subject", 	mailTemplate.getSubject());
+							message.put("body", 	mailTemplate.getBody());
+							message.put("groupId", 	mailJob.getGroupId());
+							message.put("userId",  	mailJob.getUserId());
+							message.put("testing", 	StringPool.FALSE);
+
+							message.put("portal", 	companyName);
+							message.put("community",group.getName());
+
+							String portalUrl = PortalUtil.getPortalURL(company.getVirtualHostname(), PortalUtil.getPortalPort(false), false);
+							message.put("url", 		portalUrl);
+							message.put("urlcourse",portalUrl+PortalUtil.getPathFriendlyURLPublic()+group.getFriendlyURL());							
+
+							MessageBusUtil.sendMessage("lms/mailing", message);
+						}catch(Exception e){
+							e.printStackTrace();
+						}
 					}
 				}
 				

@@ -124,7 +124,7 @@ public class LmsMailMessageListener implements MessageListener {
 			MailMessage mailm = new MailMessage(from, to, subject, calculatedBody, true);
 			MailServiceUtil.sendEmail(mailm);
 		} 
-		else if(toMail != null && userName != null && !toMail.contains("all")){
+		else if(toMail != null && userName != null && !toMail.equals("all")){
 			if(_log.isDebugEnabled())_log.debug("User");
 			User userSender = UserLocalServiceUtil.getUserById(userId);
 			User user = UserLocalServiceUtil.getUserByEmailAddress(userSender.getCompanyId(), toMail);
@@ -152,7 +152,7 @@ public class LmsMailMessageListener implements MessageListener {
 				MailEngine.send(mailm);
 			}
 		}
-		else if(toMail.contains("all"))
+		else if(toMail.equals("all"))
 		{
 			_log.info("All-Start:"+Long.toString(groupId)+":"+scopeGroup.getName());
 			if(_log.isDebugEnabled())_log.debug("ownTeam: "+ownTeam);			
@@ -202,7 +202,7 @@ public class LmsMailMessageListener implements MessageListener {
 			}else {
 				
 				users = UserLocalServiceUtil.getGroupUsers(groupId);
-				System.out.println("users     "+users.size());
+				_log.debug("Group users ::  "+users.size());
 			}
 			
 			int sendMails = 0;
