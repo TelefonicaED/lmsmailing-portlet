@@ -3,6 +3,8 @@ package com.tls.liferaylms.job;
 import java.util.List;
 import java.util.Set;
 
+import javax.portlet.ActionRequest;
+import javax.portlet.ActionResponse;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.log.Log;
@@ -17,8 +19,8 @@ import com.liferay.portal.model.Group;
 import com.liferay.portal.model.User;
 import com.liferay.portal.service.CompanyLocalServiceUtil;
 import com.liferay.portal.service.GroupLocalServiceUtil;
-import com.liferay.portal.service.UserGroupRoleLocalServiceUtil;
 import com.liferay.portal.util.PortalUtil;
+import com.liferay.util.bridges.mvc.MVCPortlet;
 import com.tls.liferaylms.job.condition.Condition;
 import com.tls.liferaylms.job.condition.ConditionUtil;
 import com.tls.liferaylms.mail.model.MailJob;
@@ -27,11 +29,26 @@ import com.tls.liferaylms.mail.service.MailJobLocalServiceUtil;
 import com.tls.liferaylms.mail.service.MailTemplateLocalServiceUtil;
 import com.tls.liferaylms.util.MailStringPool;
 
-public class ProcessMailJob implements MessageListener{
+public class ProcessMailJob extends MVCPortlet implements MessageListener{
 	private static Log log = LogFactoryUtil.getLog(ProcessMailJob.class);
 
+	public void executeMailJobs(ActionRequest actionRequest, ActionResponse actionResponse){
+		log.debug(":::EJECUTANDO MAIL JOBS MANUALMENTE:::");
+		try {
+			executeMailJobs();
+		} catch (MessageListenerException e) {
+			e.printStackTrace();
+		}
+	}
+	
 	@Override
 	public void receive(Message arg0) throws MessageListenerException {
+		log.debug(":::EJECUTANDO MAIL JOBS CRON:::");
+		executeMailJobs();
+	}
+	
+
+	public void executeMailJobs() throws MessageListenerException {		
 		if(log.isDebugEnabled())log.debug(MailStringPool.INIT+this.getClass().getName());
 		List<MailJob> mailJobs = MailJobLocalServiceUtil.getNotProcessedMailJobs();
 		

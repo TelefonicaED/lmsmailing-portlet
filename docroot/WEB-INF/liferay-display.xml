@@ -6,5 +6,6 @@
 		<portlet id="groupmailing"></portlet>
 		<portlet id="managetemplates"></portlet>
 		<portlet id="mailjob"></portlet>
+		<portlet id="processmailjob"></portlet>
 	</category>
 </display>
