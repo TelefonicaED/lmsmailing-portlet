@@ -115,7 +115,7 @@ public class LmsMailMessageListener implements MessageListener {
 			MailServiceUtil.sendEmail(mailm);
 		}else if(toMail != null && !toMail.equals("all")) {
 			if(_log.isDebugEnabled()) {
-				_log.debug("Se entra en el env�o individual de correos.");
+				_log.debug("Se entra en el envio individual de correos.");
 			}
 
 			User student = UserLocalServiceUtil.fetchUserByEmailAddress(userSender.getCompanyId(), toMail);
@@ -130,7 +130,7 @@ public class LmsMailMessageListener implements MessageListener {
 				String calculatedsubject = createMessage(subject, portal, community, student.getFullName(), userSender.getFullName(),url,urlcourse);
 				
 				if(log.isDebugEnabled()) {
-					log.debug("Se env�a el siguiente correo...");
+					log.debug("Se envia el siguiente correo...");
 					log.debug("De: " + from);
 					log.debug("A: " + toMail + " " + student.getFullName());
 					log.debug("Asunto: " + calculatedsubject);
@@ -142,7 +142,7 @@ public class LmsMailMessageListener implements MessageListener {
 			}
 		}else if(toMail.equals("all")) {
 			if(_log.isDebugEnabled()) {
-				_log.debug("Se env�a un correo a todos..." + ownTeam);
+				_log.debug("Se envia un correo a todos..." + ownTeam);
 			}
 			List<User> users = new ArrayList<User>();
 			if (ownTeam) {
@@ -190,7 +190,7 @@ public class LmsMailMessageListener implements MessageListener {
 			}
 			
 			if(_log.isDebugEnabled()) {
-				_log.debug("Se env�a a " + users.size() + " usuarios.");
+				_log.debug("Se envia a " + users.size() + " usuarios.");
 			}
 			
 			int sendMails = 0;
@@ -207,7 +207,7 @@ public class LmsMailMessageListener implements MessageListener {
 				log.debug("Conectando con el servidor SMTP");
 				log.debug("Protocolo: " + protocol);
 				log.debug("Usuario: " + smtpuser);
-				log.debug("Contrase�a: " + password);
+				log.debug("Contrasena: " + password);
 			}
 			
 			try {
@@ -224,13 +224,13 @@ public class LmsMailMessageListener implements MessageListener {
 			String subjectTemplate = createTemplateMessage(subject, portal, community, userSender.getFullName(), url, urlcourse);
 			String calculatedBody, calculatedSubject;
 			
-			// Se env�an los correos a todos los alumnos.
+			// Se envían los correos a todos los alumnos.
 			for (User student : users) {
 				if (student.isActive() && Validator.isEmailAddress(student.getEmailAddress())) {
 					if (nUsers > 0 && sendMails == nUsers) {
 						try {
 							if(_log.isDebugEnabled())
-								_log.debug("Se ha llegado al n�mero m�ximo de env�os en el bloque, se para " + millis + " milisegundos.");
+								_log.debug("Se ha llegado al numero maximo de envios en el bloque, se para " + millis + " milisegundos.");
 						    Thread.sleep(millis);
 						}
 						catch(InterruptedException ex) {
@@ -242,7 +242,7 @@ public class LmsMailMessageListener implements MessageListener {
 					try {
 						InternetAddress to = new InternetAddress(student.getEmailAddress(), student.getFullName());
 						if(_log.isDebugEnabled()) {
-							_log.debug("Se env�a un correo electr�nico al siguiente usuario: " + student.getEmailAddress());
+							_log.debug("Se envia un correo electronico al siguiente usuario: " + student.getEmailAddress());
 						}
 						
 						calculatedSubject = createMessage(subjectTemplate, student.getFullName());
@@ -252,7 +252,7 @@ public class LmsMailMessageListener implements MessageListener {
 						calculatedBody += LanguageUtil.get(student.getLocale(),"mail.footer");
 						
 						if(log.isDebugEnabled()) {
-							log.debug("Se env�a el siguiente correo...");
+							log.debug("Se envia el siguiente correo...");
 							log.debug("De: " + from);
 							log.debug("A: " + toMail + " " + userName);
 							log.debug("Asunto: " + calculatedSubject);
@@ -270,7 +270,7 @@ public class LmsMailMessageListener implements MessageListener {
 			}
 			transport.close();
 			
-			_log.debug("Se finaliza el env�o de correos electr�nicos");
+			_log.debug("Se finaliza el envio de correos electronicos");
 			
 		}
 		
@@ -312,7 +312,7 @@ public class LmsMailMessageListener implements MessageListener {
 	}
 	
 	/*
-	 * M�todo que crea una plantilla de mensaje enviado para evitar tantos replaces. Se sustituyen todas las variables excepto las relacionadas con el usuario.
+	 * Método que crea una plantilla de mensaje enviado para evitar tantos replaces. Se sustituyen todas las variables excepto las relacionadas con el usuario.
 	 */
 	private String createTemplateMessage (String text, String portal, String community, String teacher, String url, String urlcourse){
 		String res = "";
@@ -329,7 +329,7 @@ public class LmsMailMessageListener implements MessageListener {
 	}
 	
 	/*
-	 * M�todo que cambia cambia el nombre del usuario de la plantilla.
+	 * Método que cambia cambia el nombre del usuario de la plantilla.
 	 */
 	private String createMessage(String text, String student) {
 		if(text != null) {
