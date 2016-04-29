@@ -76,7 +76,7 @@ public class LmsMailMessageListener implements MessageListener {
 		boolean ownTeam = message.getBoolean("ownTeam");
 		boolean isOmniadmin = message.getBoolean("isOmniadmin");
 		
-		User sender = UserLocalServiceUtil.getUser(userId);
+
 		Group scopeGroup = GroupLocalServiceUtil.getGroup(groupId);
 		long companyId = scopeGroup.getCompanyId();
 		
@@ -96,43 +96,43 @@ public class LmsMailMessageListener implements MessageListener {
 		}
 		
 		InternetAddress from = new InternetAddress(fromAddress, fromName);
-		
+		User userSender = UserLocalServiceUtil.getUserById(userId);
 		if ("true".equals(testing)) {
 			if(_log.isDebugEnabled()) {
 				_log.debug("Se entra en modo testing");
 			}
-			InternetAddress to = new InternetAddress(sender.getEmailAddress(), sender.getFullName());
+			InternetAddress to = new InternetAddress(userSender.getEmailAddress(), userSender.getFullName());
 			
-			body = createMessage(body, portal, community, sender.getFullName(), UserLocalServiceUtil.getUserById(userId).getFullName(), url, urlcourse);
+			body = createMessage(body, portal, community, userSender.getFullName(), UserLocalServiceUtil.getUserById(userId).getFullName(), url, urlcourse);
 
 			String calculatedBody = LanguageUtil.get(Locale.getDefault(),"mail.header");
 			calculatedBody += body;
 			calculatedBody += LanguageUtil.get(Locale.getDefault(),"mail.footer");
 			
-			subject = createMessage(subject, portal, community, sender.getFullName(), UserLocalServiceUtil.getUserById(userId).getFullName(),url,urlcourse);
+			subject = createMessage(subject, portal, community, userSender.getFullName(), userSender.getFullName(),url,urlcourse);
 			
 			MailMessage mailm = new MailMessage(from, to, subject, calculatedBody, true);
 			MailServiceUtil.sendEmail(mailm);
-		} 
-		else if(toMail != null && userName != null && !toMail.equals("all")) {
+		}else if(toMail != null && !toMail.equals("all")) {
 			if(_log.isDebugEnabled()) {
-				_log.debug("Se entra en el envío individual de correos.");
+				_log.debug("Se entra en el envï¿½o individual de correos.");
 			}
-			User userSender = UserLocalServiceUtil.getUserById(userId);
-			User user = UserLocalServiceUtil.fetchUserByEmailAddress(userSender.getCompanyId(), toMail);
-			if(user != null && user.isActive()) {
-				InternetAddress to = new InternetAddress(toMail, userName);
 
-				String calculatedBody = LanguageUtil.get(user.getLocale(),"mail.header");
-				calculatedBody += createMessage(body, portal, community, userName, user.getFullName(),url,urlcourse);
-				calculatedBody += LanguageUtil.get(user.getLocale(),"mail.footer");
+			User student = UserLocalServiceUtil.fetchUserByEmailAddress(userSender.getCompanyId(), toMail);
+			
+			if(student != null && student.isActive() && Validator.isEmailAddress(student.getEmailAddress())) {
+				InternetAddress to = new InternetAddress(toMail, student.getFullName());
+
+				String calculatedBody = LanguageUtil.get(student.getLocale(),"mail.header");
+				calculatedBody += createMessage(body, portal, community, student.getFullName(), userSender.getFullName(),url,urlcourse);
+				calculatedBody += LanguageUtil.get(student.getLocale(),"mail.footer");
 				
-				String calculatedsubject = createMessage(subject, portal, community, userName, user.getFullName(),url,urlcourse);
+				String calculatedsubject = createMessage(subject, portal, community, student.getFullName(), userSender.getFullName(),url,urlcourse);
 				
 				if(log.isDebugEnabled()) {
-					log.debug("Se envía el siguiente correo...");
+					log.debug("Se envï¿½a el siguiente correo...");
 					log.debug("De: " + from);
-					log.debug("A: " + toMail + " " + userName);
+					log.debug("A: " + toMail + " " + student.getFullName());
 					log.debug("Asunto: " + calculatedsubject);
 					log.debug("Cuerpo: " + calculatedBody);
 				}
@@ -140,10 +140,9 @@ public class LmsMailMessageListener implements MessageListener {
 				MailMessage mailm = new MailMessage(from, to, calculatedsubject, calculatedBody ,true);
 				MailEngine.send(mailm);
 			}
-		}
-		else if(toMail.equals("all")) {
+		}else if(toMail.equals("all")) {
 			if(_log.isDebugEnabled()) {
-				_log.debug("Se envía un correo a todos..." + ownTeam);
+				_log.debug("Se envï¿½a un correo a todos..." + ownTeam);
 			}
 			List<User> users = new ArrayList<User>();
 			if (ownTeam) {
@@ -186,13 +185,12 @@ public class LmsMailMessageListener implements MessageListener {
 				
 				users  = UserLocalServiceUtil.search(companyId, null, 0, userParams, QueryUtil.ALL_POS, QueryUtil.ALL_POS, obc);
 				
-			}
-			else {
+			}else {
 				users = UserLocalServiceUtil.getGroupUsers(groupId);
 			}
 			
 			if(_log.isDebugEnabled()) {
-				_log.debug("Se envía a " + users.size() + " usuarios.");
+				_log.debug("Se envï¿½a a " + users.size() + " usuarios.");
 			}
 			
 			int sendMails = 0;
@@ -209,7 +207,7 @@ public class LmsMailMessageListener implements MessageListener {
 				log.debug("Conectando con el servidor SMTP");
 				log.debug("Protocolo: " + protocol);
 				log.debug("Usuario: " + smtpuser);
-				log.debug("Contraseña: " + password);
+				log.debug("Contraseï¿½a: " + password);
 			}
 			
 			try {
@@ -221,18 +219,18 @@ public class LmsMailMessageListener implements MessageListener {
 				throw new Exception(me);
 			}
 			
-			User userSender = UserLocalServiceUtil.getUserById(userId);
+
 			String bodyTemplate = createTemplateMessage(body, portal, community, userSender.getFullName(), url, urlcourse);
 			String subjectTemplate = createTemplateMessage(subject, portal, community, userSender.getFullName(), url, urlcourse);
 			String calculatedBody, calculatedSubject;
 			
-			// Se envían los correos a todos los alumnos.
-			for (User user : users) {
-				if (user.isActive()) {
+			// Se envï¿½an los correos a todos los alumnos.
+			for (User student : users) {
+				if (student.isActive() && Validator.isEmailAddress(student.getEmailAddress())) {
 					if (nUsers > 0 && sendMails == nUsers) {
 						try {
 							if(_log.isDebugEnabled())
-								_log.debug("Se ha llegado al número máximo de envíos en el bloque, se para " + millis + " milisegundos.");
+								_log.debug("Se ha llegado al nï¿½mero mï¿½ximo de envï¿½os en el bloque, se para " + millis + " milisegundos.");
 						    Thread.sleep(millis);
 						}
 						catch(InterruptedException ex) {
@@ -242,19 +240,19 @@ public class LmsMailMessageListener implements MessageListener {
 					}
 					
 					try {
-						InternetAddress to = new InternetAddress(user.getEmailAddress(), user.getFullName());
+						InternetAddress to = new InternetAddress(student.getEmailAddress(), student.getFullName());
 						if(_log.isDebugEnabled()) {
-							_log.debug("Se envía un correo electrónico al siguiente usuario: " + user.getEmailAddress());
+							_log.debug("Se envï¿½a un correo electrï¿½nico al siguiente usuario: " + student.getEmailAddress());
 						}
 						
-						calculatedSubject = createMessage(subjectTemplate, user.getFullName());
+						calculatedSubject = createMessage(subjectTemplate, student.getFullName());
 						
-						calculatedBody = LanguageUtil.get(user.getLocale(),"mail.header");
-						calculatedBody += createMessage(bodyTemplate, user.getFullName());
-						calculatedBody += LanguageUtil.get(user.getLocale(),"mail.footer");
+						calculatedBody = LanguageUtil.get(student.getLocale(),"mail.header");
+						calculatedBody += createMessage(bodyTemplate, student.getFullName());
+						calculatedBody += LanguageUtil.get(student.getLocale(),"mail.footer");
 						
 						if(log.isDebugEnabled()) {
-							log.debug("Se envía el siguiente correo...");
+							log.debug("Se envï¿½a el siguiente correo...");
 							log.debug("De: " + from);
 							log.debug("A: " + toMail + " " + userName);
 							log.debug("Asunto: " + calculatedSubject);
@@ -272,7 +270,7 @@ public class LmsMailMessageListener implements MessageListener {
 			}
 			transport.close();
 			
-			_log.debug("Se finaliza el envío de correos electrónicos");
+			_log.debug("Se finaliza el envï¿½o de correos electrï¿½nicos");
 			
 		}
 		
@@ -314,7 +312,7 @@ public class LmsMailMessageListener implements MessageListener {
 	}
 	
 	/*
-	 * Método que crea una plantilla de mensaje enviado para evitar tantos replaces. Se sustituyen todas las variables excepto las relacionadas con el usuario.
+	 * Mï¿½todo que crea una plantilla de mensaje enviado para evitar tantos replaces. Se sustituyen todas las variables excepto las relacionadas con el usuario.
 	 */
 	private String createTemplateMessage (String text, String portal, String community, String teacher, String url, String urlcourse){
 		String res = "";
@@ -331,7 +329,7 @@ public class LmsMailMessageListener implements MessageListener {
 	}
 	
 	/*
-	 * Método que cambia cambia el nombre del usuario de la plantilla.
+	 * Mï¿½todo que cambia cambia el nombre del usuario de la plantilla.
 	 */
 	private String createMessage(String text, String student) {
 		if(text != null) {
