@@ -23,7 +23,7 @@
 	Course course = null;
 %>
 
-<liferay-ui:search-container emptyResultsMessage="there-are-no-mail" delta="10" deltaConfigurable="true" iteratorURL="<%=portletURL%>" >
+<liferay-ui:search-container emptyResultsMessage="there-are-no-mailjobs" delta="10" deltaConfigurable="true" iteratorURL="<%=portletURL%>" >
 	<liferay-ui:search-container-results>
 <%
 	List<AuditSendMails> sendings = AuditSendMailsLocalServiceUtil.getHistoryByCompanyId(themeDisplay.getCompanyId());
