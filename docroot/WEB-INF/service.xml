@@ -27,6 +27,11 @@
 		<column name="templateId" type="long" />
 		<column name="groupId" type="long"></column>
 		<column name="sendDate" type="Date" />
+		<column name="numberOfPost" type="long" />
+		<column name="companyId" type="long" />
+		<finder name="c" return-type="Collection">
+			<finder-column name="companyId" />
+		</finder>
 	</entity> 
 	
 	 <entity remote-service="false" local-service="true" name="MailJob" uuid="true">
