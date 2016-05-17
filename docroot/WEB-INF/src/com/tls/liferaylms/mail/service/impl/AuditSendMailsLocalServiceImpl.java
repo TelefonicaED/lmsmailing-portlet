@@ -14,7 +14,12 @@
 
 package com.tls.liferaylms.mail.service.impl;
 
+import java.util.List;
+
+import com.liferay.portal.kernel.exception.SystemException;
+import com.tls.liferaylms.mail.model.AuditSendMails;
 import com.tls.liferaylms.mail.service.base.AuditSendMailsLocalServiceBaseImpl;
+import com.tls.liferaylms.mail.service.persistence.AuditSendMailsUtil;
 
 /**
  * The implementation of the audit send mails local service.
@@ -37,4 +42,9 @@ import com.tls.liferaylms.mail.service.base.AuditSendMailsLocalServiceBaseImpl;
  */
 public class AuditSendMailsLocalServiceImpl
 	extends AuditSendMailsLocalServiceBaseImpl {
+	
+	public List<AuditSendMails> getHistoryByCompanyId(long companyId) throws SystemException{
+		return AuditSendMailsUtil.findByc(companyId);
+	}
+	
 }
