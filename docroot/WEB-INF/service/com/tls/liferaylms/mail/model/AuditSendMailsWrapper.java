@@ -52,6 +52,8 @@ public class AuditSendMailsWrapper implements AuditSendMails,
 		attributes.put("templateId", getTemplateId());
 		attributes.put("groupId", getGroupId());
 		attributes.put("sendDate", getSendDate());
+		attributes.put("numberOfPost", getNumberOfPost());
+		attributes.put("companyId", getCompanyId());
 
 		return attributes;
 	}
@@ -91,6 +93,18 @@ public class AuditSendMailsWrapper implements AuditSendMails,
 
 		if (sendDate != null) {
 			setSendDate(sendDate);
+		}
+
+		Long numberOfPost = (Long)attributes.get("numberOfPost");
+
+		if (numberOfPost != null) {
+			setNumberOfPost(numberOfPost);
+		}
+
+		Long companyId = (Long)attributes.get("companyId");
+
+		if (companyId != null) {
+			setCompanyId(companyId);
 		}
 	}
 
@@ -238,6 +252,42 @@ public class AuditSendMailsWrapper implements AuditSendMails,
 	*/
 	public void setSendDate(java.util.Date sendDate) {
 		_auditSendMails.setSendDate(sendDate);
+	}
+
+	/**
+	* Returns the number of post of this audit send mails.
+	*
+	* @return the number of post of this audit send mails
+	*/
+	public long getNumberOfPost() {
+		return _auditSendMails.getNumberOfPost();
+	}
+
+	/**
+	* Sets the number of post of this audit send mails.
+	*
+	* @param numberOfPost the number of post of this audit send mails
+	*/
+	public void setNumberOfPost(long numberOfPost) {
+		_auditSendMails.setNumberOfPost(numberOfPost);
+	}
+
+	/**
+	* Returns the company ID of this audit send mails.
+	*
+	* @return the company ID of this audit send mails
+	*/
+	public long getCompanyId() {
+		return _auditSendMails.getCompanyId();
+	}
+
+	/**
+	* Sets the company ID of this audit send mails.
+	*
+	* @param companyId the company ID of this audit send mails
+	*/
+	public void setCompanyId(long companyId) {
+		_auditSendMails.setCompanyId(companyId);
 	}
 
 	public boolean isNew() {

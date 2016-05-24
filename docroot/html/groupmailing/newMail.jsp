@@ -253,7 +253,7 @@ else
 
 	<jsp:include page="/html/groupmailing/search_form.jsp" />
 	
-	<liferay-ui:search-container iteratorURL="<%=portletURL%>" emptyResultsMessage="there-are-no-results" delta="15" deltaConfigurable="true" >
+	<liferay-ui:search-container iteratorURL="<%=portletURL%>" emptyResultsMessage="there-are-no-results" delta="5" deltaConfigurable="true" >
 
 	   	<liferay-ui:search-container-results>
 			<%

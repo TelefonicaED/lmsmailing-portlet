@@ -160,6 +160,34 @@ public interface AuditSendMailsModel extends BaseModel<AuditSendMails> {
 	 */
 	public void setSendDate(Date sendDate);
 
+	/**
+	 * Returns the number of post of this audit send mails.
+	 *
+	 * @return the number of post of this audit send mails
+	 */
+	public long getNumberOfPost();
+
+	/**
+	 * Sets the number of post of this audit send mails.
+	 *
+	 * @param numberOfPost the number of post of this audit send mails
+	 */
+	public void setNumberOfPost(long numberOfPost);
+
+	/**
+	 * Returns the company ID of this audit send mails.
+	 *
+	 * @return the company ID of this audit send mails
+	 */
+	public long getCompanyId();
+
+	/**
+	 * Sets the company ID of this audit send mails.
+	 *
+	 * @param companyId the company ID of this audit send mails
+	 */
+	public void setCompanyId(long companyId);
+
 	public boolean isNew();
 
 	public void setNew(boolean n);

@@ -73,6 +73,8 @@ public class AuditSendMailsClp extends BaseModelImpl<AuditSendMails>
 		attributes.put("templateId", getTemplateId());
 		attributes.put("groupId", getGroupId());
 		attributes.put("sendDate", getSendDate());
+		attributes.put("numberOfPost", getNumberOfPost());
+		attributes.put("companyId", getCompanyId());
 
 		return attributes;
 	}
@@ -113,6 +115,18 @@ public class AuditSendMailsClp extends BaseModelImpl<AuditSendMails>
 
 		if (sendDate != null) {
 			setSendDate(sendDate);
+		}
+
+		Long numberOfPost = (Long)attributes.get("numberOfPost");
+
+		if (numberOfPost != null) {
+			setNumberOfPost(numberOfPost);
+		}
+
+		Long companyId = (Long)attributes.get("companyId");
+
+		if (companyId != null) {
+			setCompanyId(companyId);
 		}
 	}
 
@@ -172,6 +186,22 @@ public class AuditSendMailsClp extends BaseModelImpl<AuditSendMails>
 		_sendDate = sendDate;
 	}
 
+	public long getNumberOfPost() {
+		return _numberOfPost;
+	}
+
+	public void setNumberOfPost(long numberOfPost) {
+		_numberOfPost = numberOfPost;
+	}
+
+	public long getCompanyId() {
+		return _companyId;
+	}
+
+	public void setCompanyId(long companyId) {
+		_companyId = companyId;
+	}
+
 	public BaseModel<?> getAuditSendMailsRemoteModel() {
 		return _auditSendMailsRemoteModel;
 	}
@@ -207,6 +237,8 @@ public class AuditSendMailsClp extends BaseModelImpl<AuditSendMails>
 		clone.setTemplateId(getTemplateId());
 		clone.setGroupId(getGroupId());
 		clone.setSendDate(getSendDate());
+		clone.setNumberOfPost(getNumberOfPost());
+		clone.setCompanyId(getCompanyId());
 
 		return clone;
 	}
@@ -257,7 +289,7 @@ public class AuditSendMailsClp extends BaseModelImpl<AuditSendMails>
 
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(13);
+		StringBundler sb = new StringBundler(17);
 
 		sb.append("{uuid=");
 		sb.append(getUuid());
@@ -271,13 +303,17 @@ public class AuditSendMailsClp extends BaseModelImpl<AuditSendMails>
 		sb.append(getGroupId());
 		sb.append(", sendDate=");
 		sb.append(getSendDate());
+		sb.append(", numberOfPost=");
+		sb.append(getNumberOfPost());
+		sb.append(", companyId=");
+		sb.append(getCompanyId());
 		sb.append("}");
 
 		return sb.toString();
 	}
 
 	public String toXmlString() {
-		StringBundler sb = new StringBundler(22);
+		StringBundler sb = new StringBundler(28);
 
 		sb.append("<model><model-name>");
 		sb.append("com.tls.liferaylms.mail.model.AuditSendMails");
@@ -307,6 +343,14 @@ public class AuditSendMailsClp extends BaseModelImpl<AuditSendMails>
 			"<column><column-name>sendDate</column-name><column-value><![CDATA[");
 		sb.append(getSendDate());
 		sb.append("]]></column-value></column>");
+		sb.append(
+			"<column><column-name>numberOfPost</column-name><column-value><![CDATA[");
+		sb.append(getNumberOfPost());
+		sb.append("]]></column-value></column>");
+		sb.append(
+			"<column><column-name>companyId</column-name><column-value><![CDATA[");
+		sb.append(getCompanyId());
+		sb.append("]]></column-value></column>");
 
 		sb.append("</model>");
 
@@ -320,5 +364,7 @@ public class AuditSendMailsClp extends BaseModelImpl<AuditSendMails>
 	private long _templateId;
 	private long _groupId;
 	private Date _sendDate;
+	private long _numberOfPost;
+	private long _companyId;
 	private BaseModel<?> _auditSendMailsRemoteModel;
 }

@@ -288,6 +288,12 @@ public class AuditSendMailsLocalServiceWrapper
 			arguments);
 	}
 
+	public java.util.List<com.tls.liferaylms.mail.model.AuditSendMails> getHistoryByCompanyId(
+		long companyId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return _auditSendMailsLocalService.getHistoryByCompanyId(companyId);
+	}
+
 	/**
 	 * @deprecated Renamed to {@link #getWrappedService}
 	 */

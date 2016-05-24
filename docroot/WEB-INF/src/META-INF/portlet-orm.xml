@@ -19,6 +19,8 @@
 			<basic name="sendDate">
 				<temporal>TIMESTAMP</temporal>
 			</basic>
+			<basic name="numberOfPost" />
+			<basic name="companyId" />
 			<transient name="modelAttributes" />
 			<transient name="primaryKey" />
 			<transient name="primaryKeyObj" />

@@ -110,6 +110,26 @@ public class AuditSendMailsPersistenceImpl extends BasePersistenceImpl<AuditSend
 			AuditSendMailsModelImpl.FINDER_CACHE_ENABLED, Long.class,
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByUUID_G",
 			new String[] { String.class.getName(), Long.class.getName() });
+	public static final FinderPath FINDER_PATH_WITH_PAGINATION_FIND_BY_C = new FinderPath(AuditSendMailsModelImpl.ENTITY_CACHE_ENABLED,
+			AuditSendMailsModelImpl.FINDER_CACHE_ENABLED,
+			AuditSendMailsImpl.class, FINDER_CLASS_NAME_LIST_WITH_PAGINATION,
+			"findByc",
+			new String[] {
+				Long.class.getName(),
+				
+			"java.lang.Integer", "java.lang.Integer",
+				"com.liferay.portal.kernel.util.OrderByComparator"
+			});
+	public static final FinderPath FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_C = new FinderPath(AuditSendMailsModelImpl.ENTITY_CACHE_ENABLED,
+			AuditSendMailsModelImpl.FINDER_CACHE_ENABLED,
+			AuditSendMailsImpl.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByc",
+			new String[] { Long.class.getName() },
+			AuditSendMailsModelImpl.COMPANYID_COLUMN_BITMASK);
+	public static final FinderPath FINDER_PATH_COUNT_BY_C = new FinderPath(AuditSendMailsModelImpl.ENTITY_CACHE_ENABLED,
+			AuditSendMailsModelImpl.FINDER_CACHE_ENABLED, Long.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByc",
+			new String[] { Long.class.getName() });
 	public static final FinderPath FINDER_PATH_WITH_PAGINATION_FIND_ALL = new FinderPath(AuditSendMailsModelImpl.ENTITY_CACHE_ENABLED,
 			AuditSendMailsModelImpl.FINDER_CACHE_ENABLED,
 			AuditSendMailsImpl.class, FINDER_CLASS_NAME_LIST_WITH_PAGINATION,
@@ -370,6 +390,25 @@ public class AuditSendMailsPersistenceImpl extends BasePersistenceImpl<AuditSend
 				FinderCacheUtil.removeResult(FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_UUID,
 					args);
 			}
+
+			if ((auditSendMailsModelImpl.getColumnBitmask() &
+					FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_C.getColumnBitmask()) != 0) {
+				Object[] args = new Object[] {
+						Long.valueOf(auditSendMailsModelImpl.getOriginalCompanyId())
+					};
+
+				FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_C, args);
+				FinderCacheUtil.removeResult(FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_C,
+					args);
+
+				args = new Object[] {
+						Long.valueOf(auditSendMailsModelImpl.getCompanyId())
+					};
+
+				FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_C, args);
+				FinderCacheUtil.removeResult(FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_C,
+					args);
+			}
 		}
 
 		EntityCacheUtil.putResult(AuditSendMailsModelImpl.ENTITY_CACHE_ENABLED,
@@ -422,6 +461,8 @@ public class AuditSendMailsPersistenceImpl extends BasePersistenceImpl<AuditSend
 		auditSendMailsImpl.setTemplateId(auditSendMails.getTemplateId());
 		auditSendMailsImpl.setGroupId(auditSendMails.getGroupId());
 		auditSendMailsImpl.setSendDate(auditSendMails.getSendDate());
+		auditSendMailsImpl.setNumberOfPost(auditSendMails.getNumberOfPost());
+		auditSendMailsImpl.setCompanyId(auditSendMails.getCompanyId());
 
 		return auditSendMailsImpl;
 	}
@@ -1084,6 +1125,379 @@ public class AuditSendMailsPersistenceImpl extends BasePersistenceImpl<AuditSend
 	}
 
 	/**
+	 * Returns all the audit send mailses where companyId = &#63;.
+	 *
+	 * @param companyId the company ID
+	 * @return the matching audit send mailses
+	 * @throws SystemException if a system exception occurred
+	 */
+	public List<AuditSendMails> findByc(long companyId)
+		throws SystemException {
+		return findByc(companyId, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
+	}
+
+	/**
+	 * Returns a range of all the audit send mailses where companyId = &#63;.
+	 *
+	 * <p>
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
+	 * </p>
+	 *
+	 * @param companyId the company ID
+	 * @param start the lower bound of the range of audit send mailses
+	 * @param end the upper bound of the range of audit send mailses (not inclusive)
+	 * @return the range of matching audit send mailses
+	 * @throws SystemException if a system exception occurred
+	 */
+	public List<AuditSendMails> findByc(long companyId, int start, int end)
+		throws SystemException {
+		return findByc(companyId, start, end, null);
+	}
+
+	/**
+	 * Returns an ordered range of all the audit send mailses where companyId = &#63;.
+	 *
+	 * <p>
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
+	 * </p>
+	 *
+	 * @param companyId the company ID
+	 * @param start the lower bound of the range of audit send mailses
+	 * @param end the upper bound of the range of audit send mailses (not inclusive)
+	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
+	 * @return the ordered range of matching audit send mailses
+	 * @throws SystemException if a system exception occurred
+	 */
+	public List<AuditSendMails> findByc(long companyId, int start, int end,
+		OrderByComparator orderByComparator) throws SystemException {
+		FinderPath finderPath = null;
+		Object[] finderArgs = null;
+
+		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
+				(orderByComparator == null)) {
+			finderPath = FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_C;
+			finderArgs = new Object[] { companyId };
+		}
+		else {
+			finderPath = FINDER_PATH_WITH_PAGINATION_FIND_BY_C;
+			finderArgs = new Object[] { companyId, start, end, orderByComparator };
+		}
+
+		List<AuditSendMails> list = (List<AuditSendMails>)FinderCacheUtil.getResult(finderPath,
+				finderArgs, this);
+
+		if ((list != null) && !list.isEmpty()) {
+			for (AuditSendMails auditSendMails : list) {
+				if ((companyId != auditSendMails.getCompanyId())) {
+					list = null;
+
+					break;
+				}
+			}
+		}
+
+		if (list == null) {
+			StringBundler query = null;
+
+			if (orderByComparator != null) {
+				query = new StringBundler(3 +
+						(orderByComparator.getOrderByFields().length * 3));
+			}
+			else {
+				query = new StringBundler(2);
+			}
+
+			query.append(_SQL_SELECT_AUDITSENDMAILS_WHERE);
+
+			query.append(_FINDER_COLUMN_C_COMPANYID_2);
+
+			if (orderByComparator != null) {
+				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
+					orderByComparator);
+			}
+
+			String sql = query.toString();
+
+			Session session = null;
+
+			try {
+				session = openSession();
+
+				Query q = session.createQuery(sql);
+
+				QueryPos qPos = QueryPos.getInstance(q);
+
+				qPos.add(companyId);
+
+				list = (List<AuditSendMails>)QueryUtil.list(q, getDialect(),
+						start, end);
+			}
+			catch (Exception e) {
+				throw processException(e);
+			}
+			finally {
+				if (list == null) {
+					FinderCacheUtil.removeResult(finderPath, finderArgs);
+				}
+				else {
+					cacheResult(list);
+
+					FinderCacheUtil.putResult(finderPath, finderArgs, list);
+				}
+
+				closeSession(session);
+			}
+		}
+
+		return list;
+	}
+
+	/**
+	 * Returns the first audit send mails in the ordered set where companyId = &#63;.
+	 *
+	 * @param companyId the company ID
+	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	 * @return the first matching audit send mails
+	 * @throws com.tls.liferaylms.mail.NoSuchAuditSendMailsException if a matching audit send mails could not be found
+	 * @throws SystemException if a system exception occurred
+	 */
+	public AuditSendMails findByc_First(long companyId,
+		OrderByComparator orderByComparator)
+		throws NoSuchAuditSendMailsException, SystemException {
+		AuditSendMails auditSendMails = fetchByc_First(companyId,
+				orderByComparator);
+
+		if (auditSendMails != null) {
+			return auditSendMails;
+		}
+
+		StringBundler msg = new StringBundler(4);
+
+		msg.append(_NO_SUCH_ENTITY_WITH_KEY);
+
+		msg.append("companyId=");
+		msg.append(companyId);
+
+		msg.append(StringPool.CLOSE_CURLY_BRACE);
+
+		throw new NoSuchAuditSendMailsException(msg.toString());
+	}
+
+	/**
+	 * Returns the first audit send mails in the ordered set where companyId = &#63;.
+	 *
+	 * @param companyId the company ID
+	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	 * @return the first matching audit send mails, or <code>null</code> if a matching audit send mails could not be found
+	 * @throws SystemException if a system exception occurred
+	 */
+	public AuditSendMails fetchByc_First(long companyId,
+		OrderByComparator orderByComparator) throws SystemException {
+		List<AuditSendMails> list = findByc(companyId, 0, 1, orderByComparator);
+
+		if (!list.isEmpty()) {
+			return list.get(0);
+		}
+
+		return null;
+	}
+
+	/**
+	 * Returns the last audit send mails in the ordered set where companyId = &#63;.
+	 *
+	 * @param companyId the company ID
+	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	 * @return the last matching audit send mails
+	 * @throws com.tls.liferaylms.mail.NoSuchAuditSendMailsException if a matching audit send mails could not be found
+	 * @throws SystemException if a system exception occurred
+	 */
+	public AuditSendMails findByc_Last(long companyId,
+		OrderByComparator orderByComparator)
+		throws NoSuchAuditSendMailsException, SystemException {
+		AuditSendMails auditSendMails = fetchByc_Last(companyId,
+				orderByComparator);
+
+		if (auditSendMails != null) {
+			return auditSendMails;
+		}
+
+		StringBundler msg = new StringBundler(4);
+
+		msg.append(_NO_SUCH_ENTITY_WITH_KEY);
+
+		msg.append("companyId=");
+		msg.append(companyId);
+
+		msg.append(StringPool.CLOSE_CURLY_BRACE);
+
+		throw new NoSuchAuditSendMailsException(msg.toString());
+	}
+
+	/**
+	 * Returns the last audit send mails in the ordered set where companyId = &#63;.
+	 *
+	 * @param companyId the company ID
+	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	 * @return the last matching audit send mails, or <code>null</code> if a matching audit send mails could not be found
+	 * @throws SystemException if a system exception occurred
+	 */
+	public AuditSendMails fetchByc_Last(long companyId,
+		OrderByComparator orderByComparator) throws SystemException {
+		int count = countByc(companyId);
+
+		List<AuditSendMails> list = findByc(companyId, count - 1, count,
+				orderByComparator);
+
+		if (!list.isEmpty()) {
+			return list.get(0);
+		}
+
+		return null;
+	}
+
+	/**
+	 * Returns the audit send mailses before and after the current audit send mails in the ordered set where companyId = &#63;.
+	 *
+	 * @param auditSendMailsId the primary key of the current audit send mails
+	 * @param companyId the company ID
+	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	 * @return the previous, current, and next audit send mails
+	 * @throws com.tls.liferaylms.mail.NoSuchAuditSendMailsException if a audit send mails with the primary key could not be found
+	 * @throws SystemException if a system exception occurred
+	 */
+	public AuditSendMails[] findByc_PrevAndNext(long auditSendMailsId,
+		long companyId, OrderByComparator orderByComparator)
+		throws NoSuchAuditSendMailsException, SystemException {
+		AuditSendMails auditSendMails = findByPrimaryKey(auditSendMailsId);
+
+		Session session = null;
+
+		try {
+			session = openSession();
+
+			AuditSendMails[] array = new AuditSendMailsImpl[3];
+
+			array[0] = getByc_PrevAndNext(session, auditSendMails, companyId,
+					orderByComparator, true);
+
+			array[1] = auditSendMails;
+
+			array[2] = getByc_PrevAndNext(session, auditSendMails, companyId,
+					orderByComparator, false);
+
+			return array;
+		}
+		catch (Exception e) {
+			throw processException(e);
+		}
+		finally {
+			closeSession(session);
+		}
+	}
+
+	protected AuditSendMails getByc_PrevAndNext(Session session,
+		AuditSendMails auditSendMails, long companyId,
+		OrderByComparator orderByComparator, boolean previous) {
+		StringBundler query = null;
+
+		if (orderByComparator != null) {
+			query = new StringBundler(6 +
+					(orderByComparator.getOrderByFields().length * 6));
+		}
+		else {
+			query = new StringBundler(3);
+		}
+
+		query.append(_SQL_SELECT_AUDITSENDMAILS_WHERE);
+
+		query.append(_FINDER_COLUMN_C_COMPANYID_2);
+
+		if (orderByComparator != null) {
+			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
+
+			if (orderByConditionFields.length > 0) {
+				query.append(WHERE_AND);
+			}
+
+			for (int i = 0; i < orderByConditionFields.length; i++) {
+				query.append(_ORDER_BY_ENTITY_ALIAS);
+				query.append(orderByConditionFields[i]);
+
+				if ((i + 1) < orderByConditionFields.length) {
+					if (orderByComparator.isAscending() ^ previous) {
+						query.append(WHERE_GREATER_THAN_HAS_NEXT);
+					}
+					else {
+						query.append(WHERE_LESSER_THAN_HAS_NEXT);
+					}
+				}
+				else {
+					if (orderByComparator.isAscending() ^ previous) {
+						query.append(WHERE_GREATER_THAN);
+					}
+					else {
+						query.append(WHERE_LESSER_THAN);
+					}
+				}
+			}
+
+			query.append(ORDER_BY_CLAUSE);
+
+			String[] orderByFields = orderByComparator.getOrderByFields();
+
+			for (int i = 0; i < orderByFields.length; i++) {
+				query.append(_ORDER_BY_ENTITY_ALIAS);
+				query.append(orderByFields[i]);
+
+				if ((i + 1) < orderByFields.length) {
+					if (orderByComparator.isAscending() ^ previous) {
+						query.append(ORDER_BY_ASC_HAS_NEXT);
+					}
+					else {
+						query.append(ORDER_BY_DESC_HAS_NEXT);
+					}
+				}
+				else {
+					if (orderByComparator.isAscending() ^ previous) {
+						query.append(ORDER_BY_ASC);
+					}
+					else {
+						query.append(ORDER_BY_DESC);
+					}
+				}
+			}
+		}
+
+		String sql = query.toString();
+
+		Query q = session.createQuery(sql);
+
+		q.setFirstResult(0);
+		q.setMaxResults(2);
+
+		QueryPos qPos = QueryPos.getInstance(q);
+
+		qPos.add(companyId);
+
+		if (orderByComparator != null) {
+			Object[] values = orderByComparator.getOrderByConditionValues(auditSendMails);
+
+			for (Object value : values) {
+				qPos.add(value);
+			}
+		}
+
+		List<AuditSendMails> list = q.list();
+
+		if (list.size() == 2) {
+			return list.get(1);
+		}
+		else {
+			return null;
+		}
+	}
+
+	/**
 	 * Returns all the audit send mailses.
 	 *
 	 * @return the audit send mailses
@@ -1223,6 +1637,18 @@ public class AuditSendMailsPersistenceImpl extends BasePersistenceImpl<AuditSend
 		AuditSendMails auditSendMails = findByUUID_G(uuid, groupId);
 
 		return remove(auditSendMails);
+	}
+
+	/**
+	 * Removes all the audit send mailses where companyId = &#63; from the database.
+	 *
+	 * @param companyId the company ID
+	 * @throws SystemException if a system exception occurred
+	 */
+	public void removeByc(long companyId) throws SystemException {
+		for (AuditSendMails auditSendMails : findByc(companyId)) {
+			remove(auditSendMails);
+		}
 	}
 
 	/**
@@ -1373,6 +1799,59 @@ public class AuditSendMailsPersistenceImpl extends BasePersistenceImpl<AuditSend
 	}
 
 	/**
+	 * Returns the number of audit send mailses where companyId = &#63;.
+	 *
+	 * @param companyId the company ID
+	 * @return the number of matching audit send mailses
+	 * @throws SystemException if a system exception occurred
+	 */
+	public int countByc(long companyId) throws SystemException {
+		Object[] finderArgs = new Object[] { companyId };
+
+		Long count = (Long)FinderCacheUtil.getResult(FINDER_PATH_COUNT_BY_C,
+				finderArgs, this);
+
+		if (count == null) {
+			StringBundler query = new StringBundler(2);
+
+			query.append(_SQL_COUNT_AUDITSENDMAILS_WHERE);
+
+			query.append(_FINDER_COLUMN_C_COMPANYID_2);
+
+			String sql = query.toString();
+
+			Session session = null;
+
+			try {
+				session = openSession();
+
+				Query q = session.createQuery(sql);
+
+				QueryPos qPos = QueryPos.getInstance(q);
+
+				qPos.add(companyId);
+
+				count = (Long)q.uniqueResult();
+			}
+			catch (Exception e) {
+				throw processException(e);
+			}
+			finally {
+				if (count == null) {
+					count = Long.valueOf(0);
+				}
+
+				FinderCacheUtil.putResult(FINDER_PATH_COUNT_BY_C, finderArgs,
+					count);
+
+				closeSession(session);
+			}
+		}
+
+		return count.intValue();
+	}
+
+	/**
 	 * Returns the number of audit send mailses.
 	 *
 	 * @return the number of audit send mailses
@@ -1462,6 +1941,7 @@ public class AuditSendMailsPersistenceImpl extends BasePersistenceImpl<AuditSend
 	private static final String _FINDER_COLUMN_UUID_G_UUID_2 = "auditSendMails.uuid = ? AND ";
 	private static final String _FINDER_COLUMN_UUID_G_UUID_3 = "(auditSendMails.uuid IS NULL OR auditSendMails.uuid = ?) AND ";
 	private static final String _FINDER_COLUMN_UUID_G_GROUPID_2 = "auditSendMails.groupId = ?";
+	private static final String _FINDER_COLUMN_C_COMPANYID_2 = "auditSendMails.companyId = ?";
 	private static final String _ORDER_BY_ENTITY_ALIAS = "auditSendMails.";
 	private static final String _NO_SUCH_ENTITY_WITH_PRIMARY_KEY = "No AuditSendMails exists with the primary key ";
 	private static final String _NO_SUCH_ENTITY_WITH_KEY = "No AuditSendMails exists with the key {";

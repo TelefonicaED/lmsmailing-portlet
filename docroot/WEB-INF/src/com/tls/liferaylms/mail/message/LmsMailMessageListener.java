@@ -75,6 +75,7 @@ public class LmsMailMessageListener implements MessageListener {
 		String userName = message.getString("userName");
 		boolean ownTeam = message.getBoolean("ownTeam");
 		boolean isOmniadmin = message.getBoolean("isOmniadmin");
+		long numUsersSender = 0;
 		
 
 		Group scopeGroup = GroupLocalServiceUtil.getGroup(groupId);
@@ -193,6 +194,7 @@ public class LmsMailMessageListener implements MessageListener {
 				_log.debug("Se envia a " + users.size() + " usuarios.");
 			}
 			
+			numUsersSender = users.size();
 			int sendMails = 0;
 			Session session = MailEngine.getSession();
 			String smtpuser = _getSMTPProperty(session, "user");
@@ -266,6 +268,8 @@ public class LmsMailMessageListener implements MessageListener {
 		auditSendMails.setGroupId(groupId);
 		auditSendMails.setTemplateId(Long.parseLong(templateId));
 		auditSendMails.setSendDate(new Date(System.currentTimeMillis()));
+		auditSendMails.setNumberOfPost(numUsersSender);
+		auditSendMails.setCompanyId(companyId);
 		AuditSendMailsLocalServiceUtil.addAuditSendMails(auditSendMails); 
 
 	}

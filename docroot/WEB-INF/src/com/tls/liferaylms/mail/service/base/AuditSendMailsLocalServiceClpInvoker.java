@@ -115,6 +115,10 @@ public class AuditSendMailsLocalServiceClpInvoker {
 		_methodName50 = "setBeanIdentifier";
 
 		_methodParameterTypes50 = new String[] { "java.lang.String" };
+
+		_methodName55 = "getHistoryByCompanyId";
+
+		_methodParameterTypes55 = new String[] { "long" };
 	}
 
 	public Object invokeMethod(String name, String[] parameterTypes,
@@ -222,6 +226,11 @@ public class AuditSendMailsLocalServiceClpInvoker {
 			AuditSendMailsLocalServiceUtil.setBeanIdentifier((java.lang.String)arguments[0]);
 		}
 
+		if (_methodName55.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes55, parameterTypes)) {
+			return AuditSendMailsLocalServiceUtil.getHistoryByCompanyId(((Long)arguments[0]).longValue());
+		}
+
 		throw new UnsupportedOperationException();
 	}
 
@@ -263,4 +272,6 @@ public class AuditSendMailsLocalServiceClpInvoker {
 	private String[] _methodParameterTypes49;
 	private String _methodName50;
 	private String[] _methodParameterTypes50;
+	private String _methodName55;
+	private String[] _methodParameterTypes55;
 }

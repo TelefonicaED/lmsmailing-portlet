@@ -263,6 +263,125 @@ public interface AuditSendMailsPersistence extends BasePersistence<AuditSendMail
 		throws com.liferay.portal.kernel.exception.SystemException;
 
 	/**
+	* Returns all the audit send mailses where companyId = &#63;.
+	*
+	* @param companyId the company ID
+	* @return the matching audit send mailses
+	* @throws SystemException if a system exception occurred
+	*/
+	public java.util.List<com.tls.liferaylms.mail.model.AuditSendMails> findByc(
+		long companyId)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns a range of all the audit send mailses where companyId = &#63;.
+	*
+	* <p>
+	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
+	* </p>
+	*
+	* @param companyId the company ID
+	* @param start the lower bound of the range of audit send mailses
+	* @param end the upper bound of the range of audit send mailses (not inclusive)
+	* @return the range of matching audit send mailses
+	* @throws SystemException if a system exception occurred
+	*/
+	public java.util.List<com.tls.liferaylms.mail.model.AuditSendMails> findByc(
+		long companyId, int start, int end)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns an ordered range of all the audit send mailses where companyId = &#63;.
+	*
+	* <p>
+	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
+	* </p>
+	*
+	* @param companyId the company ID
+	* @param start the lower bound of the range of audit send mailses
+	* @param end the upper bound of the range of audit send mailses (not inclusive)
+	* @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
+	* @return the ordered range of matching audit send mailses
+	* @throws SystemException if a system exception occurred
+	*/
+	public java.util.List<com.tls.liferaylms.mail.model.AuditSendMails> findByc(
+		long companyId, int start, int end,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns the first audit send mails in the ordered set where companyId = &#63;.
+	*
+	* @param companyId the company ID
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the first matching audit send mails
+	* @throws com.tls.liferaylms.mail.NoSuchAuditSendMailsException if a matching audit send mails could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public com.tls.liferaylms.mail.model.AuditSendMails findByc_First(
+		long companyId,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.kernel.exception.SystemException,
+			com.tls.liferaylms.mail.NoSuchAuditSendMailsException;
+
+	/**
+	* Returns the first audit send mails in the ordered set where companyId = &#63;.
+	*
+	* @param companyId the company ID
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the first matching audit send mails, or <code>null</code> if a matching audit send mails could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public com.tls.liferaylms.mail.model.AuditSendMails fetchByc_First(
+		long companyId,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns the last audit send mails in the ordered set where companyId = &#63;.
+	*
+	* @param companyId the company ID
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the last matching audit send mails
+	* @throws com.tls.liferaylms.mail.NoSuchAuditSendMailsException if a matching audit send mails could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public com.tls.liferaylms.mail.model.AuditSendMails findByc_Last(
+		long companyId,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.kernel.exception.SystemException,
+			com.tls.liferaylms.mail.NoSuchAuditSendMailsException;
+
+	/**
+	* Returns the last audit send mails in the ordered set where companyId = &#63;.
+	*
+	* @param companyId the company ID
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the last matching audit send mails, or <code>null</code> if a matching audit send mails could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public com.tls.liferaylms.mail.model.AuditSendMails fetchByc_Last(
+		long companyId,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns the audit send mailses before and after the current audit send mails in the ordered set where companyId = &#63;.
+	*
+	* @param auditSendMailsId the primary key of the current audit send mails
+	* @param companyId the company ID
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the previous, current, and next audit send mails
+	* @throws com.tls.liferaylms.mail.NoSuchAuditSendMailsException if a audit send mails with the primary key could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public com.tls.liferaylms.mail.model.AuditSendMails[] findByc_PrevAndNext(
+		long auditSendMailsId, long companyId,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.kernel.exception.SystemException,
+			com.tls.liferaylms.mail.NoSuchAuditSendMailsException;
+
+	/**
 	* Returns all the audit send mailses.
 	*
 	* @return the audit send mailses
@@ -328,6 +447,15 @@ public interface AuditSendMailsPersistence extends BasePersistence<AuditSendMail
 			com.tls.liferaylms.mail.NoSuchAuditSendMailsException;
 
 	/**
+	* Removes all the audit send mailses where companyId = &#63; from the database.
+	*
+	* @param companyId the company ID
+	* @throws SystemException if a system exception occurred
+	*/
+	public void removeByc(long companyId)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
 	* Removes all the audit send mailses from the database.
 	*
 	* @throws SystemException if a system exception occurred
@@ -354,6 +482,16 @@ public interface AuditSendMailsPersistence extends BasePersistence<AuditSendMail
 	* @throws SystemException if a system exception occurred
 	*/
 	public int countByUUID_G(java.lang.String uuid, long groupId)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns the number of audit send mailses where companyId = &#63;.
+	*
+	* @param companyId the company ID
+	* @return the number of matching audit send mailses
+	* @throws SystemException if a system exception occurred
+	*/
+	public int countByc(long companyId)
 		throws com.liferay.portal.kernel.exception.SystemException;
 
 	/**

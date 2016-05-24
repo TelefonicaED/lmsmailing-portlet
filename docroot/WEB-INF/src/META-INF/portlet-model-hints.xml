@@ -8,6 +8,8 @@
 		<field name="templateId" type="long" />
 		<field name="groupId" type="long" />
 		<field name="sendDate" type="Date" />
+		<field name="numberOfPost" type="long" />
+		<field name="companyId" type="long" />
 	</model>
 	<model name="com.tls.liferaylms.mail.model.MailJob">
 		<field name="uuid" type="String" />

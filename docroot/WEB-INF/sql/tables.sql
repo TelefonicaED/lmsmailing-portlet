@@ -4,7 +4,9 @@ create table lmsmail_AuditSendMails (
 	userId LONG,
 	templateId LONG,
 	groupId LONG,
-	sendDate DATE null
+	sendDate DATE null,
+	numberOfPost LONG,
+	companyId LONG
 );
 
 create table lmsmail_MailJob (
