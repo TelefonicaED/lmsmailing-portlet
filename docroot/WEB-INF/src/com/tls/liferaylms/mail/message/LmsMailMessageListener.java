@@ -195,28 +195,15 @@ public class LmsMailMessageListener implements MessageListener {
 			
 			int sendMails = 0;
 			Session session = MailEngine.getSession();
-			String smtpHost = _getSMTPProperty(session, "host");
-			int smtpPort = GetterUtil.getInteger(_getSMTPProperty(session, "port"), Account.PORT_SMTP);
 			String smtpuser = _getSMTPProperty(session, "user");
 			String password = _getSMTPProperty(session, "password");
-			Transport transport = null;
 			String protocol = GetterUtil.getString(session.getProperty("mail.transport.protocol"), Account.PROTOCOL_SMTP);
 
-			transport = session.getTransport(protocol);
 			if(_log.isDebugEnabled()) {
 				log.debug("Conectando con el servidor SMTP");
 				log.debug("Protocolo: " + protocol);
 				log.debug("Usuario: " + smtpuser);
 				log.debug("Contrasena: " + password);
-			}
-			
-			try {
-				transport.connect(smtpHost, smtpPort, smtpuser, password);
-				_log.debug("Conectado al servidor SMTP");
-			}
-			catch(MessagingException me) {
-				me.printStackTrace();
-				throw new Exception(me);
 			}
 			
 
@@ -260,7 +247,7 @@ public class LmsMailMessageListener implements MessageListener {
 						}
 						
 						MailMessage mailm = new MailMessage(from, to, calculatedSubject, calculatedBody ,true);
-						sendMail(mailm,transport,session);
+						MailEngine.send(mailm);
 					}
 					catch(Exception meEx){
 						meEx.printStackTrace();
@@ -268,7 +255,6 @@ public class LmsMailMessageListener implements MessageListener {
 					sendMails++;
 				}
 			}
-			transport.close();
 			
 			_log.debug("Se finaliza el envio de correos electronicos");
 			
