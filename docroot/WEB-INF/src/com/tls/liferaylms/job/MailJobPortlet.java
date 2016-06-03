@@ -236,9 +236,11 @@ public class MailJobPortlet extends MVCPortlet {
 		
 		StringBuffer conditionState = new StringBuffer();
 		
-		for(long lconditionState : alConditionState){
-			conditionState.append(lconditionState);
-			conditionState.append(StringPool.COMMA);
+		if(alConditionState!=null){
+			for(long lconditionState : alConditionState){
+				conditionState.append(lconditionState);
+				conditionState.append(StringPool.COMMA);
+			}
 		}
 		
 		String referenceClassName = ParamUtil.getString(request, MailStringPool.REFERENCE_CLASSNAME, StringPool.BLANK);
