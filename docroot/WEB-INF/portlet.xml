@@ -103,6 +103,7 @@
 			<mime-type>text/html</mime-type>
 			<portlet-mode>view</portlet-mode>
 		</supports>
+		<resource-bundle>content/mailjob/Language</resource-bundle>
 		<portlet-info>
 			<title>Mail Job</title>
 			<short-title>Mail Job Portlet</short-title>
