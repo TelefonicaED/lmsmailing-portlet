@@ -57,6 +57,7 @@ public class LmsMailMessageListener implements MessageListener {
 		}
 	}
 
+	@SuppressWarnings("unchecked")
 	protected void doReceive(Message message) throws Exception {
 		_log.debug("LmsMailMessageListener doReceive");
 		
@@ -197,6 +198,8 @@ public class LmsMailMessageListener implements MessageListener {
 			numUsersSender = users.size();
 			int sendMails = 0;
 			Session session = MailEngine.getSession();
+			String smtpHost = _getSMTPProperty(session, "host");
+			int smtpPort = GetterUtil.getInteger(_getSMTPProperty(session, "port"), Account.PORT_SMTP);
 			String smtpuser = _getSMTPProperty(session, "user");
 			String password = _getSMTPProperty(session, "password");
 			String protocol = GetterUtil.getString(session.getProperty("mail.transport.protocol"), Account.PROTOCOL_SMTP);
@@ -212,6 +215,16 @@ public class LmsMailMessageListener implements MessageListener {
 			String bodyTemplate = createTemplateMessage(body, portal, community, userSender.getFullName(), url, urlcourse);
 			String subjectTemplate = createTemplateMessage(subject, portal, community, userSender.getFullName(), url, urlcourse);
 			String calculatedBody, calculatedSubject;
+			
+			Transport transport = session.getTransport(protocol);
+			try {
+				transport.connect(smtpHost, smtpPort, smtpuser, password);
+				_log.debug("Conectado al servidor SMTP");
+			}
+			catch(MessagingException me) {
+				me.printStackTrace();
+				throw new Exception(me);
+			}
 			
 			// Se envían los correos a todos los alumnos.
 			for (User student : users) {
@@ -249,7 +262,21 @@ public class LmsMailMessageListener implements MessageListener {
 						}
 						
 						MailMessage mailm = new MailMessage(from, to, calculatedSubject, calculatedBody ,true);
-						MailEngine.send(mailm);
+						//MailEngine.send(mailm);
+						
+						try{
+							sendMail(mailm,transport,session);
+						}catch(MessagingException ex){
+							ex.printStackTrace();
+							log.error("*****************ERROR al enviar mail["+student.getEmailAddress()+"]*****************");
+							if(!transport.isConnected()){
+								log.debug("TRANSPORT NOT CONNECTED. RECONECTAMOS");
+								transport.connect(smtpHost, smtpPort, smtpuser, password);
+								log.debug("***Reenviando el mail que no se pudo enviar["+student.getEmailAddress()+"]");
+								sendMail(mailm,transport,session);
+							}
+						}
+						
 					}
 					catch(Exception meEx){
 						meEx.printStackTrace();
@@ -257,6 +284,8 @@ public class LmsMailMessageListener implements MessageListener {
 					sendMails++;
 				}
 			}
+			
+			transport.close();
 			
 			_log.debug("Se finaliza el envio de correos electronicos");
 			
