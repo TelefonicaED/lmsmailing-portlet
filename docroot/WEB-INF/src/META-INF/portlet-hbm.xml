@@ -2,9 +2,19 @@
 <!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
 
 <hibernate-mapping default-lazy="false" auto-import="false">
+	<import class="com.tls.liferaylms.mail.model.AuditReceiverMail" />
 	<import class="com.tls.liferaylms.mail.model.AuditSendMails" />
 	<import class="com.tls.liferaylms.mail.model.MailJob" />
 	<import class="com.tls.liferaylms.mail.model.MailTemplate" />
+	<class name="com.tls.liferaylms.mail.model.impl.AuditReceiverMailImpl" table="lmsmail_AuditReceiverMail">
+		<cache usage="read-write" />
+		<id name="auditReceiverMailId" type="long">
+			<generator class="assigned" />
+		</id>
+		<property name="auditSendMailsId" type="com.liferay.portal.dao.orm.hibernate.LongType" />
+		<property name="to" type="com.liferay.portal.dao.orm.hibernate.StringType" column="to_" />
+		<property name="status" type="com.liferay.portal.dao.orm.hibernate.IntegerType" />
+	</class>
 	<class name="com.tls.liferaylms.mail.model.impl.AuditSendMailsImpl" table="lmsmail_AuditSendMails">
 		<cache usage="read-write" />
 		<id name="auditSendMailsId" type="long">
@@ -17,6 +27,8 @@
 		<property name="sendDate" type="org.hibernate.type.TimestampType" />
 		<property name="numberOfPost" type="com.liferay.portal.dao.orm.hibernate.LongType" />
 		<property name="companyId" type="com.liferay.portal.dao.orm.hibernate.LongType" />
+		<property name="subject" type="com.liferay.portal.dao.orm.hibernate.StringType" />
+		<property name="body" type="com.liferay.portal.dao.orm.hibernate.StringType" />
 	</class>
 	<class name="com.tls.liferaylms.mail.model.impl.MailJobImpl" table="lmsmail_MailJob">
 		<cache usage="read-write" />

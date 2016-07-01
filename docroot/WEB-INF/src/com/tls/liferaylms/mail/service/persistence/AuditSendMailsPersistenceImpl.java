@@ -463,6 +463,8 @@ public class AuditSendMailsPersistenceImpl extends BasePersistenceImpl<AuditSend
 		auditSendMailsImpl.setSendDate(auditSendMails.getSendDate());
 		auditSendMailsImpl.setNumberOfPost(auditSendMails.getNumberOfPost());
 		auditSendMailsImpl.setCompanyId(auditSendMails.getCompanyId());
+		auditSendMailsImpl.setSubject(auditSendMails.getSubject());
+		auditSendMailsImpl.setBody(auditSendMails.getBody());
 
 		return auditSendMailsImpl;
 	}
@@ -1920,6 +1922,8 @@ public class AuditSendMailsPersistenceImpl extends BasePersistenceImpl<AuditSend
 		FinderCacheUtil.removeCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
 	}
 
+	@BeanReference(type = AuditReceiverMailPersistence.class)
+	protected AuditReceiverMailPersistence auditReceiverMailPersistence;
 	@BeanReference(type = AuditSendMailsPersistence.class)
 	protected AuditSendMailsPersistence auditSendMailsPersistence;
 	@BeanReference(type = MailJobPersistence.class)

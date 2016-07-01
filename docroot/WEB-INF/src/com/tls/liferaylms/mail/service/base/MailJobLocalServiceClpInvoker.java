@@ -108,44 +108,44 @@ public class MailJobLocalServiceClpInvoker {
 				"com.tls.liferaylms.mail.model.MailJob", "boolean"
 			};
 
-		_methodName49 = "getBeanIdentifier";
+		_methodName55 = "getBeanIdentifier";
 
-		_methodParameterTypes49 = new String[] {  };
+		_methodParameterTypes55 = new String[] {  };
 
-		_methodName50 = "setBeanIdentifier";
+		_methodName56 = "setBeanIdentifier";
 
-		_methodParameterTypes50 = new String[] { "java.lang.String" };
+		_methodParameterTypes56 = new String[] { "java.lang.String" };
 
-		_methodName55 = "addMailJob";
+		_methodName61 = "addMailJob";
 
-		_methodParameterTypes55 = new String[] {
+		_methodParameterTypes61 = new String[] {
 				"java.lang.Long", "java.lang.String", "java.lang.Long",
 				"java.lang.String", "java.lang.String", "java.lang.Long",
 				"java.lang.Long", "java.lang.Long",
 				"com.liferay.portal.service.ServiceContext"
 			};
 
-		_methodName56 = "getNotProcessedMailJobs";
+		_methodName62 = "getNotProcessedMailJobs";
 
-		_methodParameterTypes56 = new String[] {  };
+		_methodParameterTypes62 = new String[] {  };
 
-		_methodName57 = "getMailJobsInGroupId";
+		_methodName63 = "getMailJobsInGroupId";
 
-		_methodParameterTypes57 = new String[] { "java.lang.Long", "int", "int" };
+		_methodParameterTypes63 = new String[] { "java.lang.Long", "int", "int" };
 
-		_methodName58 = "countByGroup";
+		_methodName64 = "countByGroup";
 
-		_methodParameterTypes58 = new String[] { "java.lang.Long" };
+		_methodParameterTypes64 = new String[] { "java.lang.Long" };
 
-		_methodName59 = "getMailJobsInGroupIdAndProcessed";
+		_methodName65 = "getMailJobsInGroupIdAndProcessed";
 
-		_methodParameterTypes59 = new String[] {
+		_methodParameterTypes65 = new String[] {
 				"java.lang.Long", "boolean", "int", "int"
 			};
 
-		_methodName60 = "countByGroupAndProcessed";
+		_methodName66 = "countByGroupAndProcessed";
 
-		_methodParameterTypes60 = new String[] { "java.lang.Long", "boolean" };
+		_methodParameterTypes66 = new String[] { "java.lang.Long", "boolean" };
 	}
 
 	public Object invokeMethod(String name, String[] parameterTypes,
@@ -243,18 +243,18 @@ public class MailJobLocalServiceClpInvoker {
 				((Boolean)arguments[1]).booleanValue());
 		}
 
-		if (_methodName49.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes49, parameterTypes)) {
+		if (_methodName55.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes55, parameterTypes)) {
 			return MailJobLocalServiceUtil.getBeanIdentifier();
 		}
 
-		if (_methodName50.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes50, parameterTypes)) {
+		if (_methodName56.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes56, parameterTypes)) {
 			MailJobLocalServiceUtil.setBeanIdentifier((java.lang.String)arguments[0]);
 		}
 
-		if (_methodName55.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes55, parameterTypes)) {
+		if (_methodName61.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes61, parameterTypes)) {
 			return MailJobLocalServiceUtil.addMailJob((java.lang.Long)arguments[0],
 				(java.lang.String)arguments[1], (java.lang.Long)arguments[2],
 				(java.lang.String)arguments[3], (java.lang.String)arguments[4],
@@ -263,33 +263,33 @@ public class MailJobLocalServiceClpInvoker {
 				(com.liferay.portal.service.ServiceContext)arguments[8]);
 		}
 
-		if (_methodName56.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes56, parameterTypes)) {
+		if (_methodName62.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes62, parameterTypes)) {
 			return MailJobLocalServiceUtil.getNotProcessedMailJobs();
 		}
 
-		if (_methodName57.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes57, parameterTypes)) {
+		if (_methodName63.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes63, parameterTypes)) {
 			return MailJobLocalServiceUtil.getMailJobsInGroupId((java.lang.Long)arguments[0],
 				((Integer)arguments[1]).intValue(),
 				((Integer)arguments[2]).intValue());
 		}
 
-		if (_methodName58.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes58, parameterTypes)) {
+		if (_methodName64.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes64, parameterTypes)) {
 			return MailJobLocalServiceUtil.countByGroup((java.lang.Long)arguments[0]);
 		}
 
-		if (_methodName59.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes59, parameterTypes)) {
+		if (_methodName65.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes65, parameterTypes)) {
 			return MailJobLocalServiceUtil.getMailJobsInGroupIdAndProcessed((java.lang.Long)arguments[0],
 				((Boolean)arguments[1]).booleanValue(),
 				((Integer)arguments[2]).intValue(),
 				((Integer)arguments[3]).intValue());
 		}
 
-		if (_methodName60.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes60, parameterTypes)) {
+		if (_methodName66.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes66, parameterTypes)) {
 			return MailJobLocalServiceUtil.countByGroupAndProcessed((java.lang.Long)arguments[0],
 				((Boolean)arguments[1]).booleanValue());
 		}
@@ -331,20 +331,20 @@ public class MailJobLocalServiceClpInvoker {
 	private String[] _methodParameterTypes15;
 	private String _methodName16;
 	private String[] _methodParameterTypes16;
-	private String _methodName49;
-	private String[] _methodParameterTypes49;
-	private String _methodName50;
-	private String[] _methodParameterTypes50;
 	private String _methodName55;
 	private String[] _methodParameterTypes55;
 	private String _methodName56;
 	private String[] _methodParameterTypes56;
-	private String _methodName57;
-	private String[] _methodParameterTypes57;
-	private String _methodName58;
-	private String[] _methodParameterTypes58;
-	private String _methodName59;
-	private String[] _methodParameterTypes59;
-	private String _methodName60;
-	private String[] _methodParameterTypes60;
+	private String _methodName61;
+	private String[] _methodParameterTypes61;
+	private String _methodName62;
+	private String[] _methodParameterTypes62;
+	private String _methodName63;
+	private String[] _methodParameterTypes63;
+	private String _methodName64;
+	private String[] _methodParameterTypes64;
+	private String _methodName65;
+	private String[] _methodParameterTypes65;
+	private String _methodName66;
+	private String[] _methodParameterTypes66;
 }

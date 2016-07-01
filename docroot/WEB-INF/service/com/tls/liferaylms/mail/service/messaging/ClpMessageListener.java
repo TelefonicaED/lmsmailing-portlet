@@ -17,6 +17,8 @@ package com.tls.liferaylms.mail.service.messaging;
 import com.liferay.portal.kernel.messaging.BaseMessageListener;
 import com.liferay.portal.kernel.messaging.Message;
 
+import com.tls.liferaylms.mail.service.AuditReceiverMailLocalServiceUtil;
+import com.tls.liferaylms.mail.service.AuditReceiverMailServiceUtil;
 import com.tls.liferaylms.mail.service.AuditSendMailsLocalServiceUtil;
 import com.tls.liferaylms.mail.service.AuditSendMailsServiceUtil;
 import com.tls.liferaylms.mail.service.ClpSerializer;
@@ -39,6 +41,9 @@ public class ClpMessageListener extends BaseMessageListener {
 
 		if (command.equals("undeploy") &&
 				servletContextName.equals(getServletContextName())) {
+			AuditReceiverMailLocalServiceUtil.clearService();
+
+			AuditReceiverMailServiceUtil.clearService();
 			AuditSendMailsLocalServiceUtil.clearService();
 
 			AuditSendMailsServiceUtil.clearService();

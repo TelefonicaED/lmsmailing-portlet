@@ -108,21 +108,21 @@ public class MailTemplateLocalServiceClpInvoker {
 				"com.tls.liferaylms.mail.model.MailTemplate", "boolean"
 			};
 
-		_methodName49 = "getBeanIdentifier";
+		_methodName55 = "getBeanIdentifier";
 
-		_methodParameterTypes49 = new String[] {  };
+		_methodParameterTypes55 = new String[] {  };
 
-		_methodName50 = "setBeanIdentifier";
+		_methodName56 = "setBeanIdentifier";
 
-		_methodParameterTypes50 = new String[] { "java.lang.String" };
+		_methodParameterTypes56 = new String[] { "java.lang.String" };
 
-		_methodName55 = "getMailTemplateByGroupId";
+		_methodName61 = "getMailTemplateByGroupId";
 
-		_methodParameterTypes55 = new String[] { "long" };
+		_methodParameterTypes61 = new String[] { "long" };
 
-		_methodName56 = "getMailTemplateByGroupIdAndGlobalGroupId";
+		_methodName62 = "getMailTemplateByGroupIdAndGlobalGroupId";
 
-		_methodParameterTypes56 = new String[] { "long" };
+		_methodParameterTypes62 = new String[] { "long" };
 	}
 
 	public Object invokeMethod(String name, String[] parameterTypes,
@@ -220,23 +220,23 @@ public class MailTemplateLocalServiceClpInvoker {
 				((Boolean)arguments[1]).booleanValue());
 		}
 
-		if (_methodName49.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes49, parameterTypes)) {
-			return MailTemplateLocalServiceUtil.getBeanIdentifier();
-		}
-
-		if (_methodName50.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes50, parameterTypes)) {
-			MailTemplateLocalServiceUtil.setBeanIdentifier((java.lang.String)arguments[0]);
-		}
-
 		if (_methodName55.equals(name) &&
 				Arrays.deepEquals(_methodParameterTypes55, parameterTypes)) {
-			return MailTemplateLocalServiceUtil.getMailTemplateByGroupId(((Long)arguments[0]).longValue());
+			return MailTemplateLocalServiceUtil.getBeanIdentifier();
 		}
 
 		if (_methodName56.equals(name) &&
 				Arrays.deepEquals(_methodParameterTypes56, parameterTypes)) {
+			MailTemplateLocalServiceUtil.setBeanIdentifier((java.lang.String)arguments[0]);
+		}
+
+		if (_methodName61.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes61, parameterTypes)) {
+			return MailTemplateLocalServiceUtil.getMailTemplateByGroupId(((Long)arguments[0]).longValue());
+		}
+
+		if (_methodName62.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes62, parameterTypes)) {
 			return MailTemplateLocalServiceUtil.getMailTemplateByGroupIdAndGlobalGroupId(((Long)arguments[0]).longValue());
 		}
 
@@ -277,12 +277,12 @@ public class MailTemplateLocalServiceClpInvoker {
 	private String[] _methodParameterTypes15;
 	private String _methodName16;
 	private String[] _methodParameterTypes16;
-	private String _methodName49;
-	private String[] _methodParameterTypes49;
-	private String _methodName50;
-	private String[] _methodParameterTypes50;
 	private String _methodName55;
 	private String[] _methodParameterTypes55;
 	private String _methodName56;
 	private String[] _methodParameterTypes56;
+	private String _methodName61;
+	private String[] _methodParameterTypes61;
+	private String _methodName62;
+	private String[] _methodParameterTypes62;
 }

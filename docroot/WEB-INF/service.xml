@@ -28,11 +28,25 @@
 		<column name="groupId" type="long"></column>
 		<column name="sendDate" type="Date" />
 		<column name="numberOfPost" type="long" />
-		<column name="companyId" type="long" />
+		<column name="companyId" type="long"  />
+        <column name="subject" type="String"></column>
+        <column name="body" type="String"></column>
 		<finder name="c" return-type="Collection">
 			<finder-column name="companyId" />
 		</finder>
 	</entity> 
+	
+	
+	<entity name="AuditReceiverMail" remote-service="true" local-service="true">
+		<column name="auditReceiverMailId" type="long" primary="true" />
+		<column name="auditSendMailsId" type="long"/>
+		<column name="to" type="String"/>
+		<column name="status" type="Integer"/> 
+		<finder name="auditSendMail" return-type="Collection">
+			<finder-column name="auditSendMailsId" />
+		</finder>
+	</entity>
+	
 	
 	 <entity remote-service="false" local-service="true" name="MailJob" uuid="true">
         <column name="idJob" type="long" primary="true"></column>

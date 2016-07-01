@@ -3340,6 +3340,8 @@ public class MailJobPersistenceImpl extends BasePersistenceImpl<MailJob>
 		FinderCacheUtil.removeCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
 	}
 
+	@BeanReference(type = AuditReceiverMailPersistence.class)
+	protected AuditReceiverMailPersistence auditReceiverMailPersistence;
 	@BeanReference(type = AuditSendMailsPersistence.class)
 	protected AuditSendMailsPersistence auditSendMailsPersistence;
 	@BeanReference(type = MailJobPersistence.class)

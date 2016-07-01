@@ -38,11 +38,14 @@ import com.liferay.portal.service.persistence.ResourcePersistence;
 import com.liferay.portal.service.persistence.UserPersistence;
 
 import com.tls.liferaylms.mail.model.MailTemplate;
+import com.tls.liferaylms.mail.service.AuditReceiverMailLocalService;
+import com.tls.liferaylms.mail.service.AuditReceiverMailService;
 import com.tls.liferaylms.mail.service.AuditSendMailsLocalService;
 import com.tls.liferaylms.mail.service.AuditSendMailsService;
 import com.tls.liferaylms.mail.service.MailJobLocalService;
 import com.tls.liferaylms.mail.service.MailTemplateLocalService;
 import com.tls.liferaylms.mail.service.MailTemplateService;
+import com.tls.liferaylms.mail.service.persistence.AuditReceiverMailPersistence;
 import com.tls.liferaylms.mail.service.persistence.AuditSendMailsPersistence;
 import com.tls.liferaylms.mail.service.persistence.MailJobPersistence;
 import com.tls.liferaylms.mail.service.persistence.MailTemplatePersistence;
@@ -290,6 +293,63 @@ public abstract class MailTemplateLocalServiceBaseImpl
 		mailTemplate.setNew(false);
 
 		return mailTemplatePersistence.update(mailTemplate, merge);
+	}
+
+	/**
+	 * Returns the audit receiver mail local service.
+	 *
+	 * @return the audit receiver mail local service
+	 */
+	public AuditReceiverMailLocalService getAuditReceiverMailLocalService() {
+		return auditReceiverMailLocalService;
+	}
+
+	/**
+	 * Sets the audit receiver mail local service.
+	 *
+	 * @param auditReceiverMailLocalService the audit receiver mail local service
+	 */
+	public void setAuditReceiverMailLocalService(
+		AuditReceiverMailLocalService auditReceiverMailLocalService) {
+		this.auditReceiverMailLocalService = auditReceiverMailLocalService;
+	}
+
+	/**
+	 * Returns the audit receiver mail remote service.
+	 *
+	 * @return the audit receiver mail remote service
+	 */
+	public AuditReceiverMailService getAuditReceiverMailService() {
+		return auditReceiverMailService;
+	}
+
+	/**
+	 * Sets the audit receiver mail remote service.
+	 *
+	 * @param auditReceiverMailService the audit receiver mail remote service
+	 */
+	public void setAuditReceiverMailService(
+		AuditReceiverMailService auditReceiverMailService) {
+		this.auditReceiverMailService = auditReceiverMailService;
+	}
+
+	/**
+	 * Returns the audit receiver mail persistence.
+	 *
+	 * @return the audit receiver mail persistence
+	 */
+	public AuditReceiverMailPersistence getAuditReceiverMailPersistence() {
+		return auditReceiverMailPersistence;
+	}
+
+	/**
+	 * Sets the audit receiver mail persistence.
+	 *
+	 * @param auditReceiverMailPersistence the audit receiver mail persistence
+	 */
+	public void setAuditReceiverMailPersistence(
+		AuditReceiverMailPersistence auditReceiverMailPersistence) {
+		this.auditReceiverMailPersistence = auditReceiverMailPersistence;
 	}
 
 	/**
@@ -628,6 +688,12 @@ public abstract class MailTemplateLocalServiceBaseImpl
 		}
 	}
 
+	@BeanReference(type = AuditReceiverMailLocalService.class)
+	protected AuditReceiverMailLocalService auditReceiverMailLocalService;
+	@BeanReference(type = AuditReceiverMailService.class)
+	protected AuditReceiverMailService auditReceiverMailService;
+	@BeanReference(type = AuditReceiverMailPersistence.class)
+	protected AuditReceiverMailPersistence auditReceiverMailPersistence;
 	@BeanReference(type = AuditSendMailsLocalService.class)
 	protected AuditSendMailsLocalService auditSendMailsLocalService;
 	@BeanReference(type = AuditSendMailsService.class)

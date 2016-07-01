@@ -75,6 +75,8 @@ public class AuditSendMailsClp extends BaseModelImpl<AuditSendMails>
 		attributes.put("sendDate", getSendDate());
 		attributes.put("numberOfPost", getNumberOfPost());
 		attributes.put("companyId", getCompanyId());
+		attributes.put("subject", getSubject());
+		attributes.put("body", getBody());
 
 		return attributes;
 	}
@@ -127,6 +129,18 @@ public class AuditSendMailsClp extends BaseModelImpl<AuditSendMails>
 
 		if (companyId != null) {
 			setCompanyId(companyId);
+		}
+
+		String subject = (String)attributes.get("subject");
+
+		if (subject != null) {
+			setSubject(subject);
+		}
+
+		String body = (String)attributes.get("body");
+
+		if (body != null) {
+			setBody(body);
 		}
 	}
 
@@ -202,6 +216,22 @@ public class AuditSendMailsClp extends BaseModelImpl<AuditSendMails>
 		_companyId = companyId;
 	}
 
+	public String getSubject() {
+		return _subject;
+	}
+
+	public void setSubject(String subject) {
+		_subject = subject;
+	}
+
+	public String getBody() {
+		return _body;
+	}
+
+	public void setBody(String body) {
+		_body = body;
+	}
+
 	public BaseModel<?> getAuditSendMailsRemoteModel() {
 		return _auditSendMailsRemoteModel;
 	}
@@ -239,6 +269,8 @@ public class AuditSendMailsClp extends BaseModelImpl<AuditSendMails>
 		clone.setSendDate(getSendDate());
 		clone.setNumberOfPost(getNumberOfPost());
 		clone.setCompanyId(getCompanyId());
+		clone.setSubject(getSubject());
+		clone.setBody(getBody());
 
 		return clone;
 	}
@@ -289,7 +321,7 @@ public class AuditSendMailsClp extends BaseModelImpl<AuditSendMails>
 
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(17);
+		StringBundler sb = new StringBundler(21);
 
 		sb.append("{uuid=");
 		sb.append(getUuid());
@@ -307,13 +339,17 @@ public class AuditSendMailsClp extends BaseModelImpl<AuditSendMails>
 		sb.append(getNumberOfPost());
 		sb.append(", companyId=");
 		sb.append(getCompanyId());
+		sb.append(", subject=");
+		sb.append(getSubject());
+		sb.append(", body=");
+		sb.append(getBody());
 		sb.append("}");
 
 		return sb.toString();
 	}
 
 	public String toXmlString() {
-		StringBundler sb = new StringBundler(28);
+		StringBundler sb = new StringBundler(34);
 
 		sb.append("<model><model-name>");
 		sb.append("com.tls.liferaylms.mail.model.AuditSendMails");
@@ -351,6 +387,14 @@ public class AuditSendMailsClp extends BaseModelImpl<AuditSendMails>
 			"<column><column-name>companyId</column-name><column-value><![CDATA[");
 		sb.append(getCompanyId());
 		sb.append("]]></column-value></column>");
+		sb.append(
+			"<column><column-name>subject</column-name><column-value><![CDATA[");
+		sb.append(getSubject());
+		sb.append("]]></column-value></column>");
+		sb.append(
+			"<column><column-name>body</column-name><column-value><![CDATA[");
+		sb.append(getBody());
+		sb.append("]]></column-value></column>");
 
 		sb.append("</model>");
 
@@ -366,5 +410,7 @@ public class AuditSendMailsClp extends BaseModelImpl<AuditSendMails>
 	private Date _sendDate;
 	private long _numberOfPost;
 	private long _companyId;
+	private String _subject;
+	private String _body;
 	private BaseModel<?> _auditSendMailsRemoteModel;
 }

@@ -35,7 +35,7 @@ public class AuditSendMailsCacheModel implements CacheModel<AuditSendMails>,
 	Serializable {
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(17);
+		StringBundler sb = new StringBundler(21);
 
 		sb.append("{uuid=");
 		sb.append(uuid);
@@ -53,6 +53,10 @@ public class AuditSendMailsCacheModel implements CacheModel<AuditSendMails>,
 		sb.append(numberOfPost);
 		sb.append(", companyId=");
 		sb.append(companyId);
+		sb.append(", subject=");
+		sb.append(subject);
+		sb.append(", body=");
+		sb.append(body);
 		sb.append("}");
 
 		return sb.toString();
@@ -83,6 +87,20 @@ public class AuditSendMailsCacheModel implements CacheModel<AuditSendMails>,
 		auditSendMailsImpl.setNumberOfPost(numberOfPost);
 		auditSendMailsImpl.setCompanyId(companyId);
 
+		if (subject == null) {
+			auditSendMailsImpl.setSubject(StringPool.BLANK);
+		}
+		else {
+			auditSendMailsImpl.setSubject(subject);
+		}
+
+		if (body == null) {
+			auditSendMailsImpl.setBody(StringPool.BLANK);
+		}
+		else {
+			auditSendMailsImpl.setBody(body);
+		}
+
 		auditSendMailsImpl.resetOriginalValues();
 
 		return auditSendMailsImpl;
@@ -96,4 +114,6 @@ public class AuditSendMailsCacheModel implements CacheModel<AuditSendMails>,
 	public long sendDate;
 	public long numberOfPost;
 	public long companyId;
+	public String subject;
+	public String body;
 }

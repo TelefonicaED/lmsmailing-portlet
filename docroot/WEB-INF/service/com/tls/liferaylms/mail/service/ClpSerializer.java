@@ -25,6 +25,7 @@ import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.BaseModel;
 
+import com.tls.liferaylms.mail.model.AuditReceiverMailClp;
 import com.tls.liferaylms.mail.model.AuditSendMailsClp;
 import com.tls.liferaylms.mail.model.MailJobClp;
 import com.tls.liferaylms.mail.model.MailTemplateClp;
@@ -104,6 +105,10 @@ public class ClpSerializer {
 
 		String oldModelClassName = oldModelClass.getName();
 
+		if (oldModelClassName.equals(AuditReceiverMailClp.class.getName())) {
+			return translateInputAuditReceiverMail(oldModel);
+		}
+
 		if (oldModelClassName.equals(AuditSendMailsClp.class.getName())) {
 			return translateInputAuditSendMails(oldModel);
 		}
@@ -129,6 +134,16 @@ public class ClpSerializer {
 		}
 
 		return newList;
+	}
+
+	public static Object translateInputAuditReceiverMail(BaseModel<?> oldModel) {
+		AuditReceiverMailClp oldClpModel = (AuditReceiverMailClp)oldModel;
+
+		BaseModel<?> newModel = oldClpModel.getAuditReceiverMailRemoteModel();
+
+		newModel.setModelAttributes(oldClpModel.getModelAttributes());
+
+		return newModel;
 	}
 
 	public static Object translateInputAuditSendMails(BaseModel<?> oldModel) {
@@ -177,6 +192,11 @@ public class ClpSerializer {
 		Class<?> oldModelClass = oldModel.getClass();
 
 		String oldModelClassName = oldModelClass.getName();
+
+		if (oldModelClassName.equals(
+					"com.tls.liferaylms.mail.model.impl.AuditReceiverMailImpl")) {
+			return translateOutputAuditReceiverMail(oldModel);
+		}
 
 		if (oldModelClassName.equals(
 					"com.tls.liferaylms.mail.model.impl.AuditSendMailsImpl")) {
@@ -274,6 +294,11 @@ public class ClpSerializer {
 		}
 
 		if (className.equals(
+					"com.tls.liferaylms.mail.NoSuchAuditReceiverMailException")) {
+			return new com.tls.liferaylms.mail.NoSuchAuditReceiverMailException();
+		}
+
+		if (className.equals(
 					"com.tls.liferaylms.mail.NoSuchAuditSendMailsException")) {
 			return new com.tls.liferaylms.mail.NoSuchAuditSendMailsException();
 		}
@@ -288,6 +313,16 @@ public class ClpSerializer {
 		}
 
 		return throwable;
+	}
+
+	public static Object translateOutputAuditReceiverMail(BaseModel<?> oldModel) {
+		AuditReceiverMailClp newModel = new AuditReceiverMailClp();
+
+		newModel.setModelAttributes(oldModel.getModelAttributes());
+
+		newModel.setAuditReceiverMailRemoteModel(oldModel);
+
+		return newModel;
 	}
 
 	public static Object translateOutputAuditSendMails(BaseModel<?> oldModel) {

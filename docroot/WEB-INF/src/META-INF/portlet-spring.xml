@@ -1,6 +1,9 @@
 <?xml version="1.0"?>
 
 <beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" default-destroy-method="destroy" default-init-method="afterPropertiesSet" xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+	<bean id="com.tls.liferaylms.mail.service.AuditReceiverMailLocalService" class="com.tls.liferaylms.mail.service.impl.AuditReceiverMailLocalServiceImpl" />
+	<bean id="com.tls.liferaylms.mail.service.AuditReceiverMailService" class="com.tls.liferaylms.mail.service.impl.AuditReceiverMailServiceImpl" />
+	<bean id="com.tls.liferaylms.mail.service.persistence.AuditReceiverMailPersistence" class="com.tls.liferaylms.mail.service.persistence.AuditReceiverMailPersistenceImpl" parent="basePersistence" />
 	<bean id="com.tls.liferaylms.mail.service.AuditSendMailsLocalService" class="com.tls.liferaylms.mail.service.impl.AuditSendMailsLocalServiceImpl" />
 	<bean id="com.tls.liferaylms.mail.service.AuditSendMailsService" class="com.tls.liferaylms.mail.service.impl.AuditSendMailsServiceImpl" />
 	<bean id="com.tls.liferaylms.mail.service.persistence.AuditSendMailsPersistence" class="com.tls.liferaylms.mail.service.persistence.AuditSendMailsPersistenceImpl" parent="basePersistence" />

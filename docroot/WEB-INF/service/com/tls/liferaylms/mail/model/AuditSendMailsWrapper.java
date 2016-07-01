@@ -54,6 +54,8 @@ public class AuditSendMailsWrapper implements AuditSendMails,
 		attributes.put("sendDate", getSendDate());
 		attributes.put("numberOfPost", getNumberOfPost());
 		attributes.put("companyId", getCompanyId());
+		attributes.put("subject", getSubject());
+		attributes.put("body", getBody());
 
 		return attributes;
 	}
@@ -105,6 +107,18 @@ public class AuditSendMailsWrapper implements AuditSendMails,
 
 		if (companyId != null) {
 			setCompanyId(companyId);
+		}
+
+		String subject = (String)attributes.get("subject");
+
+		if (subject != null) {
+			setSubject(subject);
+		}
+
+		String body = (String)attributes.get("body");
+
+		if (body != null) {
+			setBody(body);
 		}
 	}
 
@@ -288,6 +302,42 @@ public class AuditSendMailsWrapper implements AuditSendMails,
 	*/
 	public void setCompanyId(long companyId) {
 		_auditSendMails.setCompanyId(companyId);
+	}
+
+	/**
+	* Returns the subject of this audit send mails.
+	*
+	* @return the subject of this audit send mails
+	*/
+	public java.lang.String getSubject() {
+		return _auditSendMails.getSubject();
+	}
+
+	/**
+	* Sets the subject of this audit send mails.
+	*
+	* @param subject the subject of this audit send mails
+	*/
+	public void setSubject(java.lang.String subject) {
+		_auditSendMails.setSubject(subject);
+	}
+
+	/**
+	* Returns the body of this audit send mails.
+	*
+	* @return the body of this audit send mails
+	*/
+	public java.lang.String getBody() {
+		return _auditSendMails.getBody();
+	}
+
+	/**
+	* Sets the body of this audit send mails.
+	*
+	* @param body the body of this audit send mails
+	*/
+	public void setBody(java.lang.String body) {
+		_auditSendMails.setBody(body);
 	}
 
 	public boolean isNew() {

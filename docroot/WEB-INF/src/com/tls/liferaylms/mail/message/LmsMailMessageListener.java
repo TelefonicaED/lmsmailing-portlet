@@ -20,6 +20,7 @@ import com.liferay.lms.service.LmsPrefsLocalServiceUtil;
 import com.liferay.mail.service.MailServiceUtil;
 import com.liferay.portal.kernel.dao.orm.CustomSQLParam;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
+import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -41,13 +42,18 @@ import com.liferay.portal.service.TeamLocalServiceUtil;
 import com.liferay.portal.service.UserLocalServiceUtil;
 import com.liferay.portal.util.comparator.UserLastNameComparator;
 import com.liferay.util.mail.MailEngine;
+import com.tls.liferaylms.mail.model.AuditReceiverMail;
 import com.tls.liferaylms.mail.model.AuditSendMails;
+import com.tls.liferaylms.mail.service.AuditReceiverMailLocalServiceUtil;
 import com.tls.liferaylms.mail.service.AuditSendMailsLocalServiceUtil;
 
 
 public class LmsMailMessageListener implements MessageListener {
 	private static Log log = LogFactoryUtil.getLog(LmsMailMessageListener.class);
-
+	private static int STATUS_OK = 1;
+	private static int STATUS_KO = 0;
+	
+			
 	@Override
 	public void receive(Message message) {
 		try {
@@ -112,9 +118,31 @@ public class LmsMailMessageListener implements MessageListener {
 			calculatedBody += LanguageUtil.get(Locale.getDefault(),"mail.footer");
 			
 			subject = createMessage(subject, portal, community, userSender.getFullName(), userSender.getFullName(),url,urlcourse);
+			//Guardar una auditoria del envio de emails.
+			AuditSendMails auditSendMails = AuditSendMailsLocalServiceUtil.createAuditSendMails(CounterLocalServiceUtil.increment(AuditSendMails.class.getName()));
+			auditSendMails.setUserId(userId);
+			auditSendMails.setGroupId(groupId);
+			auditSendMails.setTemplateId(Long.parseLong(templateId));
+			if(Long.parseLong(templateId)<0){
+				auditSendMails.setBody(body);
+				auditSendMails.setSubject(subject);
+			}
+			auditSendMails.setCompanyId(companyId);
+			AuditSendMailsLocalServiceUtil.addAuditSendMails(auditSendMails);
 			
-			MailMessage mailm = new MailMessage(from, to, subject, calculatedBody, true);
-			MailServiceUtil.sendEmail(mailm);
+			try{
+				MailMessage mailm = new MailMessage(from, to, subject, calculatedBody, true);
+				MailServiceUtil.sendEmail(mailm);
+				addAuditReceiverMail(auditSendMails.getAuditSendMailsId(), toMail, STATUS_OK);
+			}catch(Exception e){
+				addAuditReceiverMail(auditSendMails.getAuditSendMailsId(), toMail, STATUS_KO);
+				e.printStackTrace();
+			}
+			//Guardar una auditoria del envio de emails.
+			auditSendMails.setSendDate(new Date(System.currentTimeMillis()));
+			auditSendMails.setNumberOfPost(numUsersSender);
+			AuditSendMailsLocalServiceUtil.updateAuditSendMails(auditSendMails); 
+			
 		}else if(toMail != null && !toMail.equals("all")) {
 			if(_log.isDebugEnabled()) {
 				_log.debug("Se entra en el envio individual de correos.");
@@ -138,9 +166,30 @@ public class LmsMailMessageListener implements MessageListener {
 					log.debug("Asunto: " + calculatedsubject);
 					log.debug("Cuerpo: " + calculatedBody);
 				}
-						
-				MailMessage mailm = new MailMessage(from, to, calculatedsubject, calculatedBody ,true);
-				MailEngine.send(mailm);
+				//Guardar una auditoria del envio de emails.
+				AuditSendMails auditSendMails = AuditSendMailsLocalServiceUtil.createAuditSendMails(CounterLocalServiceUtil.increment(AuditSendMails.class.getName()));
+				auditSendMails.setUserId(userId);
+				auditSendMails.setGroupId(groupId);
+				auditSendMails.setTemplateId(Long.parseLong(templateId));
+				if(Long.parseLong(templateId)<0){
+					auditSendMails.setBody(calculatedBody);
+					auditSendMails.setSubject(calculatedsubject);
+				}
+				auditSendMails.setCompanyId(companyId);
+				AuditSendMailsLocalServiceUtil.addAuditSendMails(auditSendMails);
+				try{
+					MailMessage mailm = new MailMessage(from, to, calculatedsubject, calculatedBody ,true);
+					MailEngine.send(mailm);
+					addAuditReceiverMail(auditSendMails.getAuditSendMailsId(), toMail, STATUS_OK);
+				}catch(Exception e){
+					addAuditReceiverMail(auditSendMails.getAuditSendMailsId(), toMail, STATUS_KO);
+					e.printStackTrace();
+				}
+				//Guardar una auditoria del envio de emails.
+				auditSendMails.setSendDate(new Date(System.currentTimeMillis()));
+				auditSendMails.setNumberOfPost(numUsersSender);
+				AuditSendMailsLocalServiceUtil.updateAuditSendMails(auditSendMails); 
+				
 			}
 		}else if(toMail.equals("all")) {
 			if(_log.isDebugEnabled()) {
@@ -217,14 +266,33 @@ public class LmsMailMessageListener implements MessageListener {
 			String calculatedBody, calculatedSubject;
 			
 			Transport transport = session.getTransport(protocol);
+			
+			//Guardar una auditoria del envio de emails.
+			AuditSendMails auditSendMails = AuditSendMailsLocalServiceUtil.createAuditSendMails(CounterLocalServiceUtil.increment(AuditSendMails.class.getName()));
+			auditSendMails.setUserId(userId);
+			auditSendMails.setGroupId(groupId);
+			auditSendMails.setTemplateId(Long.parseLong(templateId));
+			auditSendMails.setCompanyId(companyId);
+			AuditSendMailsLocalServiceUtil.addAuditSendMails(auditSendMails); 
+			
+			
 			try {
 				transport.connect(smtpHost, smtpPort, smtpuser, password);
 				_log.debug("Conectado al servidor SMTP");
 			}
 			catch(MessagingException me) {
+				//Guardar una auditoria del envio de emails.
+				auditSendMails.setSendDate(new Date(System.currentTimeMillis()));
+				auditSendMails.setNumberOfPost(numUsersSender);
+				AuditSendMailsLocalServiceUtil.updateAuditSendMails(auditSendMails); 
+				
 				me.printStackTrace();
 				throw new Exception(me);
 			}
+			
+			
+			
+			
 			
 			// Se envían los correos a todos los alumnos.
 			for (User student : users) {
@@ -253,6 +321,7 @@ public class LmsMailMessageListener implements MessageListener {
 						calculatedBody += createMessage(bodyTemplate, student.getFullName());
 						calculatedBody += LanguageUtil.get(student.getLocale(),"mail.footer");
 						
+						
 						if(log.isDebugEnabled()) {
 							log.debug("Se envia el siguiente correo...");
 							log.debug("De: " + from);
@@ -266,21 +335,28 @@ public class LmsMailMessageListener implements MessageListener {
 						
 						try{
 							sendMail(mailm,transport,session);
+							addAuditReceiverMail(auditSendMails.getAuditSendMailsId(), toMail, STATUS_OK);
 						}catch(MessagingException ex){
 							ex.printStackTrace();
+							addAuditReceiverMail(auditSendMails.getAuditSendMailsId(), toMail, STATUS_KO);
 							log.error("*****************ERROR al enviar mail["+student.getEmailAddress()+"]*****************");
 							if(!transport.isConnected()){
 								log.debug("TRANSPORT NOT CONNECTED. RECONECTAMOS");
 								transport.connect(smtpHost, smtpPort, smtpuser, password);
 								log.debug("***Reenviando el mail que no se pudo enviar["+student.getEmailAddress()+"]");
 								sendMail(mailm,transport,session);
+
+								addAuditReceiverMail(auditSendMails.getAuditSendMailsId(), toMail, STATUS_OK);
 							}
 						}
 						
 					}
 					catch(Exception meEx){
+
+						addAuditReceiverMail(auditSendMails.getAuditSendMailsId(), toMail, STATUS_KO);
 						meEx.printStackTrace();
 					}
+				
 					sendMails++;
 				}
 			}
@@ -288,21 +364,29 @@ public class LmsMailMessageListener implements MessageListener {
 			transport.close();
 			
 			_log.debug("Se finaliza el envio de correos electronicos");
-			
-		}
 		
-		//Guardar una auditoria del envio de emails.
-		AuditSendMails auditSendMails = AuditSendMailsLocalServiceUtil.createAuditSendMails(CounterLocalServiceUtil.increment(AuditSendMails.class.getName()));
-		auditSendMails.setUserId(userId);
-		auditSendMails.setGroupId(groupId);
-		auditSendMails.setTemplateId(Long.parseLong(templateId));
-		auditSendMails.setSendDate(new Date(System.currentTimeMillis()));
-		auditSendMails.setNumberOfPost(numUsersSender);
-		auditSendMails.setCompanyId(companyId);
-		AuditSendMailsLocalServiceUtil.addAuditSendMails(auditSendMails); 
+			//Guardar una auditoria del envio de emails.
+			auditSendMails.setSendDate(new Date(System.currentTimeMillis()));
+			auditSendMails.setNumberOfPost(numUsersSender);
+			AuditSendMailsLocalServiceUtil.updateAuditSendMails(auditSendMails); 
+		}		
+		
 
 	}
 		
+	private static void addAuditReceiverMail(long auditSendMailsId, String toMail, int status){
+		try {
+			AuditReceiverMail auditReceiverMail = AuditReceiverMailLocalServiceUtil.createAuditReceiverMail(CounterLocalServiceUtil.increment(AuditReceiverMail.class.getName()));
+			auditReceiverMail.setAuditSendMailsId(auditSendMailsId);
+			auditReceiverMail.setTo(toMail);
+			auditReceiverMail.setStatus(status);
+			AuditReceiverMailLocalServiceUtil.addAuditReceiverMail(auditReceiverMail);
+		} catch (SystemException e) {
+			e.printStackTrace();
+		}
+		
+	}
+	
 	private static String _getSMTPProperty(Session session, String suffix) {
 		String protocol = GetterUtil.getString(
 			session.getProperty("mail.transport.protocol"));

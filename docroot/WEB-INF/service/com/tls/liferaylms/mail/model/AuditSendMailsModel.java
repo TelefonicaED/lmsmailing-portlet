@@ -188,6 +188,36 @@ public interface AuditSendMailsModel extends BaseModel<AuditSendMails> {
 	 */
 	public void setCompanyId(long companyId);
 
+	/**
+	 * Returns the subject of this audit send mails.
+	 *
+	 * @return the subject of this audit send mails
+	 */
+	@AutoEscape
+	public String getSubject();
+
+	/**
+	 * Sets the subject of this audit send mails.
+	 *
+	 * @param subject the subject of this audit send mails
+	 */
+	public void setSubject(String subject);
+
+	/**
+	 * Returns the body of this audit send mails.
+	 *
+	 * @return the body of this audit send mails
+	 */
+	@AutoEscape
+	public String getBody();
+
+	/**
+	 * Sets the body of this audit send mails.
+	 *
+	 * @param body the body of this audit send mails
+	 */
+	public void setBody(String body);
+
 	public boolean isNew();
 
 	public void setNew(boolean n);

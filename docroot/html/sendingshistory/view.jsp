@@ -73,15 +73,47 @@
 			template = MailTemplateLocalServiceUtil.getMailTemplate(send.getTemplateId());
 		}catch(NoSuchMailTemplateException e){}
 		%>
-		<liferay-ui:search-container-column-text name="subject.template">
-			<c:out value="<%=template!=null ? template.getSubject() : \"-\" %>"/>
-		</liferay-ui:search-container-column-text>
-		
-		<liferay-ui:search-container-column-text name="mail.sends" property="numberOfPost"/>
-		
+		<c:choose>
+			<c:when test="<%= template!=null %>">
+				<liferay-ui:search-container-column-text name="subject.template">
+					<c:out value="<%=template!=null ? template.getSubject() : \"-\" %>"/>
+				</liferay-ui:search-container-column-text>
+			</c:when>
+			<c:otherwise>
+					<liferay-ui:search-container-column-text name="subject">
+						<c:out value="<%= send.getSubject() %>"/>
+					</liferay-ui:search-container-column-text>
+					<liferay-ui:search-container-column-text name="body">
+						<c:out value="<%= HtmlUtil.extractText(send.getBody()) %>"/>
+					</liferay-ui:search-container-column-text>
+			</c:otherwise>	
+		</c:choose>
+		<liferay-ui:search-container-column-text name="mail.sends" property="numberOfPost" />
+	
+		<liferay-ui:search-container-column-text name="detail">
+				<c:if test="<%= send.getNumberOfPost()>0 %>">
+					<aui:button name="viewSends" type="button" value="view" onclick="javascript:${renderResponse.getNamespace()}goToViewReceiver('${send.auditSendMailsId}')"/>
+				</c:if>	
+		</liferay-ui:search-container-column-text>	
 	</liferay-ui:search-container-row>
 	
 	<liferay-ui:search-iterator />
 	
 </liferay-ui:search-container>
+
+
+<portlet:renderURL var="goToViewReceiversURL">
+	<portlet:param name="jspPage" value="/html/sendingshistory/viewUsers.jsp" />
+</portlet:renderURL>
+
+<aui:form name="fm" action="${goToViewReceiversURL }" method="POST">
+	<aui:input name="auditSendMailId" value="" type="hidden"/>
+</aui:form>
+
+<script>
+	function <portlet:namespace />goToViewReceiver(auditSendMailId){
+		$('#<portlet:namespace />auditSendMailId').val(auditSendMailId);
+		$('#<portlet:namespace />fm').submit();
+	}
+</script>
 	

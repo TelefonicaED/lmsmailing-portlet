@@ -1,3 +1,5 @@
+create index IX_376443B9 on lmsmail_AuditReceiverMail (auditSendMailsId);
+
 create index IX_DE7D0C53 on lmsmail_AuditSendMails (companyId);
 create index IX_BE6FFF5F on lmsmail_AuditSendMails (uuid_);
 create unique index IX_7FE5502B on lmsmail_AuditSendMails (uuid_, groupId);

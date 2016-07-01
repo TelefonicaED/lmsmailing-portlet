@@ -7,6 +7,19 @@
 			<access>PROPERTY</access>
 		</persistence-unit-defaults>
 	</persistence-unit-metadata>
+	<mapped-superclass class="com.tls.liferaylms.mail.model.impl.AuditReceiverMailModelImpl">
+		<attributes>
+			<id name="auditReceiverMailId" />
+			<basic name="auditSendMailsId" />
+			<basic name="to">
+				<column name="TO_" />
+			</basic>
+			<basic name="status" />
+			<transient name="modelAttributes" />
+			<transient name="primaryKey" />
+			<transient name="primaryKeyObj" />
+		</attributes>
+	</mapped-superclass>
 	<mapped-superclass class="com.tls.liferaylms.mail.model.impl.AuditSendMailsModelImpl">
 		<attributes>
 			<id name="auditSendMailsId" />
@@ -21,6 +34,8 @@
 			</basic>
 			<basic name="numberOfPost" />
 			<basic name="companyId" />
+			<basic name="subject" />
+			<basic name="body" />
 			<transient name="modelAttributes" />
 			<transient name="primaryKey" />
 			<transient name="primaryKeyObj" />
@@ -69,6 +84,10 @@
 			<transient name="userUuid" />
 		</attributes>
 	</mapped-superclass>
+	<entity class="com.tls.liferaylms.mail.model.impl.AuditReceiverMailImpl" name="AuditReceiverMail">
+		<table name="lmsmail_AuditReceiverMail" />
+		<attributes />
+	</entity>
 	<entity class="com.tls.liferaylms.mail.model.impl.AuditSendMailsImpl" name="AuditSendMails">
 		<table name="lmsmail_AuditSendMails" />
 		<attributes />

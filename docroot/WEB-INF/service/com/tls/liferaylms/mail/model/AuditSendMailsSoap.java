@@ -39,6 +39,8 @@ public class AuditSendMailsSoap implements Serializable {
 		soapModel.setSendDate(model.getSendDate());
 		soapModel.setNumberOfPost(model.getNumberOfPost());
 		soapModel.setCompanyId(model.getCompanyId());
+		soapModel.setSubject(model.getSubject());
+		soapModel.setBody(model.getBody());
 
 		return soapModel;
 	}
@@ -155,6 +157,22 @@ public class AuditSendMailsSoap implements Serializable {
 		_companyId = companyId;
 	}
 
+	public String getSubject() {
+		return _subject;
+	}
+
+	public void setSubject(String subject) {
+		_subject = subject;
+	}
+
+	public String getBody() {
+		return _body;
+	}
+
+	public void setBody(String body) {
+		_body = body;
+	}
+
 	private String _uuid;
 	private long _auditSendMailsId;
 	private long _userId;
@@ -163,4 +181,6 @@ public class AuditSendMailsSoap implements Serializable {
 	private Date _sendDate;
 	private long _numberOfPost;
 	private long _companyId;
+	private String _subject;
+	private String _body;
 }
