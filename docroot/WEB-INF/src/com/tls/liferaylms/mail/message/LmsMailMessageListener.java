@@ -46,6 +46,7 @@ import com.tls.liferaylms.mail.model.AuditReceiverMail;
 import com.tls.liferaylms.mail.model.AuditSendMails;
 import com.tls.liferaylms.mail.service.AuditReceiverMailLocalServiceUtil;
 import com.tls.liferaylms.mail.service.AuditSendMailsLocalServiceUtil;
+import com.tls.liferaylms.util.MailStringPool;
 
 
 public class LmsMailMessageListener implements MessageListener {
@@ -83,7 +84,7 @@ public class LmsMailMessageListener implements MessageListener {
 		boolean ownTeam = message.getBoolean("ownTeam");
 		boolean isOmniadmin = message.getBoolean("isOmniadmin");
 		long numUsersSender = 0;
-		
+		boolean deregisterMail;
 
 		Group scopeGroup = GroupLocalServiceUtil.getGroup(groupId);
 		long companyId = scopeGroup.getCompanyId();
@@ -110,76 +111,34 @@ public class LmsMailMessageListener implements MessageListener {
 				_log.debug("Se entra en modo testing");
 			}
 			InternetAddress to = new InternetAddress(userSender.getEmailAddress(), userSender.getFullName());
-			
-			body = createMessage(body, portal, community, userSender.getFullName(), UserLocalServiceUtil.getUserById(userId).getFullName(), url, urlcourse);
-
-			String calculatedBody = LanguageUtil.get(Locale.getDefault(),"mail.header");
-			calculatedBody += body;
-			calculatedBody += LanguageUtil.get(Locale.getDefault(),"mail.footer");
-			
-			subject = createMessage(subject, portal, community, userSender.getFullName(), userSender.getFullName(),url,urlcourse);
-			//Guardar una auditoria del envio de emails.
-			AuditSendMails auditSendMails = AuditSendMailsLocalServiceUtil.createAuditSendMails(CounterLocalServiceUtil.increment(AuditSendMails.class.getName()));
-			auditSendMails.setUserId(userId);
-			auditSendMails.setGroupId(groupId);
-			auditSendMails.setTemplateId(Long.parseLong(templateId));
-			if(Long.parseLong(templateId)<0){
-				auditSendMails.setBody(body);
-				auditSendMails.setSubject(subject);
+			deregisterMail = false;
+			if(userSender.getExpandoBridge().getAttribute(MailStringPool.DEREGISTER_USER_EXPANDO)!=null){
+				deregisterMail = (Boolean)userSender.getExpandoBridge().getAttribute(MailStringPool.DEREGISTER_USER_EXPANDO);
 			}
-			auditSendMails.setCompanyId(companyId);
-			AuditSendMailsLocalServiceUtil.addAuditSendMails(auditSendMails);
 			
-			try{
-				MailMessage mailm = new MailMessage(from, to, subject, calculatedBody, true);
-				MailServiceUtil.sendEmail(mailm);
-				addAuditReceiverMail(auditSendMails.getAuditSendMailsId(), toMail, STATUS_OK);
-			}catch(Exception e){
-				addAuditReceiverMail(auditSendMails.getAuditSendMailsId(), toMail, STATUS_KO);
-				e.printStackTrace();
-			}
-			//Guardar una auditoria del envio de emails.
-			auditSendMails.setSendDate(new Date(System.currentTimeMillis()));
-			auditSendMails.setNumberOfPost(numUsersSender);
-			AuditSendMailsLocalServiceUtil.updateAuditSendMails(auditSendMails); 
-			
-		}else if(toMail != null && !toMail.equals("all")) {
-			if(_log.isDebugEnabled()) {
-				_log.debug("Se entra en el envio individual de correos.");
-			}
+			if(!deregisterMail){
+				body = createMessage(body, portal, community, userSender.getFullName(), UserLocalServiceUtil.getUserById(userId).getFullName(), url, urlcourse);
 
-			User student = UserLocalServiceUtil.fetchUserByEmailAddress(userSender.getCompanyId(), toMail);
-			
-			if(student != null && student.isActive() && Validator.isEmailAddress(student.getEmailAddress())) {
-				InternetAddress to = new InternetAddress(toMail, student.getFullName());
-
-				String calculatedBody = LanguageUtil.get(student.getLocale(),"mail.header");
-				calculatedBody += createMessage(body, portal, community, student.getFullName(), userSender.getFullName(),url,urlcourse);
-				calculatedBody += LanguageUtil.get(student.getLocale(),"mail.footer");
+				String calculatedBody = LanguageUtil.get(Locale.getDefault(),"mail.header");
+				calculatedBody += body;
+				calculatedBody += LanguageUtil.get(Locale.getDefault(),"mail.footer");
 				
-				String calculatedsubject = createMessage(subject, portal, community, student.getFullName(), userSender.getFullName(),url,urlcourse);
-				
-				if(log.isDebugEnabled()) {
-					log.debug("Se envia el siguiente correo...");
-					log.debug("De: " + from);
-					log.debug("A: " + toMail + " " + student.getFullName());
-					log.debug("Asunto: " + calculatedsubject);
-					log.debug("Cuerpo: " + calculatedBody);
-				}
+				subject = createMessage(subject, portal, community, userSender.getFullName(), userSender.getFullName(),url,urlcourse);
 				//Guardar una auditoria del envio de emails.
 				AuditSendMails auditSendMails = AuditSendMailsLocalServiceUtil.createAuditSendMails(CounterLocalServiceUtil.increment(AuditSendMails.class.getName()));
 				auditSendMails.setUserId(userId);
 				auditSendMails.setGroupId(groupId);
 				auditSendMails.setTemplateId(Long.parseLong(templateId));
 				if(Long.parseLong(templateId)<0){
-					auditSendMails.setBody(calculatedBody);
-					auditSendMails.setSubject(calculatedsubject);
+					auditSendMails.setBody(body);
+					auditSendMails.setSubject(subject);
 				}
 				auditSendMails.setCompanyId(companyId);
 				AuditSendMailsLocalServiceUtil.addAuditSendMails(auditSendMails);
+				
 				try{
-					MailMessage mailm = new MailMessage(from, to, calculatedsubject, calculatedBody ,true);
-					MailEngine.send(mailm);
+					MailMessage mailm = new MailMessage(from, to, subject, calculatedBody, true);
+					MailServiceUtil.sendEmail(mailm);
 					addAuditReceiverMail(auditSendMails.getAuditSendMailsId(), toMail, STATUS_OK);
 				}catch(Exception e){
 					addAuditReceiverMail(auditSendMails.getAuditSendMailsId(), toMail, STATUS_KO);
@@ -189,6 +148,63 @@ public class LmsMailMessageListener implements MessageListener {
 				auditSendMails.setSendDate(new Date(System.currentTimeMillis()));
 				auditSendMails.setNumberOfPost(numUsersSender);
 				AuditSendMailsLocalServiceUtil.updateAuditSendMails(auditSendMails); 
+			}
+			
+			
+		}else if(toMail != null && !toMail.equals("all")) {
+			if(_log.isDebugEnabled()) {
+				_log.debug("Se entra en el envio individual de correos.");
+			}
+
+			User student = UserLocalServiceUtil.fetchUserByEmailAddress(userSender.getCompanyId(), toMail);
+			
+			if(student != null && student.isActive() && Validator.isEmailAddress(student.getEmailAddress())) {
+				deregisterMail = false;
+				if(student.getExpandoBridge().getAttribute(MailStringPool.DEREGISTER_USER_EXPANDO)!=null){
+					deregisterMail = (Boolean)student.getExpandoBridge().getAttribute(MailStringPool.DEREGISTER_USER_EXPANDO);
+				}
+				
+				if(!deregisterMail){
+					InternetAddress to = new InternetAddress(toMail, student.getFullName());
+
+					String calculatedBody = LanguageUtil.get(student.getLocale(),"mail.header");
+					calculatedBody += createMessage(body, portal, community, student.getFullName(), userSender.getFullName(),url,urlcourse);
+					calculatedBody += LanguageUtil.get(student.getLocale(),"mail.footer");
+					
+					String calculatedsubject = createMessage(subject, portal, community, student.getFullName(), userSender.getFullName(),url,urlcourse);
+					
+					if(log.isDebugEnabled()) {
+						log.debug("Se envia el siguiente correo...");
+						log.debug("De: " + from);
+						log.debug("A: " + toMail + " " + student.getFullName());
+						log.debug("Asunto: " + calculatedsubject);
+						log.debug("Cuerpo: " + calculatedBody);
+					}
+					//Guardar una auditoria del envio de emails.
+					AuditSendMails auditSendMails = AuditSendMailsLocalServiceUtil.createAuditSendMails(CounterLocalServiceUtil.increment(AuditSendMails.class.getName()));
+					auditSendMails.setUserId(userId);
+					auditSendMails.setGroupId(groupId);
+					auditSendMails.setTemplateId(Long.parseLong(templateId));
+					if(Long.parseLong(templateId)<0){
+						auditSendMails.setBody(calculatedBody);
+						auditSendMails.setSubject(calculatedsubject);
+					}
+					auditSendMails.setCompanyId(companyId);
+					AuditSendMailsLocalServiceUtil.addAuditSendMails(auditSendMails);
+					try{
+						MailMessage mailm = new MailMessage(from, to, calculatedsubject, calculatedBody ,true);
+						MailEngine.send(mailm);
+						addAuditReceiverMail(auditSendMails.getAuditSendMailsId(), toMail, STATUS_OK);
+					}catch(Exception e){
+						addAuditReceiverMail(auditSendMails.getAuditSendMailsId(), toMail, STATUS_KO);
+						e.printStackTrace();
+					}
+					//Guardar una auditoria del envio de emails.
+					auditSendMails.setSendDate(new Date(System.currentTimeMillis()));
+					auditSendMails.setNumberOfPost(numUsersSender);
+					AuditSendMailsLocalServiceUtil.updateAuditSendMails(auditSendMails); 
+				}
+				
 				
 			}
 		}else if(toMail.equals("all")) {
@@ -297,67 +313,74 @@ public class LmsMailMessageListener implements MessageListener {
 			// Se envían los correos a todos los alumnos.
 			for (User student : users) {
 				if (student.isActive() && Validator.isEmailAddress(student.getEmailAddress())) {
-					if (nUsers > 0 && sendMails == nUsers) {
-						try {
-							if(_log.isDebugEnabled())
-								_log.debug("Se ha llegado al numero maximo de envios en el bloque, se para " + millis + " milisegundos.");
-						    Thread.sleep(millis);
-						}
-						catch(InterruptedException ex) {
-						    Thread.currentThread().interrupt();
-						}
-						sendMails = 0;
+					deregisterMail = false;
+					if(student.getExpandoBridge().getAttribute(MailStringPool.DEREGISTER_USER_EXPANDO)!=null){
+						deregisterMail = (Boolean)student.getExpandoBridge().getAttribute(MailStringPool.DEREGISTER_USER_EXPANDO);
 					}
 					
-					try {
-						InternetAddress to = new InternetAddress(student.getEmailAddress(), student.getFullName());
-						if(_log.isDebugEnabled()) {
-							_log.debug("Se envia un correo electronico al siguiente usuario: " + student.getEmailAddress());
-						}
-						
-						calculatedSubject = createMessage(subjectTemplate, student.getFullName());
-						
-						calculatedBody = LanguageUtil.get(student.getLocale(),"mail.header");
-						calculatedBody += createMessage(bodyTemplate, student.getFullName());
-						calculatedBody += LanguageUtil.get(student.getLocale(),"mail.footer");
-						
-						
-						if(log.isDebugEnabled()) {
-							log.debug("Se envia el siguiente correo...");
-							log.debug("De: " + from);
-							log.debug("A: " + toMail + " " + userName);
-							log.debug("Asunto: " + calculatedSubject);
-							log.debug("Cuerpo: " + calculatedBody);
-						}
-						
-						MailMessage mailm = new MailMessage(from, to, calculatedSubject, calculatedBody ,true);
-						//MailEngine.send(mailm);
-						
-						try{
-							sendMail(mailm,transport,session);
-							addAuditReceiverMail(auditSendMails.getAuditSendMailsId(), toMail, STATUS_OK);
-						}catch(MessagingException ex){
-							ex.printStackTrace();
-							addAuditReceiverMail(auditSendMails.getAuditSendMailsId(), toMail, STATUS_KO);
-							log.error("*****************ERROR al enviar mail["+student.getEmailAddress()+"]*****************");
-							if(!transport.isConnected()){
-								log.debug("TRANSPORT NOT CONNECTED. RECONECTAMOS");
-								transport.connect(smtpHost, smtpPort, smtpuser, password);
-								log.debug("***Reenviando el mail que no se pudo enviar["+student.getEmailAddress()+"]");
-								sendMail(mailm,transport,session);
-
-								addAuditReceiverMail(auditSendMails.getAuditSendMailsId(), toMail, STATUS_OK);
+					if(!deregisterMail){
+						if (nUsers > 0 && sendMails == nUsers) {
+							try {
+								if(_log.isDebugEnabled())
+									_log.debug("Se ha llegado al numero maximo de envios en el bloque, se para " + millis + " milisegundos.");
+							    Thread.sleep(millis);
 							}
+							catch(InterruptedException ex) {
+							    Thread.currentThread().interrupt();
+							}
+							sendMails = 0;
 						}
 						
+						try {
+							InternetAddress to = new InternetAddress(student.getEmailAddress(), student.getFullName());
+							if(_log.isDebugEnabled()) {
+								_log.debug("Se envia un correo electronico al siguiente usuario: " + student.getEmailAddress());
+							}
+							
+							calculatedSubject = createMessage(subjectTemplate, student.getFullName());
+							
+							calculatedBody = LanguageUtil.get(student.getLocale(),"mail.header");
+							calculatedBody += createMessage(bodyTemplate, student.getFullName());
+							calculatedBody += LanguageUtil.get(student.getLocale(),"mail.footer");
+							
+							
+							if(log.isDebugEnabled()) {
+								log.debug("Se envia el siguiente correo...");
+								log.debug("De: " + from);
+								log.debug("A: " + toMail + " " + userName);
+								log.debug("Asunto: " + calculatedSubject);
+								log.debug("Cuerpo: " + calculatedBody);
+							}
+							
+							MailMessage mailm = new MailMessage(from, to, calculatedSubject, calculatedBody ,true);
+							//MailEngine.send(mailm);
+							
+							try{
+								sendMail(mailm,transport,session);
+								addAuditReceiverMail(auditSendMails.getAuditSendMailsId(), toMail, STATUS_OK);
+							}catch(MessagingException ex){
+								ex.printStackTrace();
+								addAuditReceiverMail(auditSendMails.getAuditSendMailsId(), toMail, STATUS_KO);
+								log.error("*****************ERROR al enviar mail["+student.getEmailAddress()+"]*****************");
+								if(!transport.isConnected()){
+									log.debug("TRANSPORT NOT CONNECTED. RECONECTAMOS");
+									transport.connect(smtpHost, smtpPort, smtpuser, password);
+									log.debug("***Reenviando el mail que no se pudo enviar["+student.getEmailAddress()+"]");
+									sendMail(mailm,transport,session);
+	
+									addAuditReceiverMail(auditSendMails.getAuditSendMailsId(), toMail, STATUS_OK);
+								}
+							}
+							
+						}
+						catch(Exception meEx){
+	
+							addAuditReceiverMail(auditSendMails.getAuditSendMailsId(), toMail, STATUS_KO);
+							meEx.printStackTrace();
+						}
+					
+						sendMails++;
 					}
-					catch(Exception meEx){
-
-						addAuditReceiverMail(auditSendMails.getAuditSendMailsId(), toMail, STATUS_KO);
-						meEx.printStackTrace();
-					}
-				
-					sendMails++;
 				}
 			}
 			

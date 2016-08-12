@@ -16,6 +16,7 @@ public class MailStringPool {
 	public final static String COURSE_CON = "groupmailing.coursecondition";
 	public final static String MODULE_CON = "groupmailing.modulecondition";
 
+	public final static String DEREGISTER_USER_EXPANDO = "deregister-mail";
 	public final static String MAIL_JOBS = "mailjobs";
 	public final static String PENDING_MAIL_JOBS = "pendingMailjobs";
 	public final static String MAIL_JOB = "mailjob";
