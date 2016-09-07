@@ -115,6 +115,10 @@ public class AuditReceiverMailLocalServiceClpInvoker {
 		_methodName60 = "getRecieverMailsBySendMail";
 
 		_methodParameterTypes60 = new String[] { "long", "int", "int" };
+
+		_methodName61 = "countRecieverMailsBySendMail";
+
+		_methodParameterTypes61 = new String[] { "long" };
 	}
 
 	public Object invokeMethod(String name, String[] parameterTypes,
@@ -223,6 +227,11 @@ public class AuditReceiverMailLocalServiceClpInvoker {
 				((Integer)arguments[2]).intValue());
 		}
 
+		if (_methodName61.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes61, parameterTypes)) {
+			return AuditReceiverMailLocalServiceUtil.countRecieverMailsBySendMail(((Long)arguments[0]).longValue());
+		}
+
 		throw new UnsupportedOperationException();
 	}
 
@@ -264,4 +273,6 @@ public class AuditReceiverMailLocalServiceClpInvoker {
 	private String[] _methodParameterTypes55;
 	private String _methodName60;
 	private String[] _methodParameterTypes60;
+	private String _methodName61;
+	private String[] _methodParameterTypes61;
 }

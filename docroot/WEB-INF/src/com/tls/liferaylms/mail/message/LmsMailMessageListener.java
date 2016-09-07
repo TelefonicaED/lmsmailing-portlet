@@ -51,8 +51,8 @@ import com.tls.liferaylms.util.MailStringPool;
 
 public class LmsMailMessageListener implements MessageListener {
 	private static Log log = LogFactoryUtil.getLog(LmsMailMessageListener.class);
-	private static int STATUS_OK = 1;
-	private static int STATUS_KO = 0;
+	public static int STATUS_OK = 1;
+	public static int STATUS_KO = 0;
 	
 			
 	@Override
@@ -139,9 +139,9 @@ public class LmsMailMessageListener implements MessageListener {
 				try{
 					MailMessage mailm = new MailMessage(from, to, subject, calculatedBody, true);
 					MailServiceUtil.sendEmail(mailm);
-					addAuditReceiverMail(auditSendMails.getAuditSendMailsId(), toMail, STATUS_OK);
+					addAuditReceiverMail(auditSendMails.getAuditSendMailsId(), userSender.getEmailAddress(), STATUS_OK);
 				}catch(Exception e){
-					addAuditReceiverMail(auditSendMails.getAuditSendMailsId(), toMail, STATUS_KO);
+					addAuditReceiverMail(auditSendMails.getAuditSendMailsId(), userSender.getEmailAddress(), STATUS_KO);
 					e.printStackTrace();
 				}
 				//Guardar una auditoria del envio de emails.
@@ -357,10 +357,10 @@ public class LmsMailMessageListener implements MessageListener {
 							
 							try{
 								sendMail(mailm,transport,session);
-								addAuditReceiverMail(auditSendMails.getAuditSendMailsId(), toMail, STATUS_OK);
+								addAuditReceiverMail(auditSendMails.getAuditSendMailsId(), student.getEmailAddress(), STATUS_OK);
 							}catch(MessagingException ex){
 								ex.printStackTrace();
-								addAuditReceiverMail(auditSendMails.getAuditSendMailsId(), toMail, STATUS_KO);
+								addAuditReceiverMail(auditSendMails.getAuditSendMailsId(), student.getEmailAddress(), STATUS_KO);
 								log.error("*****************ERROR al enviar mail["+student.getEmailAddress()+"]*****************");
 								if(!transport.isConnected()){
 									log.debug("TRANSPORT NOT CONNECTED. RECONECTAMOS");
@@ -368,14 +368,14 @@ public class LmsMailMessageListener implements MessageListener {
 									log.debug("***Reenviando el mail que no se pudo enviar["+student.getEmailAddress()+"]");
 									sendMail(mailm,transport,session);
 	
-									addAuditReceiverMail(auditSendMails.getAuditSendMailsId(), toMail, STATUS_OK);
+									addAuditReceiverMail(auditSendMails.getAuditSendMailsId(), student.getEmailAddress(), STATUS_OK);
 								}
 							}
 							
 						}
 						catch(Exception meEx){
 	
-							addAuditReceiverMail(auditSendMails.getAuditSendMailsId(), toMail, STATUS_KO);
+							addAuditReceiverMail(auditSendMails.getAuditSendMailsId(), student.getEmailAddress(), STATUS_KO);
 							meEx.printStackTrace();
 						}
 					
@@ -397,7 +397,7 @@ public class LmsMailMessageListener implements MessageListener {
 
 	}
 		
-	private static void addAuditReceiverMail(long auditSendMailsId, String toMail, int status){
+	public static void addAuditReceiverMail(long auditSendMailsId, String toMail, int status){
 		try {
 			AuditReceiverMail auditReceiverMail = AuditReceiverMailLocalServiceUtil.createAuditReceiverMail(CounterLocalServiceUtil.increment(AuditReceiverMail.class.getName()));
 			auditReceiverMail.setAuditSendMailsId(auditSendMailsId);

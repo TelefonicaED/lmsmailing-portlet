@@ -252,4 +252,7 @@ public interface AuditReceiverMailLocalService extends BaseLocalService,
 	public java.util.List<com.tls.liferaylms.mail.model.AuditReceiverMail> getRecieverMailsBySendMail(
 		long auditSendMailsId, int start, int end)
 		throws com.liferay.portal.kernel.exception.SystemException;
+
+	public int countRecieverMailsBySendMail(long auditSendMailsId)
+		throws com.liferay.portal.kernel.exception.SystemException;
 }

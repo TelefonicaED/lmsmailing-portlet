@@ -281,6 +281,11 @@ public class AuditReceiverMailLocalServiceUtil {
 				   .getRecieverMailsBySendMail(auditSendMailsId, start, end);
 	}
 
+	public static int countRecieverMailsBySendMail(long auditSendMailsId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getService().countRecieverMailsBySendMail(auditSendMailsId);
+	}
+
 	public static void clearService() {
 		_service = null;
 	}

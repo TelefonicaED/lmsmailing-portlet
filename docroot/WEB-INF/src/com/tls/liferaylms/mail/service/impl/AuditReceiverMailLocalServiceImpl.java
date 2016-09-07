@@ -53,5 +53,9 @@ public class AuditReceiverMailLocalServiceImpl
 		}
 		return auditReceiverMails;
 	}
+	
+	public int countRecieverMailsBySendMail (long auditSendMailsId) throws SystemException{
+		return  AuditReceiverMailUtil.countByauditSendMail(auditSendMailsId);  		
+	}
 
 }

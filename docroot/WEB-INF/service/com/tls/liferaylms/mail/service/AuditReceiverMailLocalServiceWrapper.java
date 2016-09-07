@@ -279,6 +279,11 @@ public class AuditReceiverMailLocalServiceWrapper
 			start, end);
 	}
 
+	public int countRecieverMailsBySendMail(long auditSendMailsId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return _auditReceiverMailLocalService.countRecieverMailsBySendMail(auditSendMailsId);
+	}
+
 	/**
 	 * @deprecated Renamed to {@link #getWrappedService}
 	 */

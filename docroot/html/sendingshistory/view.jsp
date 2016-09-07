@@ -32,7 +32,13 @@
 	Collections.sort(ordererSendings, new Comparator <AuditSendMails>() {
 	    @Override
 	    public int compare(final AuditSendMails object1, final AuditSendMails object2) {
-	    	return (object1.getSendDate().before(object2.getSendDate())) ? 1 : -1;
+	    	if(object1.getSendDate()==null){
+	    		return 1;
+	    	}else if(object2.getSendDate()==null){
+	    		return -1;
+	    	}else{
+	    		return (object1.getSendDate().before(object2.getSendDate())) ? 1 : -1;
+	    	}
 	    }
 	});
 	

@@ -20,7 +20,9 @@
 	PortletURL portletURL = renderResponse.createRenderURL();
 	portletURL.setParameter("jspPage","/html/sendingshistory/viewUsers.jsp");
 	long auditSendMailId = ParamUtil.getLong(renderRequest,"auditSendMailId");
+	portletURL.setParameter("auditSendMailId",String.valueOf(auditSendMailId));
 	SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+	
 %>
 
 <liferay-ui:search-container emptyResultsMessage="there-are-no-mailjobs" delta="10" deltaConfigurable="true" iteratorURL="<%=portletURL%>" >
@@ -29,7 +31,7 @@
 	List<AuditReceiverMail> receivers =  AuditReceiverMailLocalServiceUtil.getRecieverMailsBySendMail(auditSendMailId,searchContainer.getStart(),searchContainer.getEnd());
 		
 	results = receivers;
-	total = receivers.size();
+	total = AuditReceiverMailLocalServiceUtil.countRecieverMailsBySendMail(auditSendMailId);
 	
 	pageContext.setAttribute("results", results);
 	pageContext.setAttribute("total", total);

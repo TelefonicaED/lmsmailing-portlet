@@ -117,6 +117,10 @@ public class AuditReceiverMailLocalServiceClp
 		_methodName19 = "getRecieverMailsBySendMail";
 
 		_methodParameterTypes19 = new String[] { "long", "int", "int" };
+
+		_methodName20 = "countRecieverMailsBySendMail";
+
+		_methodParameterTypes20 = new String[] { "long" };
 	}
 
 	public com.tls.liferaylms.mail.model.AuditReceiverMail addAuditReceiverMail(
@@ -683,6 +687,33 @@ public class AuditReceiverMailLocalServiceClp
 		return (java.util.List<com.tls.liferaylms.mail.model.AuditReceiverMail>)ClpSerializer.translateOutput(returnObj);
 	}
 
+	public int countRecieverMailsBySendMail(long auditSendMailsId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		Object returnObj = null;
+
+		try {
+			returnObj = _invokableLocalService.invokeMethod(_methodName20,
+					_methodParameterTypes20, new Object[] { auditSendMailsId });
+		}
+		catch (Throwable t) {
+			t = ClpSerializer.translateThrowable(t);
+
+			if (t instanceof com.liferay.portal.kernel.exception.SystemException) {
+				throw (com.liferay.portal.kernel.exception.SystemException)t;
+			}
+
+			if (t instanceof RuntimeException) {
+				throw (RuntimeException)t;
+			}
+			else {
+				throw new RuntimeException(t.getClass().getName() +
+					" is not a valid exception");
+			}
+		}
+
+		return ((Integer)returnObj).intValue();
+	}
+
 	private InvokableLocalService _invokableLocalService;
 	private String _methodName0;
 	private String[] _methodParameterTypes0;
@@ -722,4 +753,6 @@ public class AuditReceiverMailLocalServiceClp
 	private String[] _methodParameterTypes17;
 	private String _methodName19;
 	private String[] _methodParameterTypes19;
+	private String _methodName20;
+	private String[] _methodParameterTypes20;
 }
