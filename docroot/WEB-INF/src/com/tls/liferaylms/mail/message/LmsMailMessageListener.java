@@ -288,6 +288,12 @@ public class LmsMailMessageListener implements MessageListener {
 			auditSendMails.setUserId(userId);
 			auditSendMails.setGroupId(groupId);
 			auditSendMails.setTemplateId(Long.parseLong(templateId));
+			
+			if(Long.parseLong(templateId)<0){
+				auditSendMails.setBody(bodyTemplate);
+				auditSendMails.setSubject(subjectTemplate);
+			}
+			
 			auditSendMails.setCompanyId(companyId);
 			AuditSendMailsLocalServiceUtil.addAuditSendMails(auditSendMails); 
 			

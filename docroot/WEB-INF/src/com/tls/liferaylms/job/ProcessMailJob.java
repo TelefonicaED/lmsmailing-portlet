@@ -131,6 +131,11 @@ public class ProcessMailJob extends MVCPortlet implements MessageListener{
 						auditSendMails.setGroupId(mailJob.getGroupId());
 						auditSendMails.setTemplateId(mailJob.getIdTemplate());
 						auditSendMails.setCompanyId(mailJob.getCompanyId());
+						
+						auditSendMails.setSubject(mailTemplate.getSubject());
+						auditSendMails.setBody(mailTemplate.getBody());
+						
+						
 						AuditSendMailsLocalServiceUtil.addAuditSendMails(auditSendMails); 
 					}catch(Exception e){
 						e.printStackTrace();

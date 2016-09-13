@@ -81,9 +81,12 @@
 		%>
 		<c:choose>
 			<c:when test="<%= template!=null %>">
-				<liferay-ui:search-container-column-text name="subject.template">
+				<liferay-ui:search-container-column-text name="subject">
 					<c:out value="<%=template!=null ? template.getSubject() : \"-\" %>"/>
 				</liferay-ui:search-container-column-text>
+				<liferay-ui:search-container-column-text name="body">
+					<c:out value="<%=template!=null ? HtmlUtil.extractText(template.getBody()) : \"-\" %>"/>
+				</liferay-ui:search-container-column-text>				
 			</c:when>
 			<c:otherwise>
 					<liferay-ui:search-container-column-text name="subject">
