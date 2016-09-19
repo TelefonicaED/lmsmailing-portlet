@@ -47,4 +47,8 @@ public class AuditSendMailsLocalServiceImpl
 		return AuditSendMailsUtil.findByc(companyId);
 	}
 	
+	public AuditSendMails getInscriptionHistory(long groupId, long companyId) throws SystemException{
+		return AuditSendMailsUtil.fetchByinscriptionByGC(groupId, companyId, "COURSE_INSCRIPTION");
+	}
+	
 }

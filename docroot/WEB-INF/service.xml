@@ -31,8 +31,14 @@
 		<column name="companyId" type="long"  />
         <column name="subject" type="String"></column>
         <column name="body" type="String"></column>
+        <column name="type_" type="String"/>
 		<finder name="c" return-type="Collection">
 			<finder-column name="companyId" />
+		</finder>
+		<finder name="inscriptionByGC" return-type="AuditSendMails">
+			<finder-column name="groupId"/>
+			<finder-column name="companyId" />
+			<finder-column name="type_"/>
 		</finder>
 	</entity> 
 	
@@ -42,6 +48,7 @@
 		<column name="auditSendMailsId" type="long"/>
 		<column name="to" type="String"/>
 		<column name="status" type="Integer"/> 
+		<column name="sendDate" type="Date" />
 		<finder name="auditSendMail" return-type="Collection">
 			<finder-column name="auditSendMailsId" />
 		</finder>

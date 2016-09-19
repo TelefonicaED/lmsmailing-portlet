@@ -162,26 +162,26 @@ public class ProcessMailJob extends MVCPortlet implements MessageListener{
 
 							String portalUrl = PortalUtil.getPortalURL(company.getVirtualHostname(), PortalUtil.getPortalPort(false), false);
 							message.put("url", 		portalUrl);
-							message.put("urlcourse",portalUrl+PortalUtil.getPathFriendlyURLPublic()+group.getFriendlyURL());							
+							message.put("urlcourse",portalUrl+PortalUtil.getPathFriendlyURLPublic()+group.getFriendlyURL());
 
 							MessageBusUtil.sendMessage("lms/mailing", message);
 
-							LmsMailMessageListener.addAuditReceiverMail(auditSendMails.getAuditSendMailsId(), user.getEmailAddress(), LmsMailMessageListener.STATUS_OK);
+//							LmsMailMessageListener.addAuditReceiverMail(auditSendMails.getAuditSendMailsId(), user.getEmailAddress(), LmsMailMessageListener.STATUS_OK);
 						}catch(Exception e){
 							e.printStackTrace();
-							LmsMailMessageListener.addAuditReceiverMail(auditSendMails.getAuditSendMailsId(), user.getEmailAddress(), LmsMailMessageListener.STATUS_KO);
+//							LmsMailMessageListener.addAuditReceiverMail(auditSendMails.getAuditSendMailsId(), user.getEmailAddress(), LmsMailMessageListener.STATUS_KO);
 						}
 					}
 
 					//Guardar una auditoria del envio de emails.
-					try {
-						auditSendMails.setSendDate(new Date(System.currentTimeMillis()));
-						auditSendMails.setNumberOfPost(users.size());
-						AuditSendMailsLocalServiceUtil.updateAuditSendMails(auditSendMails);
-					} catch (SystemException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					} 
+//					try {
+//						auditSendMails.setSendDate(new Date(System.currentTimeMillis()));
+//						auditSendMails.setNumberOfPost(users.size());
+//						AuditSendMailsLocalServiceUtil.updateAuditSendMails(auditSendMails);
+//					} catch (SystemException e) {
+//						// TODO Auto-generated catch block
+//						e.printStackTrace();
+//					} 
 				}
 				
 				try {
