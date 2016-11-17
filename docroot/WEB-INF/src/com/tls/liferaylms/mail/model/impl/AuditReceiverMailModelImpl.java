@@ -36,6 +36,7 @@ import java.io.Serializable;
 import java.sql.Types;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -66,9 +67,10 @@ public class AuditReceiverMailModelImpl extends BaseModelImpl<AuditReceiverMail>
 			{ "auditReceiverMailId", Types.BIGINT },
 			{ "auditSendMailsId", Types.BIGINT },
 			{ "to_", Types.VARCHAR },
-			{ "status", Types.INTEGER }
+			{ "status", Types.INTEGER },
+			{ "sendDate", Types.TIMESTAMP }
 		};
-	public static final String TABLE_SQL_CREATE = "create table lmsmail_AuditReceiverMail (auditReceiverMailId LONG not null primary key,auditSendMailsId LONG,to_ VARCHAR(75) null,status INTEGER)";
+	public static final String TABLE_SQL_CREATE = "create table lmsmail_AuditReceiverMail (auditReceiverMailId LONG not null primary key,auditSendMailsId LONG,to_ VARCHAR(75) null,status INTEGER,sendDate DATE null)";
 	public static final String TABLE_SQL_DROP = "drop table lmsmail_AuditReceiverMail";
 	public static final String DATA_SOURCE = "liferayDataSource";
 	public static final String SESSION_FACTORY = "liferaySessionFactory";
@@ -101,6 +103,7 @@ public class AuditReceiverMailModelImpl extends BaseModelImpl<AuditReceiverMail>
 		model.setAuditSendMailsId(soapModel.getAuditSendMailsId());
 		model.setTo(soapModel.getTo());
 		model.setStatus(soapModel.getStatus());
+		model.setSendDate(soapModel.getSendDate());
 
 		return model;
 	}
@@ -164,6 +167,7 @@ public class AuditReceiverMailModelImpl extends BaseModelImpl<AuditReceiverMail>
 		attributes.put("auditSendMailsId", getAuditSendMailsId());
 		attributes.put("to", getTo());
 		attributes.put("status", getStatus());
+		attributes.put("sendDate", getSendDate());
 
 		return attributes;
 	}
@@ -192,6 +196,12 @@ public class AuditReceiverMailModelImpl extends BaseModelImpl<AuditReceiverMail>
 
 		if (status != null) {
 			setStatus(status);
+		}
+
+		Date sendDate = (Date)attributes.get("sendDate");
+
+		if (sendDate != null) {
+			setSendDate(sendDate);
 		}
 	}
 
@@ -248,6 +258,15 @@ public class AuditReceiverMailModelImpl extends BaseModelImpl<AuditReceiverMail>
 		_status = status;
 	}
 
+	@JSON
+	public Date getSendDate() {
+		return _sendDate;
+	}
+
+	public void setSendDate(Date sendDate) {
+		_sendDate = sendDate;
+	}
+
 	public long getColumnBitmask() {
 		return _columnBitmask;
 	}
@@ -284,6 +303,7 @@ public class AuditReceiverMailModelImpl extends BaseModelImpl<AuditReceiverMail>
 		auditReceiverMailImpl.setAuditSendMailsId(getAuditSendMailsId());
 		auditReceiverMailImpl.setTo(getTo());
 		auditReceiverMailImpl.setStatus(getStatus());
+		auditReceiverMailImpl.setSendDate(getSendDate());
 
 		auditReceiverMailImpl.resetOriginalValues();
 
@@ -363,12 +383,21 @@ public class AuditReceiverMailModelImpl extends BaseModelImpl<AuditReceiverMail>
 
 		auditReceiverMailCacheModel.status = getStatus();
 
+		Date sendDate = getSendDate();
+
+		if (sendDate != null) {
+			auditReceiverMailCacheModel.sendDate = sendDate.getTime();
+		}
+		else {
+			auditReceiverMailCacheModel.sendDate = Long.MIN_VALUE;
+		}
+
 		return auditReceiverMailCacheModel;
 	}
 
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(9);
+		StringBundler sb = new StringBundler(11);
 
 		sb.append("{auditReceiverMailId=");
 		sb.append(getAuditReceiverMailId());
@@ -378,13 +407,15 @@ public class AuditReceiverMailModelImpl extends BaseModelImpl<AuditReceiverMail>
 		sb.append(getTo());
 		sb.append(", status=");
 		sb.append(getStatus());
+		sb.append(", sendDate=");
+		sb.append(getSendDate());
 		sb.append("}");
 
 		return sb.toString();
 	}
 
 	public String toXmlString() {
-		StringBundler sb = new StringBundler(16);
+		StringBundler sb = new StringBundler(19);
 
 		sb.append("<model><model-name>");
 		sb.append("com.tls.liferaylms.mail.model.AuditReceiverMail");
@@ -406,6 +437,10 @@ public class AuditReceiverMailModelImpl extends BaseModelImpl<AuditReceiverMail>
 			"<column><column-name>status</column-name><column-value><![CDATA[");
 		sb.append(getStatus());
 		sb.append("]]></column-value></column>");
+		sb.append(
+			"<column><column-name>sendDate</column-name><column-value><![CDATA[");
+		sb.append(getSendDate());
+		sb.append("]]></column-value></column>");
 
 		sb.append("</model>");
 
@@ -422,6 +457,7 @@ public class AuditReceiverMailModelImpl extends BaseModelImpl<AuditReceiverMail>
 	private boolean _setOriginalAuditSendMailsId;
 	private String _to;
 	private Integer _status;
+	private Date _sendDate;
 	private long _columnBitmask;
 	private AuditReceiverMail _escapedModelProxy;
 }

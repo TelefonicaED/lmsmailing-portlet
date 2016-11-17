@@ -77,6 +77,7 @@ public class AuditSendMailsClp extends BaseModelImpl<AuditSendMails>
 		attributes.put("companyId", getCompanyId());
 		attributes.put("subject", getSubject());
 		attributes.put("body", getBody());
+		attributes.put("type_", getType_());
 
 		return attributes;
 	}
@@ -141,6 +142,12 @@ public class AuditSendMailsClp extends BaseModelImpl<AuditSendMails>
 
 		if (body != null) {
 			setBody(body);
+		}
+
+		String type_ = (String)attributes.get("type_");
+
+		if (type_ != null) {
+			setType_(type_);
 		}
 	}
 
@@ -232,6 +239,14 @@ public class AuditSendMailsClp extends BaseModelImpl<AuditSendMails>
 		_body = body;
 	}
 
+	public String getType_() {
+		return _type_;
+	}
+
+	public void setType_(String type_) {
+		_type_ = type_;
+	}
+
 	public BaseModel<?> getAuditSendMailsRemoteModel() {
 		return _auditSendMailsRemoteModel;
 	}
@@ -271,6 +286,7 @@ public class AuditSendMailsClp extends BaseModelImpl<AuditSendMails>
 		clone.setCompanyId(getCompanyId());
 		clone.setSubject(getSubject());
 		clone.setBody(getBody());
+		clone.setType_(getType_());
 
 		return clone;
 	}
@@ -321,7 +337,7 @@ public class AuditSendMailsClp extends BaseModelImpl<AuditSendMails>
 
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(21);
+		StringBundler sb = new StringBundler(23);
 
 		sb.append("{uuid=");
 		sb.append(getUuid());
@@ -343,13 +359,15 @@ public class AuditSendMailsClp extends BaseModelImpl<AuditSendMails>
 		sb.append(getSubject());
 		sb.append(", body=");
 		sb.append(getBody());
+		sb.append(", type_=");
+		sb.append(getType_());
 		sb.append("}");
 
 		return sb.toString();
 	}
 
 	public String toXmlString() {
-		StringBundler sb = new StringBundler(34);
+		StringBundler sb = new StringBundler(37);
 
 		sb.append("<model><model-name>");
 		sb.append("com.tls.liferaylms.mail.model.AuditSendMails");
@@ -395,6 +413,10 @@ public class AuditSendMailsClp extends BaseModelImpl<AuditSendMails>
 			"<column><column-name>body</column-name><column-value><![CDATA[");
 		sb.append(getBody());
 		sb.append("]]></column-value></column>");
+		sb.append(
+			"<column><column-name>type_</column-name><column-value><![CDATA[");
+		sb.append(getType_());
+		sb.append("]]></column-value></column>");
 
 		sb.append("</model>");
 
@@ -412,5 +434,6 @@ public class AuditSendMailsClp extends BaseModelImpl<AuditSendMails>
 	private long _companyId;
 	private String _subject;
 	private String _body;
+	private String _type_;
 	private BaseModel<?> _auditSendMailsRemoteModel;
 }

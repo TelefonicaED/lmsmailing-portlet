@@ -56,6 +56,7 @@ public class AuditSendMailsWrapper implements AuditSendMails,
 		attributes.put("companyId", getCompanyId());
 		attributes.put("subject", getSubject());
 		attributes.put("body", getBody());
+		attributes.put("type_", getType_());
 
 		return attributes;
 	}
@@ -119,6 +120,12 @@ public class AuditSendMailsWrapper implements AuditSendMails,
 
 		if (body != null) {
 			setBody(body);
+		}
+
+		String type_ = (String)attributes.get("type_");
+
+		if (type_ != null) {
+			setType_(type_);
 		}
 	}
 
@@ -338,6 +345,24 @@ public class AuditSendMailsWrapper implements AuditSendMails,
 	*/
 	public void setBody(java.lang.String body) {
 		_auditSendMails.setBody(body);
+	}
+
+	/**
+	* Returns the type_ of this audit send mails.
+	*
+	* @return the type_ of this audit send mails
+	*/
+	public java.lang.String getType_() {
+		return _auditSendMails.getType_();
+	}
+
+	/**
+	* Sets the type_ of this audit send mails.
+	*
+	* @param type_ the type_ of this audit send mails
+	*/
+	public void setType_(java.lang.String type_) {
+		_auditSendMails.setType_(type_);
 	}
 
 	public boolean isNew() {

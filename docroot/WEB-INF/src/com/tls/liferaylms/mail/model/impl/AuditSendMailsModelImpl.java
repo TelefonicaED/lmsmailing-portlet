@@ -75,9 +75,10 @@ public class AuditSendMailsModelImpl extends BaseModelImpl<AuditSendMails>
 			{ "numberOfPost", Types.BIGINT },
 			{ "companyId", Types.BIGINT },
 			{ "subject", Types.VARCHAR },
-			{ "body", Types.VARCHAR }
+			{ "body", Types.VARCHAR },
+			{ "type_", Types.VARCHAR }
 		};
-	public static final String TABLE_SQL_CREATE = "create table lmsmail_AuditSendMails (uuid_ VARCHAR(75) null,auditSendMailsId LONG not null primary key,userId LONG,templateId LONG,groupId LONG,sendDate DATE null,numberOfPost LONG,companyId LONG,subject VARCHAR(120) null,body TEXT null)";
+	public static final String TABLE_SQL_CREATE = "create table lmsmail_AuditSendMails (uuid_ VARCHAR(75) null,auditSendMailsId LONG not null primary key,userId LONG,templateId LONG,groupId LONG,sendDate DATE null,numberOfPost LONG,companyId LONG,subject VARCHAR(120) null,body TEXT null,type_ VARCHAR(75) null)";
 	public static final String TABLE_SQL_DROP = "drop table lmsmail_AuditSendMails";
 	public static final String DATA_SOURCE = "liferayDataSource";
 	public static final String SESSION_FACTORY = "liferaySessionFactory";
@@ -93,7 +94,8 @@ public class AuditSendMailsModelImpl extends BaseModelImpl<AuditSendMails>
 			true);
 	public static long COMPANYID_COLUMN_BITMASK = 1L;
 	public static long GROUPID_COLUMN_BITMASK = 2L;
-	public static long UUID_COLUMN_BITMASK = 4L;
+	public static long TYPE__COLUMN_BITMASK = 4L;
+	public static long UUID_COLUMN_BITMASK = 8L;
 
 	/**
 	 * Converts the soap model instance into a normal model instance.
@@ -118,6 +120,7 @@ public class AuditSendMailsModelImpl extends BaseModelImpl<AuditSendMails>
 		model.setCompanyId(soapModel.getCompanyId());
 		model.setSubject(soapModel.getSubject());
 		model.setBody(soapModel.getBody());
+		model.setType_(soapModel.getType_());
 
 		return model;
 	}
@@ -186,6 +189,7 @@ public class AuditSendMailsModelImpl extends BaseModelImpl<AuditSendMails>
 		attributes.put("companyId", getCompanyId());
 		attributes.put("subject", getSubject());
 		attributes.put("body", getBody());
+		attributes.put("type_", getType_());
 
 		return attributes;
 	}
@@ -250,6 +254,12 @@ public class AuditSendMailsModelImpl extends BaseModelImpl<AuditSendMails>
 
 		if (body != null) {
 			setBody(body);
+		}
+
+		String type_ = (String)attributes.get("type_");
+
+		if (type_ != null) {
+			setType_(type_);
 		}
 	}
 
@@ -398,6 +408,30 @@ public class AuditSendMailsModelImpl extends BaseModelImpl<AuditSendMails>
 		_body = body;
 	}
 
+	@JSON
+	public String getType_() {
+		if (_type_ == null) {
+			return StringPool.BLANK;
+		}
+		else {
+			return _type_;
+		}
+	}
+
+	public void setType_(String type_) {
+		_columnBitmask |= TYPE__COLUMN_BITMASK;
+
+		if (_originalType_ == null) {
+			_originalType_ = _type_;
+		}
+
+		_type_ = type_;
+	}
+
+	public String getOriginalType_() {
+		return GetterUtil.getString(_originalType_);
+	}
+
 	public long getColumnBitmask() {
 		return _columnBitmask;
 	}
@@ -440,6 +474,7 @@ public class AuditSendMailsModelImpl extends BaseModelImpl<AuditSendMails>
 		auditSendMailsImpl.setCompanyId(getCompanyId());
 		auditSendMailsImpl.setSubject(getSubject());
 		auditSendMailsImpl.setBody(getBody());
+		auditSendMailsImpl.setType_(getType_());
 
 		auditSendMailsImpl.resetOriginalValues();
 
@@ -504,6 +539,8 @@ public class AuditSendMailsModelImpl extends BaseModelImpl<AuditSendMails>
 
 		auditSendMailsModelImpl._setOriginalCompanyId = false;
 
+		auditSendMailsModelImpl._originalType_ = auditSendMailsModelImpl._type_;
+
 		auditSendMailsModelImpl._columnBitmask = 0;
 	}
 
@@ -556,12 +593,20 @@ public class AuditSendMailsModelImpl extends BaseModelImpl<AuditSendMails>
 			auditSendMailsCacheModel.body = null;
 		}
 
+		auditSendMailsCacheModel.type_ = getType_();
+
+		String type_ = auditSendMailsCacheModel.type_;
+
+		if ((type_ != null) && (type_.length() == 0)) {
+			auditSendMailsCacheModel.type_ = null;
+		}
+
 		return auditSendMailsCacheModel;
 	}
 
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(21);
+		StringBundler sb = new StringBundler(23);
 
 		sb.append("{uuid=");
 		sb.append(getUuid());
@@ -583,13 +628,15 @@ public class AuditSendMailsModelImpl extends BaseModelImpl<AuditSendMails>
 		sb.append(getSubject());
 		sb.append(", body=");
 		sb.append(getBody());
+		sb.append(", type_=");
+		sb.append(getType_());
 		sb.append("}");
 
 		return sb.toString();
 	}
 
 	public String toXmlString() {
-		StringBundler sb = new StringBundler(34);
+		StringBundler sb = new StringBundler(37);
 
 		sb.append("<model><model-name>");
 		sb.append("com.tls.liferaylms.mail.model.AuditSendMails");
@@ -635,6 +682,10 @@ public class AuditSendMailsModelImpl extends BaseModelImpl<AuditSendMails>
 			"<column><column-name>body</column-name><column-value><![CDATA[");
 		sb.append(getBody());
 		sb.append("]]></column-value></column>");
+		sb.append(
+			"<column><column-name>type_</column-name><column-value><![CDATA[");
+		sb.append(getType_());
+		sb.append("]]></column-value></column>");
 
 		sb.append("</model>");
 
@@ -661,6 +712,8 @@ public class AuditSendMailsModelImpl extends BaseModelImpl<AuditSendMails>
 	private boolean _setOriginalCompanyId;
 	private String _subject;
 	private String _body;
+	private String _type_;
+	private String _originalType_;
 	private long _columnBitmask;
 	private AuditSendMails _escapedModelProxy;
 }

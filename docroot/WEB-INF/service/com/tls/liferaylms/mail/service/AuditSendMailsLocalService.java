@@ -267,4 +267,9 @@ public interface AuditSendMailsLocalService extends BaseLocalService,
 	public java.util.List<com.tls.liferaylms.mail.model.AuditSendMails> getHistoryByCompanyId(
 		long companyId)
 		throws com.liferay.portal.kernel.exception.SystemException;
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public com.tls.liferaylms.mail.model.AuditSendMails getInscriptionHistory(
+		long groupId, long companyId)
+		throws com.liferay.portal.kernel.exception.SystemException;
 }

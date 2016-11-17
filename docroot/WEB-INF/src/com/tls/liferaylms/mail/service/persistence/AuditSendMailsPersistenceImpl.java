@@ -130,6 +130,25 @@ public class AuditSendMailsPersistenceImpl extends BasePersistenceImpl<AuditSend
 			AuditSendMailsModelImpl.FINDER_CACHE_ENABLED, Long.class,
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByc",
 			new String[] { Long.class.getName() });
+	public static final FinderPath FINDER_PATH_FETCH_BY_INSCRIPTIONBYGC = new FinderPath(AuditSendMailsModelImpl.ENTITY_CACHE_ENABLED,
+			AuditSendMailsModelImpl.FINDER_CACHE_ENABLED,
+			AuditSendMailsImpl.class, FINDER_CLASS_NAME_ENTITY,
+			"fetchByinscriptionByGC",
+			new String[] {
+				Long.class.getName(), Long.class.getName(),
+				String.class.getName()
+			},
+			AuditSendMailsModelImpl.GROUPID_COLUMN_BITMASK |
+			AuditSendMailsModelImpl.COMPANYID_COLUMN_BITMASK |
+			AuditSendMailsModelImpl.TYPE__COLUMN_BITMASK);
+	public static final FinderPath FINDER_PATH_COUNT_BY_INSCRIPTIONBYGC = new FinderPath(AuditSendMailsModelImpl.ENTITY_CACHE_ENABLED,
+			AuditSendMailsModelImpl.FINDER_CACHE_ENABLED, Long.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION,
+			"countByinscriptionByGC",
+			new String[] {
+				Long.class.getName(), Long.class.getName(),
+				String.class.getName()
+			});
 	public static final FinderPath FINDER_PATH_WITH_PAGINATION_FIND_ALL = new FinderPath(AuditSendMailsModelImpl.ENTITY_CACHE_ENABLED,
 			AuditSendMailsModelImpl.FINDER_CACHE_ENABLED,
 			AuditSendMailsImpl.class, FINDER_CLASS_NAME_LIST_WITH_PAGINATION,
@@ -156,6 +175,14 @@ public class AuditSendMailsPersistenceImpl extends BasePersistenceImpl<AuditSend
 			new Object[] {
 				auditSendMails.getUuid(),
 				Long.valueOf(auditSendMails.getGroupId())
+			}, auditSendMails);
+
+		FinderCacheUtil.putResult(FINDER_PATH_FETCH_BY_INSCRIPTIONBYGC,
+			new Object[] {
+				Long.valueOf(auditSendMails.getGroupId()),
+				Long.valueOf(auditSendMails.getCompanyId()),
+				
+			auditSendMails.getType_()
 			}, auditSendMails);
 
 		auditSendMails.resetOriginalValues();
@@ -235,6 +262,14 @@ public class AuditSendMailsPersistenceImpl extends BasePersistenceImpl<AuditSend
 			new Object[] {
 				auditSendMails.getUuid(),
 				Long.valueOf(auditSendMails.getGroupId())
+			});
+
+		FinderCacheUtil.removeResult(FINDER_PATH_FETCH_BY_INSCRIPTIONBYGC,
+			new Object[] {
+				Long.valueOf(auditSendMails.getGroupId()),
+				Long.valueOf(auditSendMails.getCompanyId()),
+				
+			auditSendMails.getType_()
 			});
 	}
 
@@ -421,6 +456,14 @@ public class AuditSendMailsPersistenceImpl extends BasePersistenceImpl<AuditSend
 					auditSendMails.getUuid(),
 					Long.valueOf(auditSendMails.getGroupId())
 				}, auditSendMails);
+
+			FinderCacheUtil.putResult(FINDER_PATH_FETCH_BY_INSCRIPTIONBYGC,
+				new Object[] {
+					Long.valueOf(auditSendMails.getGroupId()),
+					Long.valueOf(auditSendMails.getCompanyId()),
+					
+				auditSendMails.getType_()
+				}, auditSendMails);
 		}
 		else {
 			if ((auditSendMailsModelImpl.getColumnBitmask() &
@@ -438,6 +481,30 @@ public class AuditSendMailsPersistenceImpl extends BasePersistenceImpl<AuditSend
 					new Object[] {
 						auditSendMails.getUuid(),
 						Long.valueOf(auditSendMails.getGroupId())
+					}, auditSendMails);
+			}
+
+			if ((auditSendMailsModelImpl.getColumnBitmask() &
+					FINDER_PATH_FETCH_BY_INSCRIPTIONBYGC.getColumnBitmask()) != 0) {
+				Object[] args = new Object[] {
+						Long.valueOf(auditSendMailsModelImpl.getOriginalGroupId()),
+						Long.valueOf(auditSendMailsModelImpl.getOriginalCompanyId()),
+						
+						auditSendMailsModelImpl.getOriginalType_()
+					};
+
+				FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_INSCRIPTIONBYGC,
+					args);
+
+				FinderCacheUtil.removeResult(FINDER_PATH_FETCH_BY_INSCRIPTIONBYGC,
+					args);
+
+				FinderCacheUtil.putResult(FINDER_PATH_FETCH_BY_INSCRIPTIONBYGC,
+					new Object[] {
+						Long.valueOf(auditSendMails.getGroupId()),
+						Long.valueOf(auditSendMails.getCompanyId()),
+						
+					auditSendMails.getType_()
 					}, auditSendMails);
 			}
 		}
@@ -465,6 +532,7 @@ public class AuditSendMailsPersistenceImpl extends BasePersistenceImpl<AuditSend
 		auditSendMailsImpl.setCompanyId(auditSendMails.getCompanyId());
 		auditSendMailsImpl.setSubject(auditSendMails.getSubject());
 		auditSendMailsImpl.setBody(auditSendMails.getBody());
+		auditSendMailsImpl.setType_(auditSendMails.getType_());
 
 		return auditSendMailsImpl;
 	}
@@ -1500,6 +1568,180 @@ public class AuditSendMailsPersistenceImpl extends BasePersistenceImpl<AuditSend
 	}
 
 	/**
+	 * Returns the audit send mails where groupId = &#63; and companyId = &#63; and type_ = &#63; or throws a {@link com.tls.liferaylms.mail.NoSuchAuditSendMailsException} if it could not be found.
+	 *
+	 * @param groupId the group ID
+	 * @param companyId the company ID
+	 * @param type_ the type_
+	 * @return the matching audit send mails
+	 * @throws com.tls.liferaylms.mail.NoSuchAuditSendMailsException if a matching audit send mails could not be found
+	 * @throws SystemException if a system exception occurred
+	 */
+	public AuditSendMails findByinscriptionByGC(long groupId, long companyId,
+		String type_) throws NoSuchAuditSendMailsException, SystemException {
+		AuditSendMails auditSendMails = fetchByinscriptionByGC(groupId,
+				companyId, type_);
+
+		if (auditSendMails == null) {
+			StringBundler msg = new StringBundler(8);
+
+			msg.append(_NO_SUCH_ENTITY_WITH_KEY);
+
+			msg.append("groupId=");
+			msg.append(groupId);
+
+			msg.append(", companyId=");
+			msg.append(companyId);
+
+			msg.append(", type_=");
+			msg.append(type_);
+
+			msg.append(StringPool.CLOSE_CURLY_BRACE);
+
+			if (_log.isWarnEnabled()) {
+				_log.warn(msg.toString());
+			}
+
+			throw new NoSuchAuditSendMailsException(msg.toString());
+		}
+
+		return auditSendMails;
+	}
+
+	/**
+	 * Returns the audit send mails where groupId = &#63; and companyId = &#63; and type_ = &#63; or returns <code>null</code> if it could not be found. Uses the finder cache.
+	 *
+	 * @param groupId the group ID
+	 * @param companyId the company ID
+	 * @param type_ the type_
+	 * @return the matching audit send mails, or <code>null</code> if a matching audit send mails could not be found
+	 * @throws SystemException if a system exception occurred
+	 */
+	public AuditSendMails fetchByinscriptionByGC(long groupId, long companyId,
+		String type_) throws SystemException {
+		return fetchByinscriptionByGC(groupId, companyId, type_, true);
+	}
+
+	/**
+	 * Returns the audit send mails where groupId = &#63; and companyId = &#63; and type_ = &#63; or returns <code>null</code> if it could not be found, optionally using the finder cache.
+	 *
+	 * @param groupId the group ID
+	 * @param companyId the company ID
+	 * @param type_ the type_
+	 * @param retrieveFromCache whether to use the finder cache
+	 * @return the matching audit send mails, or <code>null</code> if a matching audit send mails could not be found
+	 * @throws SystemException if a system exception occurred
+	 */
+	public AuditSendMails fetchByinscriptionByGC(long groupId, long companyId,
+		String type_, boolean retrieveFromCache) throws SystemException {
+		Object[] finderArgs = new Object[] { groupId, companyId, type_ };
+
+		Object result = null;
+
+		if (retrieveFromCache) {
+			result = FinderCacheUtil.getResult(FINDER_PATH_FETCH_BY_INSCRIPTIONBYGC,
+					finderArgs, this);
+		}
+
+		if (result instanceof AuditSendMails) {
+			AuditSendMails auditSendMails = (AuditSendMails)result;
+
+			if ((groupId != auditSendMails.getGroupId()) ||
+					(companyId != auditSendMails.getCompanyId()) ||
+					!Validator.equals(type_, auditSendMails.getType_())) {
+				result = null;
+			}
+		}
+
+		if (result == null) {
+			StringBundler query = new StringBundler(4);
+
+			query.append(_SQL_SELECT_AUDITSENDMAILS_WHERE);
+
+			query.append(_FINDER_COLUMN_INSCRIPTIONBYGC_GROUPID_2);
+
+			query.append(_FINDER_COLUMN_INSCRIPTIONBYGC_COMPANYID_2);
+
+			if (type_ == null) {
+				query.append(_FINDER_COLUMN_INSCRIPTIONBYGC_TYPE__1);
+			}
+			else {
+				if (type_.equals(StringPool.BLANK)) {
+					query.append(_FINDER_COLUMN_INSCRIPTIONBYGC_TYPE__3);
+				}
+				else {
+					query.append(_FINDER_COLUMN_INSCRIPTIONBYGC_TYPE__2);
+				}
+			}
+
+			String sql = query.toString();
+
+			Session session = null;
+
+			try {
+				session = openSession();
+
+				Query q = session.createQuery(sql);
+
+				QueryPos qPos = QueryPos.getInstance(q);
+
+				qPos.add(groupId);
+
+				qPos.add(companyId);
+
+				if (type_ != null) {
+					qPos.add(type_);
+				}
+
+				List<AuditSendMails> list = q.list();
+
+				result = list;
+
+				AuditSendMails auditSendMails = null;
+
+				if (list.isEmpty()) {
+					FinderCacheUtil.putResult(FINDER_PATH_FETCH_BY_INSCRIPTIONBYGC,
+						finderArgs, list);
+				}
+				else {
+					auditSendMails = list.get(0);
+
+					cacheResult(auditSendMails);
+
+					if ((auditSendMails.getGroupId() != groupId) ||
+							(auditSendMails.getCompanyId() != companyId) ||
+							(auditSendMails.getType_() == null) ||
+							!auditSendMails.getType_().equals(type_)) {
+						FinderCacheUtil.putResult(FINDER_PATH_FETCH_BY_INSCRIPTIONBYGC,
+							finderArgs, auditSendMails);
+					}
+				}
+
+				return auditSendMails;
+			}
+			catch (Exception e) {
+				throw processException(e);
+			}
+			finally {
+				if (result == null) {
+					FinderCacheUtil.removeResult(FINDER_PATH_FETCH_BY_INSCRIPTIONBYGC,
+						finderArgs);
+				}
+
+				closeSession(session);
+			}
+		}
+		else {
+			if (result instanceof List<?>) {
+				return null;
+			}
+			else {
+				return (AuditSendMails)result;
+			}
+		}
+	}
+
+	/**
 	 * Returns all the audit send mailses.
 	 *
 	 * @return the audit send mailses
@@ -1651,6 +1893,23 @@ public class AuditSendMailsPersistenceImpl extends BasePersistenceImpl<AuditSend
 		for (AuditSendMails auditSendMails : findByc(companyId)) {
 			remove(auditSendMails);
 		}
+	}
+
+	/**
+	 * Removes the audit send mails where groupId = &#63; and companyId = &#63; and type_ = &#63; from the database.
+	 *
+	 * @param groupId the group ID
+	 * @param companyId the company ID
+	 * @param type_ the type_
+	 * @return the audit send mails that was removed
+	 * @throws SystemException if a system exception occurred
+	 */
+	public AuditSendMails removeByinscriptionByGC(long groupId, long companyId,
+		String type_) throws NoSuchAuditSendMailsException, SystemException {
+		AuditSendMails auditSendMails = findByinscriptionByGC(groupId,
+				companyId, type_);
+
+		return remove(auditSendMails);
 	}
 
 	/**
@@ -1854,6 +2113,82 @@ public class AuditSendMailsPersistenceImpl extends BasePersistenceImpl<AuditSend
 	}
 
 	/**
+	 * Returns the number of audit send mailses where groupId = &#63; and companyId = &#63; and type_ = &#63;.
+	 *
+	 * @param groupId the group ID
+	 * @param companyId the company ID
+	 * @param type_ the type_
+	 * @return the number of matching audit send mailses
+	 * @throws SystemException if a system exception occurred
+	 */
+	public int countByinscriptionByGC(long groupId, long companyId, String type_)
+		throws SystemException {
+		Object[] finderArgs = new Object[] { groupId, companyId, type_ };
+
+		Long count = (Long)FinderCacheUtil.getResult(FINDER_PATH_COUNT_BY_INSCRIPTIONBYGC,
+				finderArgs, this);
+
+		if (count == null) {
+			StringBundler query = new StringBundler(4);
+
+			query.append(_SQL_COUNT_AUDITSENDMAILS_WHERE);
+
+			query.append(_FINDER_COLUMN_INSCRIPTIONBYGC_GROUPID_2);
+
+			query.append(_FINDER_COLUMN_INSCRIPTIONBYGC_COMPANYID_2);
+
+			if (type_ == null) {
+				query.append(_FINDER_COLUMN_INSCRIPTIONBYGC_TYPE__1);
+			}
+			else {
+				if (type_.equals(StringPool.BLANK)) {
+					query.append(_FINDER_COLUMN_INSCRIPTIONBYGC_TYPE__3);
+				}
+				else {
+					query.append(_FINDER_COLUMN_INSCRIPTIONBYGC_TYPE__2);
+				}
+			}
+
+			String sql = query.toString();
+
+			Session session = null;
+
+			try {
+				session = openSession();
+
+				Query q = session.createQuery(sql);
+
+				QueryPos qPos = QueryPos.getInstance(q);
+
+				qPos.add(groupId);
+
+				qPos.add(companyId);
+
+				if (type_ != null) {
+					qPos.add(type_);
+				}
+
+				count = (Long)q.uniqueResult();
+			}
+			catch (Exception e) {
+				throw processException(e);
+			}
+			finally {
+				if (count == null) {
+					count = Long.valueOf(0);
+				}
+
+				FinderCacheUtil.putResult(FINDER_PATH_COUNT_BY_INSCRIPTIONBYGC,
+					finderArgs, count);
+
+				closeSession(session);
+			}
+		}
+
+		return count.intValue();
+	}
+
+	/**
 	 * Returns the number of audit send mailses.
 	 *
 	 * @return the number of audit send mailses
@@ -1946,6 +2281,11 @@ public class AuditSendMailsPersistenceImpl extends BasePersistenceImpl<AuditSend
 	private static final String _FINDER_COLUMN_UUID_G_UUID_3 = "(auditSendMails.uuid IS NULL OR auditSendMails.uuid = ?) AND ";
 	private static final String _FINDER_COLUMN_UUID_G_GROUPID_2 = "auditSendMails.groupId = ?";
 	private static final String _FINDER_COLUMN_C_COMPANYID_2 = "auditSendMails.companyId = ?";
+	private static final String _FINDER_COLUMN_INSCRIPTIONBYGC_GROUPID_2 = "auditSendMails.groupId = ? AND ";
+	private static final String _FINDER_COLUMN_INSCRIPTIONBYGC_COMPANYID_2 = "auditSendMails.companyId = ? AND ";
+	private static final String _FINDER_COLUMN_INSCRIPTIONBYGC_TYPE__1 = "auditSendMails.type_ IS NULL";
+	private static final String _FINDER_COLUMN_INSCRIPTIONBYGC_TYPE__2 = "auditSendMails.type_ = ?";
+	private static final String _FINDER_COLUMN_INSCRIPTIONBYGC_TYPE__3 = "(auditSendMails.type_ IS NULL OR auditSendMails.type_ = ?)";
 	private static final String _ORDER_BY_ENTITY_ALIAS = "auditSendMails.";
 	private static final String _NO_SUCH_ENTITY_WITH_PRIMARY_KEY = "No AuditSendMails exists with the primary key ";
 	private static final String _NO_SUCH_ENTITY_WITH_KEY = "No AuditSendMails exists with the key {";

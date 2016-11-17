@@ -23,6 +23,8 @@ import com.liferay.portlet.expando.model.ExpandoBridge;
 
 import java.io.Serializable;
 
+import java.util.Date;
+
 /**
  * The base model interface for the AuditReceiverMail service. Represents a row in the &quot;lmsmail_AuditReceiverMail&quot; database table, with each column mapped to a property of this class.
  *
@@ -113,6 +115,20 @@ public interface AuditReceiverMailModel extends BaseModel<AuditReceiverMail> {
 	 * @param status the status of this audit receiver mail
 	 */
 	public void setStatus(Integer status);
+
+	/**
+	 * Returns the send date of this audit receiver mail.
+	 *
+	 * @return the send date of this audit receiver mail
+	 */
+	public Date getSendDate();
+
+	/**
+	 * Sets the send date of this audit receiver mail.
+	 *
+	 * @param sendDate the send date of this audit receiver mail
+	 */
+	public void setSendDate(Date sendDate);
 
 	public boolean isNew();
 

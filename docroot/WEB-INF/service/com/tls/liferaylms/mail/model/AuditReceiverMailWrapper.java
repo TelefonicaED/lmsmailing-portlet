@@ -16,6 +16,7 @@ package com.tls.liferaylms.mail.model;
 
 import com.liferay.portal.model.ModelWrapper;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -49,6 +50,7 @@ public class AuditReceiverMailWrapper implements AuditReceiverMail,
 		attributes.put("auditSendMailsId", getAuditSendMailsId());
 		attributes.put("to", getTo());
 		attributes.put("status", getStatus());
+		attributes.put("sendDate", getSendDate());
 
 		return attributes;
 	}
@@ -76,6 +78,12 @@ public class AuditReceiverMailWrapper implements AuditReceiverMail,
 
 		if (status != null) {
 			setStatus(status);
+		}
+
+		Date sendDate = (Date)attributes.get("sendDate");
+
+		if (sendDate != null) {
+			setSendDate(sendDate);
 		}
 	}
 
@@ -167,6 +175,24 @@ public class AuditReceiverMailWrapper implements AuditReceiverMail,
 	*/
 	public void setStatus(java.lang.Integer status) {
 		_auditReceiverMail.setStatus(status);
+	}
+
+	/**
+	* Returns the send date of this audit receiver mail.
+	*
+	* @return the send date of this audit receiver mail
+	*/
+	public java.util.Date getSendDate() {
+		return _auditReceiverMail.getSendDate();
+	}
+
+	/**
+	* Sets the send date of this audit receiver mail.
+	*
+	* @param sendDate the send date of this audit receiver mail
+	*/
+	public void setSendDate(java.util.Date sendDate) {
+		_auditReceiverMail.setSendDate(sendDate);
 	}
 
 	public boolean isNew() {

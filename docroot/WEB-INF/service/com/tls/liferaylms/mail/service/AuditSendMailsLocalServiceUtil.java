@@ -296,6 +296,12 @@ public class AuditSendMailsLocalServiceUtil {
 		return getService().getHistoryByCompanyId(companyId);
 	}
 
+	public static com.tls.liferaylms.mail.model.AuditSendMails getInscriptionHistory(
+		long groupId, long companyId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getService().getInscriptionHistory(groupId, companyId);
+	}
+
 	public static void clearService() {
 		_service = null;
 	}

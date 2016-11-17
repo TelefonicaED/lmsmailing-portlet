@@ -294,6 +294,13 @@ public class AuditSendMailsLocalServiceWrapper
 		return _auditSendMailsLocalService.getHistoryByCompanyId(companyId);
 	}
 
+	public com.tls.liferaylms.mail.model.AuditSendMails getInscriptionHistory(
+		long groupId, long companyId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return _auditSendMailsLocalService.getInscriptionHistory(groupId,
+			companyId);
+	}
+
 	/**
 	 * @deprecated Renamed to {@link #getWrappedService}
 	 */

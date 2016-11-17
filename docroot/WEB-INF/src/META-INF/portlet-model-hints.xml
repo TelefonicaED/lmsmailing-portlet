@@ -6,6 +6,7 @@
 		<field name="auditSendMailsId" type="long" />
 		<field name="to" type="String" />
 		<field name="status" type="Integer" />
+		<field name="sendDate" type="Date" />
 	</model>
 	<model name="com.tls.liferaylms.mail.model.AuditSendMails">
 		<field name="uuid" type="String" />
@@ -22,6 +23,7 @@
 		<field name="body" type="String">
 			<hint name="max-length">500000</hint>
 		</field>
+		<field name="type_" type="String" />
 	</model>
 	<model name="com.tls.liferaylms.mail.model.MailJob">
 		<field name="uuid" type="String" />

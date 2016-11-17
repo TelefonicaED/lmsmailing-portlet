@@ -15,6 +15,9 @@
 				<column name="TO_" />
 			</basic>
 			<basic name="status" />
+			<basic name="sendDate">
+				<temporal>TIMESTAMP</temporal>
+			</basic>
 			<transient name="modelAttributes" />
 			<transient name="primaryKey" />
 			<transient name="primaryKeyObj" />
@@ -36,6 +39,7 @@
 			<basic name="companyId" />
 			<basic name="subject" />
 			<basic name="body" />
+			<basic name="type_" />
 			<transient name="modelAttributes" />
 			<transient name="primaryKey" />
 			<transient name="primaryKeyObj" />

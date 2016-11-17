@@ -2,7 +2,8 @@ create table lmsmail_AuditReceiverMail (
 	auditReceiverMailId LONG not null primary key,
 	auditSendMailsId LONG,
 	to_ VARCHAR(75) null,
-	status INTEGER
+	status INTEGER,
+	sendDate DATE null
 );
 
 create table lmsmail_AuditSendMails (
@@ -15,7 +16,8 @@ create table lmsmail_AuditSendMails (
 	numberOfPost LONG,
 	companyId LONG,
 	subject VARCHAR(120) null,
-	body TEXT null
+	body TEXT null,
+	type_ VARCHAR(75) null
 );
 
 create table lmsmail_MailJob (
