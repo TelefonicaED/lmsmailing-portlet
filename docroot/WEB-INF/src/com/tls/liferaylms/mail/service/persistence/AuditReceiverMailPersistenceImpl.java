@@ -360,6 +360,7 @@ public class AuditReceiverMailPersistenceImpl extends BasePersistenceImpl<AuditR
 		auditReceiverMailImpl.setAuditSendMailsId(auditReceiverMail.getAuditSendMailsId());
 		auditReceiverMailImpl.setTo(auditReceiverMail.getTo());
 		auditReceiverMailImpl.setStatus(auditReceiverMail.getStatus());
+		auditReceiverMailImpl.setSendDate(auditReceiverMail.getSendDate());
 
 		return auditReceiverMailImpl;
 	}

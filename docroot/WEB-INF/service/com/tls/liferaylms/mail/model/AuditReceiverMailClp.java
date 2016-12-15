@@ -26,6 +26,7 @@ import java.io.Serializable;
 
 import java.lang.reflect.Proxy;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -69,6 +70,7 @@ public class AuditReceiverMailClp extends BaseModelImpl<AuditReceiverMail>
 		attributes.put("auditSendMailsId", getAuditSendMailsId());
 		attributes.put("to", getTo());
 		attributes.put("status", getStatus());
+		attributes.put("sendDate", getSendDate());
 
 		return attributes;
 	}
@@ -97,6 +99,12 @@ public class AuditReceiverMailClp extends BaseModelImpl<AuditReceiverMail>
 
 		if (status != null) {
 			setStatus(status);
+		}
+
+		Date sendDate = (Date)attributes.get("sendDate");
+
+		if (sendDate != null) {
+			setSendDate(sendDate);
 		}
 	}
 
@@ -132,6 +140,14 @@ public class AuditReceiverMailClp extends BaseModelImpl<AuditReceiverMail>
 		_status = status;
 	}
 
+	public Date getSendDate() {
+		return _sendDate;
+	}
+
+	public void setSendDate(Date sendDate) {
+		_sendDate = sendDate;
+	}
+
 	public BaseModel<?> getAuditReceiverMailRemoteModel() {
 		return _auditReceiverMailRemoteModel;
 	}
@@ -165,6 +181,7 @@ public class AuditReceiverMailClp extends BaseModelImpl<AuditReceiverMail>
 		clone.setAuditSendMailsId(getAuditSendMailsId());
 		clone.setTo(getTo());
 		clone.setStatus(getStatus());
+		clone.setSendDate(getSendDate());
 
 		return clone;
 	}
@@ -215,7 +232,7 @@ public class AuditReceiverMailClp extends BaseModelImpl<AuditReceiverMail>
 
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(9);
+		StringBundler sb = new StringBundler(11);
 
 		sb.append("{auditReceiverMailId=");
 		sb.append(getAuditReceiverMailId());
@@ -225,13 +242,15 @@ public class AuditReceiverMailClp extends BaseModelImpl<AuditReceiverMail>
 		sb.append(getTo());
 		sb.append(", status=");
 		sb.append(getStatus());
+		sb.append(", sendDate=");
+		sb.append(getSendDate());
 		sb.append("}");
 
 		return sb.toString();
 	}
 
 	public String toXmlString() {
-		StringBundler sb = new StringBundler(16);
+		StringBundler sb = new StringBundler(19);
 
 		sb.append("<model><model-name>");
 		sb.append("com.tls.liferaylms.mail.model.AuditReceiverMail");
@@ -253,6 +272,10 @@ public class AuditReceiverMailClp extends BaseModelImpl<AuditReceiverMail>
 			"<column><column-name>status</column-name><column-value><![CDATA[");
 		sb.append(getStatus());
 		sb.append("]]></column-value></column>");
+		sb.append(
+			"<column><column-name>sendDate</column-name><column-value><![CDATA[");
+		sb.append(getSendDate());
+		sb.append("]]></column-value></column>");
 
 		sb.append("</model>");
 
@@ -263,5 +286,6 @@ public class AuditReceiverMailClp extends BaseModelImpl<AuditReceiverMail>
 	private long _auditSendMailsId;
 	private String _to;
 	private Integer _status;
+	private Date _sendDate;
 	private BaseModel<?> _auditReceiverMailRemoteModel;
 }

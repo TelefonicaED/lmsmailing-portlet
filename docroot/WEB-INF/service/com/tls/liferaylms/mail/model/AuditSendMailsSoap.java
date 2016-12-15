@@ -41,6 +41,7 @@ public class AuditSendMailsSoap implements Serializable {
 		soapModel.setCompanyId(model.getCompanyId());
 		soapModel.setSubject(model.getSubject());
 		soapModel.setBody(model.getBody());
+		soapModel.setType_(model.getType_());
 
 		return soapModel;
 	}
@@ -173,6 +174,14 @@ public class AuditSendMailsSoap implements Serializable {
 		_body = body;
 	}
 
+	public String getType_() {
+		return _type_;
+	}
+
+	public void setType_(String type_) {
+		_type_ = type_;
+	}
+
 	private String _uuid;
 	private long _auditSendMailsId;
 	private long _userId;
@@ -183,4 +192,5 @@ public class AuditSendMailsSoap implements Serializable {
 	private long _companyId;
 	private String _subject;
 	private String _body;
+	private String _type_;
 }

@@ -511,6 +511,57 @@ public class AuditSendMailsUtil {
 	}
 
 	/**
+	* Returns the audit send mails where groupId = &#63; and companyId = &#63; and type_ = &#63; or throws a {@link com.tls.liferaylms.mail.NoSuchAuditSendMailsException} if it could not be found.
+	*
+	* @param groupId the group ID
+	* @param companyId the company ID
+	* @param type_ the type_
+	* @return the matching audit send mails
+	* @throws com.tls.liferaylms.mail.NoSuchAuditSendMailsException if a matching audit send mails could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public static com.tls.liferaylms.mail.model.AuditSendMails findByinscriptionByGC(
+		long groupId, long companyId, java.lang.String type_)
+		throws com.liferay.portal.kernel.exception.SystemException,
+			com.tls.liferaylms.mail.NoSuchAuditSendMailsException {
+		return getPersistence().findByinscriptionByGC(groupId, companyId, type_);
+	}
+
+	/**
+	* Returns the audit send mails where groupId = &#63; and companyId = &#63; and type_ = &#63; or returns <code>null</code> if it could not be found. Uses the finder cache.
+	*
+	* @param groupId the group ID
+	* @param companyId the company ID
+	* @param type_ the type_
+	* @return the matching audit send mails, or <code>null</code> if a matching audit send mails could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public static com.tls.liferaylms.mail.model.AuditSendMails fetchByinscriptionByGC(
+		long groupId, long companyId, java.lang.String type_)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence().fetchByinscriptionByGC(groupId, companyId, type_);
+	}
+
+	/**
+	* Returns the audit send mails where groupId = &#63; and companyId = &#63; and type_ = &#63; or returns <code>null</code> if it could not be found, optionally using the finder cache.
+	*
+	* @param groupId the group ID
+	* @param companyId the company ID
+	* @param type_ the type_
+	* @param retrieveFromCache whether to use the finder cache
+	* @return the matching audit send mails, or <code>null</code> if a matching audit send mails could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public static com.tls.liferaylms.mail.model.AuditSendMails fetchByinscriptionByGC(
+		long groupId, long companyId, java.lang.String type_,
+		boolean retrieveFromCache)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .fetchByinscriptionByGC(groupId, companyId, type_,
+			retrieveFromCache);
+	}
+
+	/**
 	* Returns all the audit send mailses.
 	*
 	* @return the audit send mailses
@@ -597,6 +648,23 @@ public class AuditSendMailsUtil {
 	}
 
 	/**
+	* Removes the audit send mails where groupId = &#63; and companyId = &#63; and type_ = &#63; from the database.
+	*
+	* @param groupId the group ID
+	* @param companyId the company ID
+	* @param type_ the type_
+	* @return the audit send mails that was removed
+	* @throws SystemException if a system exception occurred
+	*/
+	public static com.tls.liferaylms.mail.model.AuditSendMails removeByinscriptionByGC(
+		long groupId, long companyId, java.lang.String type_)
+		throws com.liferay.portal.kernel.exception.SystemException,
+			com.tls.liferaylms.mail.NoSuchAuditSendMailsException {
+		return getPersistence()
+				   .removeByinscriptionByGC(groupId, companyId, type_);
+	}
+
+	/**
 	* Removes all the audit send mailses from the database.
 	*
 	* @throws SystemException if a system exception occurred
@@ -641,6 +709,21 @@ public class AuditSendMailsUtil {
 	public static int countByc(long companyId)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return getPersistence().countByc(companyId);
+	}
+
+	/**
+	* Returns the number of audit send mailses where groupId = &#63; and companyId = &#63; and type_ = &#63;.
+	*
+	* @param groupId the group ID
+	* @param companyId the company ID
+	* @param type_ the type_
+	* @return the number of matching audit send mailses
+	* @throws SystemException if a system exception occurred
+	*/
+	public static int countByinscriptionByGC(long groupId, long companyId,
+		java.lang.String type_)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence().countByinscriptionByGC(groupId, companyId, type_);
 	}
 
 	/**

@@ -14,6 +14,7 @@
 		<property name="auditSendMailsId" type="com.liferay.portal.dao.orm.hibernate.LongType" />
 		<property name="to" type="com.liferay.portal.dao.orm.hibernate.StringType" column="to_" />
 		<property name="status" type="com.liferay.portal.dao.orm.hibernate.IntegerType" />
+		<property name="sendDate" type="org.hibernate.type.TimestampType" />
 	</class>
 	<class name="com.tls.liferaylms.mail.model.impl.AuditSendMailsImpl" table="lmsmail_AuditSendMails">
 		<cache usage="read-write" />
@@ -29,6 +30,7 @@
 		<property name="companyId" type="com.liferay.portal.dao.orm.hibernate.LongType" />
 		<property name="subject" type="com.liferay.portal.dao.orm.hibernate.StringType" />
 		<property name="body" type="com.liferay.portal.dao.orm.hibernate.StringType" />
+		<property name="type_" type="com.liferay.portal.dao.orm.hibernate.StringType" />
 	</class>
 	<class name="com.tls.liferaylms.mail.model.impl.MailJobImpl" table="lmsmail_MailJob">
 		<cache usage="read-write" />

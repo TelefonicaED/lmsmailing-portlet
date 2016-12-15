@@ -120,6 +120,10 @@ public class AuditSendMailsLocalServiceClp implements AuditSendMailsLocalService
 		_methodName20 = "getHistoryByCompanyId";
 
 		_methodParameterTypes20 = new String[] { "long" };
+
+		_methodName21 = "getInscriptionHistory";
+
+		_methodParameterTypes21 = new String[] { "long", "long" };
 	}
 
 	public com.tls.liferaylms.mail.model.AuditSendMails addAuditSendMails(
@@ -715,6 +719,34 @@ public class AuditSendMailsLocalServiceClp implements AuditSendMailsLocalService
 		return (java.util.List<com.tls.liferaylms.mail.model.AuditSendMails>)ClpSerializer.translateOutput(returnObj);
 	}
 
+	public com.tls.liferaylms.mail.model.AuditSendMails getInscriptionHistory(
+		long groupId, long companyId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		Object returnObj = null;
+
+		try {
+			returnObj = _invokableLocalService.invokeMethod(_methodName21,
+					_methodParameterTypes21, new Object[] { groupId, companyId });
+		}
+		catch (Throwable t) {
+			t = ClpSerializer.translateThrowable(t);
+
+			if (t instanceof com.liferay.portal.kernel.exception.SystemException) {
+				throw (com.liferay.portal.kernel.exception.SystemException)t;
+			}
+
+			if (t instanceof RuntimeException) {
+				throw (RuntimeException)t;
+			}
+			else {
+				throw new RuntimeException(t.getClass().getName() +
+					" is not a valid exception");
+			}
+		}
+
+		return (com.tls.liferaylms.mail.model.AuditSendMails)ClpSerializer.translateOutput(returnObj);
+	}
+
 	private InvokableLocalService _invokableLocalService;
 	private String _methodName0;
 	private String[] _methodParameterTypes0;
@@ -756,4 +788,6 @@ public class AuditSendMailsLocalServiceClp implements AuditSendMailsLocalService
 	private String[] _methodParameterTypes18;
 	private String _methodName20;
 	private String[] _methodParameterTypes20;
+	private String _methodName21;
+	private String[] _methodParameterTypes21;
 }

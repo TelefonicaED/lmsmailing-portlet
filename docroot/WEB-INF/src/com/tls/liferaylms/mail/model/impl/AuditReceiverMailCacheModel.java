@@ -22,6 +22,8 @@ import com.tls.liferaylms.mail.model.AuditReceiverMail;
 
 import java.io.Serializable;
 
+import java.util.Date;
+
 /**
  * The cache model class for representing AuditReceiverMail in entity cache.
  *
@@ -33,7 +35,7 @@ public class AuditReceiverMailCacheModel implements CacheModel<AuditReceiverMail
 	Serializable {
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(9);
+		StringBundler sb = new StringBundler(11);
 
 		sb.append("{auditReceiverMailId=");
 		sb.append(auditReceiverMailId);
@@ -43,6 +45,8 @@ public class AuditReceiverMailCacheModel implements CacheModel<AuditReceiverMail
 		sb.append(to);
 		sb.append(", status=");
 		sb.append(status);
+		sb.append(", sendDate=");
+		sb.append(sendDate);
 		sb.append("}");
 
 		return sb.toString();
@@ -63,6 +67,13 @@ public class AuditReceiverMailCacheModel implements CacheModel<AuditReceiverMail
 
 		auditReceiverMailImpl.setStatus(status);
 
+		if (sendDate == Long.MIN_VALUE) {
+			auditReceiverMailImpl.setSendDate(null);
+		}
+		else {
+			auditReceiverMailImpl.setSendDate(new Date(sendDate));
+		}
+
 		auditReceiverMailImpl.resetOriginalValues();
 
 		return auditReceiverMailImpl;
@@ -72,4 +83,5 @@ public class AuditReceiverMailCacheModel implements CacheModel<AuditReceiverMail
 	public long auditSendMailsId;
 	public String to;
 	public Integer status;
+	public long sendDate;
 }

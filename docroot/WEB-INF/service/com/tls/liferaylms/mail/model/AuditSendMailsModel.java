@@ -218,6 +218,21 @@ public interface AuditSendMailsModel extends BaseModel<AuditSendMails> {
 	 */
 	public void setBody(String body);
 
+	/**
+	 * Returns the type_ of this audit send mails.
+	 *
+	 * @return the type_ of this audit send mails
+	 */
+	@AutoEscape
+	public String getType_();
+
+	/**
+	 * Sets the type_ of this audit send mails.
+	 *
+	 * @param type_ the type_ of this audit send mails
+	 */
+	public void setType_(String type_);
+
 	public boolean isNew();
 
 	public void setNew(boolean n);

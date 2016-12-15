@@ -17,6 +17,7 @@ package com.tls.liferaylms.mail.model;
 import java.io.Serializable;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -34,6 +35,7 @@ public class AuditReceiverMailSoap implements Serializable {
 		soapModel.setAuditSendMailsId(model.getAuditSendMailsId());
 		soapModel.setTo(model.getTo());
 		soapModel.setStatus(model.getStatus());
+		soapModel.setSendDate(model.getSendDate());
 
 		return soapModel;
 	}
@@ -121,8 +123,17 @@ public class AuditReceiverMailSoap implements Serializable {
 		_status = status;
 	}
 
+	public Date getSendDate() {
+		return _sendDate;
+	}
+
+	public void setSendDate(Date sendDate) {
+		_sendDate = sendDate;
+	}
+
 	private long _auditReceiverMailId;
 	private long _auditSendMailsId;
 	private String _to;
 	private Integer _status;
+	private Date _sendDate;
 }
