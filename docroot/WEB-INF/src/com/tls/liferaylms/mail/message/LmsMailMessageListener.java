@@ -157,9 +157,13 @@ public class LmsMailMessageListener implements MessageListener {
 			}
 			InternetAddress to = new InternetAddress(userSender.getEmailAddress(), userSender.getFullName());
 			deregisterMail = false;
-			if(userSender.getExpandoBridge().getAttribute(MailStringPool.DEREGISTER_USER_EXPANDO)!=null){
-				deregisterMail = (Boolean)userSender.getExpandoBridge().getAttribute(MailStringPool.DEREGISTER_USER_EXPANDO);
+			if(userSender.getExpandoBridge().getAttribute(MailStringPool.DEREGISTER_USER_EXPANDO,false)!=null){
+				deregisterMail = (Boolean)userSender.getExpandoBridge().getAttribute(MailStringPool.DEREGISTER_USER_EXPANDO,false);
 			}
+			log.debug("---STUDENT MAIL 2: "+userSender.getEmailAddress());
+			log.debug("---STUDENT ID 2: "+userSender.getUserId());
+			log.debug("---DEREGISTER MAIL 2: "+deregisterMail);
+			log.debug("--- EXPANDO 2: "+userSender.getExpandoBridge().getAttribute(MailStringPool.DEREGISTER_USER_EXPANDO,false));
 			
 			if(!deregisterMail){
 				body = createMessage(body, portal, community, userSender.getFullName(), UserLocalServiceUtil.getUserById(userId).getFullName(), url, urlcourse);
@@ -205,9 +209,13 @@ public class LmsMailMessageListener implements MessageListener {
 			
 			if(student != null && student.isActive() && Validator.isEmailAddress(student.getEmailAddress())) {
 				deregisterMail = false;
-				if(student.getExpandoBridge().getAttribute(MailStringPool.DEREGISTER_USER_EXPANDO)!=null){
-					deregisterMail = (Boolean)student.getExpandoBridge().getAttribute(MailStringPool.DEREGISTER_USER_EXPANDO);
+				if(student.getExpandoBridge().getAttribute(MailStringPool.DEREGISTER_USER_EXPANDO,false)!=null){
+					deregisterMail = (Boolean)student.getExpandoBridge().getAttribute(MailStringPool.DEREGISTER_USER_EXPANDO,false);
 				}
+				log.debug("---STUDENT MAIL 3: "+student.getEmailAddress());
+				log.debug("---STUDENT ID 3: "+student.getUserId());
+				log.debug("---DEREGISTER MAIL 3: "+deregisterMail);
+				log.debug("--- EXPANDO 3: "+student.getExpandoBridge().getAttribute(MailStringPool.DEREGISTER_USER_EXPANDO,false));
 				
 				if(!deregisterMail){
 					InternetAddress to = new InternetAddress(toMail, student.getFullName());
@@ -375,9 +383,14 @@ public class LmsMailMessageListener implements MessageListener {
 			for (User student : users) {
 				if (student.isActive() && Validator.isEmailAddress(student.getEmailAddress())) {
 					deregisterMail = false;
-					if(student.getExpandoBridge().getAttribute(MailStringPool.DEREGISTER_USER_EXPANDO)!=null){
-						deregisterMail = (Boolean)student.getExpandoBridge().getAttribute(MailStringPool.DEREGISTER_USER_EXPANDO);
+					if(student.getExpandoBridge().getAttribute(MailStringPool.DEREGISTER_USER_EXPANDO,false)!=null){
+						deregisterMail = (Boolean)student.getExpandoBridge().getAttribute(MailStringPool.DEREGISTER_USER_EXPANDO,false);
 					}
+					log.debug("---STUDENT MAIL 1: "+student.getEmailAddress());
+					log.debug("---STUDENT ID 1: "+student.getUserId());
+					log.debug("---DEREGISTER MAIL 1: "+deregisterMail);
+					log.debug("--- EXPANDO 1: "+student.getExpandoBridge().getAttribute(MailStringPool.DEREGISTER_USER_EXPANDO,false));
+					
 					
 					if(!deregisterMail){
 						if (nUsers > 0 && sendMails == nUsers) {
