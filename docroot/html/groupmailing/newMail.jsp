@@ -158,7 +158,7 @@ else
 				if (document.getElementById('team_selector'))
 					document.getElementById('team_selector').style.display='none';
 				A.one('#<portlet:namespace />to').val ('');
-				A.one('#<portlet:namespace />selected_users').setContent('<liferay-ui:message key="all"/>');
+				A.one('#<portlet:namespace />selected_users').setContent('<liferay-ui:message key="mailing.all-users"/>');
 				A.one('#<portlet:namespace />student_search').hide();
 				A.one('#<portlet:namespace />search_box').hide();
 			}
@@ -215,8 +215,8 @@ else
 
 <aui:form name="form_to" >
 	<aui:field-wrapper name="mailto">
-		<aui:input checked="<%= !searchForm %>" inlineLabel="all" name="radio_to" type="radio" value="all" label="all"  onClick="<%=renderResponse.getNamespace()+\"changeSelection()\" %>" />
-		<aui:input checked="<%= searchForm %>" inlineLabel="student" name="radio_to" type="radio" value="student" label="student" onClick="<%=renderResponse.getNamespace()+\"changeSelection()\" %>"  />
+		<aui:input checked="<%= !searchForm %>" name="radio_to" type="radio" value="all" label="mailing.all-users"  onClick="<%=renderResponse.getNamespace()+\"changeSelection()\" %>" />
+		<aui:input checked="<%= searchForm %>" name="radio_to" type="radio" value="student" label="student" onClick="<%=renderResponse.getNamespace()+\"changeSelection()\" %>"  />
 	<%if(userTeams!=null&& userTeams.size()>0){%>
 		<aui:input inlineLabel="teams" name="radio_to" type="radio" value="teams" label="teams" onClick="<%=renderResponse.getNamespace()+\"changeSelection()\" %>"  />
 		<div id="team_selector" style="display: none">
@@ -406,7 +406,7 @@ else
 	
 	<div class="to">
 		<liferay-ui:message key="groupmailing.messages.to" />
-		<div class="aui-helper-clearfix aui-textboxlistentry-holder" id="<portlet:namespace />selected_users" ><liferay-ui:message key="all"/></div>
+		<div class="aui-helper-clearfix aui-textboxlistentry-holder" id="<portlet:namespace />selected_users" ><liferay-ui:message key="mailing.all-users"/></div>
 		<%-- <ul class="aui-helper-clearfix aui-textboxlistentry-holder" id="<portlet:namespace />selected_users"> --%>
 	</div>
 	
