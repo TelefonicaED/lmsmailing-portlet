@@ -215,8 +215,8 @@ else
 
 <aui:form name="form_to" >
 	<aui:field-wrapper name="mailto">
-		<aui:input checked="<%= !searchForm %>" name="radio_to" type="radio" value="all" label="mailing.all-users"  onClick="<%=renderResponse.getNamespace()+\"changeSelection()\" %>" />
-		<aui:input checked="<%= searchForm %>"  name="radio_to" type="radio" value="student" label="student" onClick="<%=renderResponse.getNamespace()+\"changeSelection()\" %>"  />
+		<aui:input checked="<%= !searchForm %>" inlineLabel="true" name="radio_to" type="radio" value="all" label="mailing.all-users"  onClick="<%=renderResponse.getNamespace()+\"changeSelection()\" %>" />
+		<aui:input checked="<%= searchForm %>"  inlineLabel="true" name="radio_to" type="radio" value="student" label="student" onClick="<%=renderResponse.getNamespace()+\"changeSelection()\" %>"  />
 	<%if(userTeams!=null&& userTeams.size()>0){%>
 		<aui:input inlineLabel="teams" name="radio_to" type="radio" value="teams" label="teams" onClick="<%=renderResponse.getNamespace()+\"changeSelection()\" %>"  />
 		<div id="team_selector" style="display: none">
