@@ -25,10 +25,6 @@
 			<mime-type>text/html</mime-type>
 			<portlet-mode>view</portlet-mode>
 		</supports>
-		<supported-locale>es</supported-locale>
-		<supported-locale>en</supported-locale>
-		<supported-locale>pt</supported-locale>
-		<resource-bundle>content/Language</resource-bundle>
 		<portlet-info>
 			<title>GroupMailing</title>
 			<short-title>GroupMailing</short-title>
@@ -62,10 +58,6 @@
 			<mime-type>text/html</mime-type>
 			<portlet-mode>view</portlet-mode>
 		</supports>
-		<supported-locale>es</supported-locale>
-		<supported-locale>en</supported-locale>
-		<supported-locale>pt</supported-locale>
-		<resource-bundle>content/Language</resource-bundle>
 		<portlet-info>
 			<title>ManageTemplates</title>
 			<short-title>ManageTemplates</short-title>

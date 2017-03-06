@@ -391,6 +391,7 @@ public class LmsMailMessageListener implements MessageListener {
 					log.debug("---DEREGISTER MAIL 3: "+deregisterMail);
 					log.debug("--- EXPANDO 3: "+userSender.getExpandoBridge().getAttribute(MailStringPool.DEREGISTER_USER_EXPANDO,false));
 					
+					
 					if(!deregisterMail){
 						if (nUsers > 0 && sendMails == nUsers) {
 							try {

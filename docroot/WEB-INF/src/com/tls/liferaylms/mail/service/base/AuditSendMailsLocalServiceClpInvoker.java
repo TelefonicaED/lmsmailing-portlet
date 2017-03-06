@@ -120,9 +120,17 @@ public class AuditSendMailsLocalServiceClpInvoker {
 
 		_methodParameterTypes61 = new String[] { "long" };
 
-		_methodName62 = "getInscriptionHistory";
+		_methodName62 = "countHistoryByCompanyId";
 
-		_methodParameterTypes62 = new String[] { "long", "long" };
+		_methodParameterTypes62 = new String[] { "long" };
+
+		_methodName63 = "getHistoryByCompanyId";
+
+		_methodParameterTypes63 = new String[] { "long", "int", "int" };
+
+		_methodName64 = "getInscriptionHistory";
+
+		_methodParameterTypes64 = new String[] { "long", "long" };
 	}
 
 	public Object invokeMethod(String name, String[] parameterTypes,
@@ -237,6 +245,18 @@ public class AuditSendMailsLocalServiceClpInvoker {
 
 		if (_methodName62.equals(name) &&
 				Arrays.deepEquals(_methodParameterTypes62, parameterTypes)) {
+			return AuditSendMailsLocalServiceUtil.countHistoryByCompanyId(((Long)arguments[0]).longValue());
+		}
+
+		if (_methodName63.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes63, parameterTypes)) {
+			return AuditSendMailsLocalServiceUtil.getHistoryByCompanyId(((Long)arguments[0]).longValue(),
+				((Integer)arguments[1]).intValue(),
+				((Integer)arguments[2]).intValue());
+		}
+
+		if (_methodName64.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes64, parameterTypes)) {
 			return AuditSendMailsLocalServiceUtil.getInscriptionHistory(((Long)arguments[0]).longValue(),
 				((Long)arguments[1]).longValue());
 		}
@@ -286,4 +306,8 @@ public class AuditSendMailsLocalServiceClpInvoker {
 	private String[] _methodParameterTypes61;
 	private String _methodName62;
 	private String[] _methodParameterTypes62;
+	private String _methodName63;
+	private String[] _methodParameterTypes63;
+	private String _methodName64;
+	private String[] _methodParameterTypes64;
 }

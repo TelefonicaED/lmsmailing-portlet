@@ -17,6 +17,9 @@ package com.tls.liferaylms.mail.service.impl;
 import java.util.List;
 
 import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.util.OrderByComparator;
+import com.liferay.portal.kernel.util.OrderByComparatorFactory;
+import com.liferay.portal.kernel.util.OrderByComparatorFactoryUtil;
 import com.tls.liferaylms.mail.model.AuditSendMails;
 import com.tls.liferaylms.mail.service.base.AuditSendMailsLocalServiceBaseImpl;
 import com.tls.liferaylms.mail.service.persistence.AuditSendMailsUtil;
@@ -45,6 +48,19 @@ public class AuditSendMailsLocalServiceImpl
 	
 	public List<AuditSendMails> getHistoryByCompanyId(long companyId) throws SystemException{
 		return AuditSendMailsUtil.findByc(companyId);
+	}
+
+	
+	public int countHistoryByCompanyId(long companyId) throws SystemException{
+		return AuditSendMailsUtil.countByc(companyId);
+	}
+
+	
+	
+	public List<AuditSendMails> getHistoryByCompanyId(long companyId, int start, int end) throws SystemException{
+		OrderByComparator comparator = OrderByComparatorFactoryUtil.create("lmsmail_auditsendmails", "sendDate", true);
+		
+		return AuditSendMailsUtil.findByc(companyId, start, end, comparator);
 	}
 	
 	public AuditSendMails getInscriptionHistory(long groupId, long companyId) throws SystemException{

@@ -296,6 +296,17 @@ public class AuditSendMailsLocalServiceUtil {
 		return getService().getHistoryByCompanyId(companyId);
 	}
 
+	public static int countHistoryByCompanyId(long companyId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getService().countHistoryByCompanyId(companyId);
+	}
+
+	public static java.util.List<com.tls.liferaylms.mail.model.AuditSendMails> getHistoryByCompanyId(
+		long companyId, int start, int end)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getService().getHistoryByCompanyId(companyId, start, end);
+	}
+
 	public static com.tls.liferaylms.mail.model.AuditSendMails getInscriptionHistory(
 		long groupId, long companyId)
 		throws com.liferay.portal.kernel.exception.SystemException {

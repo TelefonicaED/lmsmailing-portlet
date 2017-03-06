@@ -23,27 +23,12 @@
 	Course course = null;
 %>
 
-<liferay-ui:search-container emptyResultsMessage="there-are-no-mailjobs" delta="10" deltaConfigurable="true" iteratorURL="<%=portletURL%>" >
+<liferay-ui:search-container emptyResultsMessage="there-are-no-mailjobs" delta="10" 
+deltaConfigurable="true" iteratorURL="<%=portletURL%>" >
 	<liferay-ui:search-container-results>
 <%
-	List<AuditSendMails> sendings = AuditSendMailsLocalServiceUtil.getHistoryByCompanyId(themeDisplay.getCompanyId());
-	List<AuditSendMails> ordererSendings = new ArrayList<AuditSendMails>(sendings);
-
-	Collections.sort(ordererSendings, new Comparator <AuditSendMails>() {
-	    @Override
-	    public int compare(final AuditSendMails object1, final AuditSendMails object2) {
-	    	if(object1.getSendDate()==null){
-	    		return 1;
-	    	}else if(object2.getSendDate()==null){
-	    		return -1;
-	    	}else{
-	    		return (object1.getSendDate().before(object2.getSendDate())) ? 1 : -1;
-	    	}
-	    }
-	});
-	
-	results = ListUtil.subList(ordererSendings, searchContainer.getStart(),searchContainer.getEnd());
-	total = sendings.size();
+	results = AuditSendMailsLocalServiceUtil.getHistoryByCompanyId(themeDisplay.getCompanyId(),  searchContainer.getStart(),searchContainer.getEnd());
+	total = AuditSendMailsLocalServiceUtil.countHistoryByCompanyId(themeDisplay.getCompanyId());
 	
 	pageContext.setAttribute("results", results);
 	pageContext.setAttribute("total", total);
@@ -53,7 +38,7 @@
 	<liferay-ui:search-container-row className="com.tls.liferaylms.mail.model.AuditSendMails" keyProperty="auditSendMailsId" modelVar="send">
 		
 		<liferay-ui:search-container-column-text name="send.date">
-			<c:out value="<%=sdf.format(send.getSendDate())%>"/>
+			<c:out value="<%=send.getSendDate()!=null ? sdf.format(send.getSendDate()) : \"-\"%>"/>
 		</liferay-ui:search-container-column-text>
 		
 		<%
