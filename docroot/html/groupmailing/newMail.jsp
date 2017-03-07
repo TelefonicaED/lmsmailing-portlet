@@ -316,12 +316,12 @@ else
 			%>
 		</liferay-ui:search-container-results>
 		
-		<liferay-ui:search-container-row className="com.liferay.portal.model.User" keyProperty="userId" modelVar="user">
-			<liferay-ui:search-container-column-text name="studentsearch.user.firstName" title="studentsearch.user.firstName"><%=user.getFullName() %></liferay-ui:search-container-column-text>
+		<liferay-ui:search-container-row className="com.liferay.portal.model.User" keyProperty="userId" modelVar="userMessage">
+			<liferay-ui:search-container-column-text name="studentsearch.user.firstName" title="studentsearch.user.firstName"><%=userMessage.getFullName() %></liferay-ui:search-container-column-text>
 			<liferay-ui:search-container-column-text>
-				<a id="<portlet:namespace />addUser_<%=user.getUserId() %>" onClick="<portlet:namespace />addUser(<%=user.getUserId() %>, '<%=user.getFullName() %>')" style="Cursor:pointer;" >
+				<a id="<portlet:namespace />addUser_<%=userMessage.getUserId() %>" onClick="<portlet:namespace />addUser(<%=userMessage.getUserId() %>, '<%=userMessage.getFullName() %>')" style="Cursor:pointer;" >
 				<liferay-ui:message key="select" /></a>
-				<a id="<portlet:namespace />deleteUser_<%=user.getUserId() %>" class="aui-helper-hidden" onClick="<portlet:namespace />deleteUser(<%=user.getUserId() %>)" style="Cursor:pointer;" >
+				<a id="<portlet:namespace />deleteUser_<%=userMessage.getUserId() %>" class="aui-helper-hidden" onClick="<portlet:namespace />deleteUser(<%=userMessage.getUserId() %>)" style="Cursor:pointer;" >
 				<liferay-ui:message key="groupmailing.deselect" /></a>			
 			</liferay-ui:search-container-column-text>
 		</liferay-ui:search-container-row>

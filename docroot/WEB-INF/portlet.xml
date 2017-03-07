@@ -175,4 +175,37 @@
 			<role-name>user</role-name>
 		</security-role-ref>
 	</portlet>
+	<portlet>
+		<portlet-name>lmsmailingprefsmanagement</portlet-name>
+		<display-name>Lms Mailing Preferences Management</display-name>
+		<portlet-class>
+			com.tls.liferaylms.portlet.LmsMailingPreferencesManagement
+		</portlet-class>
+		<init-param>
+			<name>view-template</name>
+			<value>/html/lmsmailingprefsmanagement/view.jsp</value>
+		</init-param>
+		<expiration-cache>0</expiration-cache>
+		<supports>
+			<mime-type>text/html</mime-type>
+			<portlet-mode>view</portlet-mode>
+		</supports>
+		<resource-bundle>
+			content/lmsmailingprefsmanagement/Language
+		</resource-bundle>
+		<portlet-info>
+			<title>Lms Mailing Preferences Management</title>
+			<short-title>Lms Mailing Preferences Management</short-title>
+			<keywords></keywords>
+		</portlet-info>
+		<security-role-ref>
+			<role-name>administrator</role-name>
+		</security-role-ref>
+		<security-role-ref>
+			<role-name>power-user</role-name>
+		</security-role-ref>
+		<security-role-ref>
+			<role-name>user</role-name>
+		</security-role-ref>
+	</portlet>
 </portlet-app>

@@ -1,6 +1,7 @@
 package com.tls.liferaylms.mail.message;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -33,6 +34,7 @@ import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.PrefsPropsUtil;
 import com.liferay.portal.kernel.util.PropsKeys;
+import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.Group;
 import com.liferay.portal.model.Team;
@@ -41,7 +43,12 @@ import com.liferay.portal.service.GroupLocalServiceUtil;
 import com.liferay.portal.service.RoleLocalServiceUtil;
 import com.liferay.portal.service.TeamLocalServiceUtil;
 import com.liferay.portal.service.UserLocalServiceUtil;
+import com.liferay.portal.util.PortalUtil;
 import com.liferay.portal.util.comparator.UserLastNameComparator;
+import com.liferay.portlet.announcements.model.AnnouncementsEntry;
+import com.liferay.portlet.announcements.model.AnnouncementsFlagConstants;
+import com.liferay.portlet.announcements.service.AnnouncementsEntryLocalServiceUtil;
+import com.liferay.portlet.announcements.service.AnnouncementsFlagLocalServiceUtil;
 import com.liferay.util.mail.MailEngine;
 import com.tls.liferaylms.mail.model.AuditReceiverMail;
 import com.tls.liferaylms.mail.model.AuditSendMails;
@@ -79,8 +86,23 @@ public class LmsMailMessageListener implements MessageListener {
 		String subject 	= message.getString("subject");
 		String body 	= message.getString("body");
 		
+		
+		
+		
 		Group scopeGroup = GroupLocalServiceUtil.getGroup(groupId);
 		long companyId 	 = scopeGroup.getCompanyId();
+		
+		
+		boolean internalMessagingActive = PrefsPropsUtil.getBoolean(companyId, MailStringPool.INTERNAL_MESSAGING_KEY);
+		String deregisterMailExpando = PrefsPropsUtil.getString(companyId, MailStringPool.DEREGISTER_MAIL_KEY);
+		if(Validator.isNull(deregisterMailExpando)){
+			deregisterMailExpando=MailStringPool.DEREGISTER_USER_EXPANDO;
+		}
+		
+		log.debug("--- Internal Messaging Active: "+internalMessagingActive);
+		log.debug("--- Deregister Mail Expando: "+deregisterMailExpando);
+		
+		
 		
 		AuditSendMails auditSendMails = null;
 		
@@ -157,13 +179,13 @@ public class LmsMailMessageListener implements MessageListener {
 			}
 			InternetAddress to = new InternetAddress(userSender.getEmailAddress(), userSender.getFullName());
 			deregisterMail = false;
-			if(userSender.getExpandoBridge().getAttribute(MailStringPool.DEREGISTER_USER_EXPANDO,false)!=null){
-				deregisterMail = (Boolean)userSender.getExpandoBridge().getAttribute(MailStringPool.DEREGISTER_USER_EXPANDO,false);
+			if(userSender.getExpandoBridge().getAttribute(deregisterMailExpando,false)!=null){
+				deregisterMail = (Boolean)userSender.getExpandoBridge().getAttribute(deregisterMailExpando,false);
 			}
 			log.debug("---STUDENT MAIL 1: "+userSender.getEmailAddress());
 			log.debug("---STUDENT ID 1: "+userSender.getUserId());
 			log.debug("---DEREGISTER MAIL 1: "+deregisterMail);
-			log.debug("--- EXPANDO 1: "+userSender.getExpandoBridge().getAttribute(MailStringPool.DEREGISTER_USER_EXPANDO,false));
+			log.debug("--- EXPANDO 1: "+userSender.getExpandoBridge().getAttribute(deregisterMailExpando,false));
 			
 			if(!deregisterMail){
 				body = createMessage(body, portal, community, userSender.getFullName(), UserLocalServiceUtil.getUserById(userId).getFullName(), url, urlcourse);
@@ -187,6 +209,9 @@ public class LmsMailMessageListener implements MessageListener {
 				
 				try{
 					MailMessage mailm = new MailMessage(from, to, subject, calculatedBody, true);
+					if(internalMessagingActive){
+						sendInternalMessageNotification(mailm, groupId, userSender.getUserId(), companyId);
+					}
 					MailServiceUtil.sendEmail(mailm);
 					addAuditReceiverMail(auditSendMails.getAuditSendMailsId(), userSender.getEmailAddress(), STATUS_OK, false);
 				}catch(Exception e){
@@ -209,13 +234,13 @@ public class LmsMailMessageListener implements MessageListener {
 			
 			if(student != null && student.isActive() && Validator.isEmailAddress(student.getEmailAddress())) {
 				deregisterMail = false;
-				if(student.getExpandoBridge().getAttribute(MailStringPool.DEREGISTER_USER_EXPANDO,false)!=null){
-					deregisterMail = (Boolean)student.getExpandoBridge().getAttribute(MailStringPool.DEREGISTER_USER_EXPANDO,false);
+				if(student.getExpandoBridge().getAttribute(deregisterMailExpando,false)!=null){
+					deregisterMail = (Boolean)student.getExpandoBridge().getAttribute(deregisterMailExpando,false);
 				}
 				log.debug("---STUDENT MAIL 2: "+userSender.getEmailAddress());
 				log.debug("---STUDENT ID 2: "+userSender.getUserId());
 				log.debug("---DEREGISTER MAIL 2: "+deregisterMail);
-				log.debug("--- EXPANDO 2: "+userSender.getExpandoBridge().getAttribute(MailStringPool.DEREGISTER_USER_EXPANDO,false));
+				log.debug("--- EXPANDO 2: "+userSender.getExpandoBridge().getAttribute(deregisterMailExpando,false));
 				
 				if(!deregisterMail){
 					InternetAddress to = new InternetAddress(toMail, student.getFullName());
@@ -265,6 +290,9 @@ public class LmsMailMessageListener implements MessageListener {
 					
 					try{
 						MailMessage mailm = new MailMessage(from, to, calculatedsubject, calculatedBody ,true);
+						if(internalMessagingActive){
+							sendInternalMessageNotification(mailm, groupId, student.getUserId(), companyId);
+						}
 						MailEngine.send(mailm);
 						addAuditReceiverMail(auditSendMails.getAuditSendMailsId(), toMail, STATUS_OK, hasDate);
 					}catch(Exception e){
@@ -383,13 +411,13 @@ public class LmsMailMessageListener implements MessageListener {
 			for (User student : users) {
 				if (student.isActive() && Validator.isEmailAddress(student.getEmailAddress())) {
 					deregisterMail = false;
-					if(student.getExpandoBridge().getAttribute(MailStringPool.DEREGISTER_USER_EXPANDO,false)!=null){
-						deregisterMail = (Boolean)student.getExpandoBridge().getAttribute(MailStringPool.DEREGISTER_USER_EXPANDO,false);
+					if(student.getExpandoBridge().getAttribute(deregisterMailExpando,false)!=null){
+						deregisterMail = (Boolean)student.getExpandoBridge().getAttribute(deregisterMailExpando,false);
 					}
 					log.debug("---STUDENT MAIL 3: "+userSender.getEmailAddress());
 					log.debug("---STUDENT ID 3: "+userSender.getUserId());
 					log.debug("---DEREGISTER MAIL 3: "+deregisterMail);
-					log.debug("--- EXPANDO 3: "+userSender.getExpandoBridge().getAttribute(MailStringPool.DEREGISTER_USER_EXPANDO,false));
+					log.debug("--- EXPANDO 3: "+userSender.getExpandoBridge().getAttribute(deregisterMailExpando,false));
 					
 					
 					if(!deregisterMail){
@@ -429,6 +457,9 @@ public class LmsMailMessageListener implements MessageListener {
 							//MailEngine.send(mailm);
 							
 							try{
+								if(internalMessagingActive){
+									sendInternalMessageNotification(mailm, groupId, student.getUserId(), companyId);
+								}
 								sendMail(mailm,transport,session);
 								addAuditReceiverMail(auditSendMails.getAuditSendMailsId(), student.getEmailAddress(), STATUS_OK, false);
 							}catch(MessagingException ex){
@@ -506,6 +537,51 @@ public class LmsMailMessageListener implements MessageListener {
 		}
 		transport.sendMessage(message, mailm.getTo());
 		
+	}
+	
+	
+	
+	private void sendInternalMessageNotification(MailMessage mailMessage, long groupId, long userId, long companyId){
+		long classNameId = PortalUtil.getClassNameId(Group.class.getName());
+		 try{
+			String title = mailMessage.getSubject();
+			String content = mailMessage.getBody(); 
+			String type = "announcements.type.general";
+			log.debug("-- Sending Interal Messaging Notification");
+			Date now = new Date();
+			log.debug("NOW "+now);
+			Calendar displayDate = Calendar.getInstance();
+			Calendar expirationDate = Calendar.getInstance();
+			displayDate.setTime(now);
+			expirationDate.setTime(now);
+			
+			expirationDate.add(Calendar.MONTH,1);
+				
+			AnnouncementsEntry ae=AnnouncementsEntryLocalServiceUtil.createAnnouncementsEntry(CounterLocalServiceUtil.increment());
+		
+			ae.setCompanyId(companyId);
+			ae.setUserId(userId);
+			ae.setUserName(StringPool.BLANK);
+			ae.setCreateDate(now);
+			ae.setModifiedDate(now);
+			ae.setClassNameId(classNameId);
+			ae.setClassPK(groupId);
+			ae.setTitle(title);
+			ae.setContent(content);
+			ae.setUrl(StringPool.BLANK);
+			ae.setType(type);
+			ae.setDisplayDate(displayDate.getTime());
+			ae.setExpirationDate(expirationDate.getTime());
+			ae.setPriority(0);
+			ae.setAlert(true);
+
+			ae = AnnouncementsEntryLocalServiceUtil.updateAnnouncementsEntry(ae);
+					
+			AnnouncementsFlagLocalServiceUtil.addFlag(userId,ae.getEntryId(),AnnouncementsFlagConstants.UNREAD);
+		 }catch(Exception e){
+	 		e.printStackTrace();
+	 	}
+			
 	}
 	
 	/*

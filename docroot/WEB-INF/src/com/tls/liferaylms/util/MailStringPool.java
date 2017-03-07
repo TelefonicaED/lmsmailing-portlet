@@ -62,4 +62,7 @@ public class MailStringPool {
 	public final static String PROCESSED_PLURAL = "processed-plural";
 	
 	public final static String DATE_FORMAT = "dd - MM - yyyy";
+	
+	public final static String INTERNAL_MESSAGING_KEY = "lms.mailing.internal.messaging.active";
+	public final static String DEREGISTER_MAIL_KEY = "lms.mailing.deregister.mail.expando";
 }
