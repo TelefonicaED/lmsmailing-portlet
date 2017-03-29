@@ -179,9 +179,11 @@ public class LmsMailMessageListener implements MessageListener {
 			}
 			InternetAddress to = new InternetAddress(userSender.getEmailAddress(), userSender.getFullName());
 			deregisterMail = false;
+			
 			if(userSender.getExpandoBridge().getAttribute(deregisterMailExpando,false)!=null){
-				deregisterMail = (Boolean)userSender.getExpandoBridge().getAttribute(deregisterMailExpando,false);
+				deregisterMail = Boolean.parseBoolean((String)userSender.getExpandoBridge().getAttribute(deregisterMailExpando,false));
 			}
+			
 			log.debug("---STUDENT MAIL 1: "+userSender.getEmailAddress());
 			log.debug("---STUDENT ID 1: "+userSender.getUserId());
 			log.debug("---DEREGISTER MAIL 1: "+deregisterMail);
@@ -411,9 +413,11 @@ public class LmsMailMessageListener implements MessageListener {
 			for (User student : users) {
 				if (student.isActive() && Validator.isEmailAddress(student.getEmailAddress())) {
 					deregisterMail = false;
+
 					if(student.getExpandoBridge().getAttribute(deregisterMailExpando,false)!=null){
-						deregisterMail = (Boolean)student.getExpandoBridge().getAttribute(deregisterMailExpando,false);
+						deregisterMail = Boolean.parseBoolean((String)student.getExpandoBridge().getAttribute(deregisterMailExpando,false));
 					}
+					
 					log.debug("---STUDENT MAIL 3: "+userSender.getEmailAddress());
 					log.debug("---STUDENT ID 3: "+userSender.getUserId());
 					log.debug("---DEREGISTER MAIL 3: "+deregisterMail);
