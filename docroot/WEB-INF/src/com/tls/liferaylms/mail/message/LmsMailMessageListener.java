@@ -235,7 +235,7 @@ public class LmsMailMessageListener implements MessageListener {
 			if(student != null && student.isActive() && Validator.isEmailAddress(student.getEmailAddress())) {
 				deregisterMail = false;
 				if(student.getExpandoBridge().getAttribute(deregisterMailExpando,false)!=null){
-					deregisterMail = (Boolean)student.getExpandoBridge().getAttribute(deregisterMailExpando,false);
+					deregisterMail = Boolean.parseBoolean((String)student.getExpandoBridge().getAttribute(deregisterMailExpando,false));
 				}
 				log.debug("---STUDENT MAIL 2: "+userSender.getEmailAddress());
 				log.debug("---STUDENT ID 2: "+userSender.getUserId());
@@ -262,7 +262,7 @@ public class LmsMailMessageListener implements MessageListener {
 					//Guardar una auditoria del envio de emails.
 					boolean hasDate = false;
 					
-					//Miramos el tipo de envío
+					//Miramos el tipo de envï¿½o
 					if (type_.equals(TYPE_INSCRIPTION)){
 
 						auditSendMails = AuditSendMailsLocalServiceUtil.getInscriptionHistory(groupId, companyId);
