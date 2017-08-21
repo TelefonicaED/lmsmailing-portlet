@@ -34,6 +34,26 @@
 	String emailAddress = ParamUtil.getString(request,"emailAddress");
 	boolean andSearch = ParamUtil.getBoolean(request,"andSearch",true);
 	boolean searchForm = ParamUtil.getBoolean(request,"searchForm",false);
+	String to = ParamUtil.getString(request, "currentTo", "");
+	String toNames = "";
+	if(Validator.isNotNull(to)){
+		try{
+			String[] toElements = to.split(",");
+			User currentUser;
+			for(int i =0; i<toElements.length; i++){
+				currentUser = UserLocalServiceUtil.fetchUser(Long.parseLong(toElements[i]));
+				if(currentUser!=null){
+					toNames += currentUser.getFullName() + ";";
+				}
+			}
+			
+			if(Validator.isNotNull(toNames) && toNames.length()>0){
+				toNames = toNames.substring(0, toNames.length()-1);
+			}
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+	}
 	long courseId=0;
 	Course course=null;
 	
@@ -160,14 +180,14 @@ else
 				A.one('#<portlet:namespace />to').val ('');
 				A.one('#<portlet:namespace />selected_users').setContent('<liferay-ui:message key="mailing.all-users"/>');
 				A.one('#<portlet:namespace />student_search').hide();
-				A.one('#<portlet:namespace />search_box').hide();
+				
 			}
 			else if (A.one('input:radio[name=<portlet:namespace />radio_to]:checked').get('value')=='student') {
 				if (document.getElementById('team_selector'))
 					document.getElementById('team_selector').style.display='none';
 				A.one('#<portlet:namespace />selected_users').setContent('');
 				A.one('#<portlet:namespace />student_search').show();
-				A.one('#<portlet:namespace />search_box').show();
+				
 
 			}else if (A.one('input:radio[name=<portlet:namespace />radio_to]:checked').get('value')=='teams') {
 				if (document.getElementById('team_selector')){
@@ -176,7 +196,7 @@ else
 				}
 				A.one('#<portlet:namespace />selected_users').setContent('');
 				A.one('#<portlet:namespace />student_search').hide();
-				A.one('#<portlet:namespace />search_box').hide();
+				
 			}			
 		});		
 	}
@@ -230,24 +250,6 @@ else
 	</aui:field-wrapper>
 </aui:form>
 
-<!-- Buscador a medias. Por eso está comentado. -->
-<%-- <div id="<portlet:namespace />search_box" class="aui-helper-hidden" >
-	<portlet:renderURL var="searchUserURL">
-	    <portlet:param name="jspPage" value="/html/groupmailing/newMail.jsp" />
-	</portlet:renderURL>
-	
-	<aui:form action="<%=searchUserURL%>">
-		<aui:fieldset>
-			<aui:column>
-				<aui:input inlineField="true" name="name" label="" value="<%=name %>"></aui:input>
-			</aui:column>
-			<aui:column>
-				<aui:button name="searchUsers" value="search" type="submit"></aui:button>
-			</aui:column>
-		</aui:fieldset>
-	</aui:form>
-</div> --%>
-<!-- Fin de comentario de buscador a medias -->	
 
 <div id="<portlet:namespace />student_search" class="aui-helper-hidden" >
 
@@ -397,7 +399,18 @@ else
 			};
 
 			AUI().ready('aui-io-request','querystring-parse','aui-parse-content',<portlet:namespace />ajaxMode<%= searchContainer.getId(request, renderResponse.getNamespace()) %>SearchContainer);
-			AUI().ready( function() { if(<%= searchForm %>){ <portlet:namespace />changeSelection(); } } );
+			AUI().ready( function() { if(<%= searchForm %>){ 
+				<portlet:namespace />changeSelection();
+				var strTo = document.getElementById("<portlet:namespace />to").value;
+				var strToNames =document.getElementById("<portlet:namespace />toNames").value;
+				if(strTo !=null && strTo != ''){
+					var currentToIds = strTo.split(",");
+					var currentToNames = strToNames.split(";");
+					for (var i = 0; i < currentToIds.length; i+=1) {
+						<portlet:namespace />addUser(currentToIds[i],currentToNames[i]);
+					}
+				}
+			} } );
 		//-->
 		</script>
 
@@ -425,7 +438,8 @@ else
 		
 	<aui:form action="<%=sendNewMailURL %>" method="POST" name="form_mail">
 	
-		<aui:input type="hidden" name="to" id="to" value="" />
+		<aui:input type="hidden" name="to"  value="<%=to%>"/>
+		<aui:input type="hidden" name="toNames" value="<%=toNames%>"/>
 			
 		<div class="mail_subject" >
 			<aui:input name="subject" title="groupmailing.messages.subject" size="120">

@@ -3,7 +3,16 @@
 // long courseId=ParamUtil.getLong(request, "courseId",0);
 // long roleId=ParamUtil.getLong(request, "roleId",0);
 %>
- 
+
+<script type="text/javascript">
+	function <portlet:namespace />searchMailUsers(){
+		var to = document.getElementById("<portlet:namespace />to").value;
+		$('#<portlet:namespace />currentTo').val(to);
+		$('#<portlet:namespace />busqusu').submit();
+		
+	}
+</script>
+
 <liferay-portlet:renderURL var="buscarURL">
 	<liferay-portlet:param name="jspPage" value="/html/groupmailing/newMail.jsp" />
 <%-- 	<portlet:param name="courseId" value="<%=Long.toString(courseId) %>" /> --%>
@@ -11,11 +20,11 @@
 </liferay-portlet:renderURL>
 
 <div class="npa_search_user"> 
-<aui:form name="busqusu" action="<%=buscarURL %>" method="post">
+<aui:form name="busqusu" action="<%=buscarURL %>" method="post" >
 	<aui:fieldset>
 		
 		<aui:input name="searchForm" type="hidden" value="true" />	
-					
+		<aui:input name="currentTo" type="hidden" />				
 		<aui:column>
 			<aui:input label="misc.user.firstName" name="firstName" size="20" value="" />
 			<aui:input label="misc.user.screenName" name="screenName" size="20" value="" />	
@@ -34,7 +43,7 @@
 		</aui:column>
 		
 		<aui:button-row>
-			<aui:button name="searchUsers" value="search" type="submit" />
+			<aui:button name="searchUsers" value="search" onClick="javascript:${renderResponse.getNamespace()}searchMailUsers()" />
 		</aui:button-row>
 	</aui:fieldset>
 </aui:form>

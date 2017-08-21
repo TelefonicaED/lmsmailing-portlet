@@ -37,12 +37,9 @@
 		    act.appendChild(opt);
 		}
 		
-		console.log(att);
 		if(att!=undefined){
 			var selatt = document.getElementById(att+"_module");
 			selatt.selectedIndex = sel.selectedIndex;
-
-			console.log("ok");
 			
 			changeModule(att);
 		}
