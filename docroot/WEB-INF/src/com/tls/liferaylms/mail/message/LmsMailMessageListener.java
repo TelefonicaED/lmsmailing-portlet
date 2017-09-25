@@ -64,6 +64,7 @@ public class LmsMailMessageListener implements MessageListener {
 	public static final String TYPE_INSCRIPTION = "COURSE_INSCRIPTION";
 	public static final String TYPE_MAILJOB = "MAIL_JOB";
 	public static final String TYPE_MASSIVE = "MASS_MAILING";
+	public static final String TYPE_MAIL_TO_TUTOR = "MAIL_TO_TUTOR";
 	
 			
 	@Override
@@ -212,7 +213,7 @@ public class LmsMailMessageListener implements MessageListener {
 				try{
 					MailMessage mailm = new MailMessage(from, to, subject, calculatedBody, true);
 					if(internalMessagingActive){
-						sendInternalMessageNotification(mailm, groupId, userSender.getUserId(), companyId);
+						sendInternalMessageNotification(mailm, groupId, userId, userSender.getUserId(), companyId);
 					}
 					MailServiceUtil.sendEmail(mailm);
 					addAuditReceiverMail(auditSendMails.getAuditSendMailsId(), userSender.getEmailAddress(), STATUS_OK, false);
@@ -271,7 +272,9 @@ public class LmsMailMessageListener implements MessageListener {
 						hasDate = true;
 					
 					}else{
-						type_ = TYPE_MAILJOB;
+						if(type_!=null && !type_.equals(TYPE_MAIL_TO_TUTOR)){
+							type_ = TYPE_MAILJOB;
+						}
 						
 						auditSendMails = AuditSendMailsLocalServiceUtil.createAuditSendMails(CounterLocalServiceUtil.increment(AuditSendMails.class.getName()));
 						
@@ -293,7 +296,7 @@ public class LmsMailMessageListener implements MessageListener {
 					try{
 						MailMessage mailm = new MailMessage(from, to, calculatedsubject, calculatedBody ,true);
 						if(internalMessagingActive){
-							sendInternalMessageNotification(mailm, groupId, student.getUserId(), companyId);
+							sendInternalMessageNotification(mailm, groupId,userId, student.getUserId(), companyId);
 						}
 						MailEngine.send(mailm);
 						addAuditReceiverMail(auditSendMails.getAuditSendMailsId(), toMail, STATUS_OK, hasDate);
@@ -462,7 +465,7 @@ public class LmsMailMessageListener implements MessageListener {
 							
 							try{
 								if(internalMessagingActive){
-									sendInternalMessageNotification(mailm, groupId, student.getUserId(), companyId);
+									sendInternalMessageNotification(mailm, groupId, userId, student.getUserId(), companyId);
 								}
 								sendMail(mailm,transport,session);
 								addAuditReceiverMail(auditSendMails.getAuditSendMailsId(), student.getEmailAddress(), STATUS_OK, false);
@@ -545,7 +548,7 @@ public class LmsMailMessageListener implements MessageListener {
 	
 	
 	
-	private void sendInternalMessageNotification(MailMessage mailMessage, long groupId, long userId, long companyId){
+	private void sendInternalMessageNotification(MailMessage mailMessage, long groupId,long senderUserId, long userId, long companyId){
 		long classNameId = PortalUtil.getClassNameId(Group.class.getName());
 		 try{
 			String title = mailMessage.getSubject();
@@ -564,7 +567,7 @@ public class LmsMailMessageListener implements MessageListener {
 			AnnouncementsEntry ae=AnnouncementsEntryLocalServiceUtil.createAnnouncementsEntry(CounterLocalServiceUtil.increment());
 		
 			ae.setCompanyId(companyId);
-			ae.setUserId(userId);
+			ae.setUserId(senderUserId);
 			ae.setUserName(StringPool.BLANK);
 			ae.setCreateDate(now);
 			ae.setModifiedDate(now);
@@ -580,7 +583,8 @@ public class LmsMailMessageListener implements MessageListener {
 			ae.setAlert(true);
 
 			ae = AnnouncementsEntryLocalServiceUtil.updateAnnouncementsEntry(ae);
-					
+		//	AnnouncementsFlagLocalServiceUtil.addFlag(senderUserId,ae.getEntryId(),AnnouncementsFlagConstants.NOT_HIDDEN);
+			
 			AnnouncementsFlagLocalServiceUtil.addFlag(userId,ae.getEntryId(),AnnouncementsFlagConstants.UNREAD);
 		 }catch(Exception e){
 	 		e.printStackTrace();
