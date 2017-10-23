@@ -24,7 +24,7 @@
 
 <liferay-ui:tabs names="processed-plural,non-processed-plural" refresh="false" onClick="changeTab()" value="${tab}" />
 
-<a href="${newURL}"><liferay-ui:message key="groupmailing.new-mail-job" /></a>
+<aui:button value="groupmailing.new-mail-job" type="button" onClick="${newURL}" />
 
 
 <%
