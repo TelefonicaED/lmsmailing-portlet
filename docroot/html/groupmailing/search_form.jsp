@@ -8,6 +8,8 @@
 	function <portlet:namespace />searchMailUsers(){
 		var to = document.getElementById("<portlet:namespace />to").value;
 		$('#<portlet:namespace />currentTo').val(to);
+		$('#<portlet:namespace />emailSubject').val($('#<portlet:namespace />subject').val());
+		$('#<portlet:namespace />emailContent').val(window.<portlet:namespace />body.getHTML());
 		$('#<portlet:namespace />busqusu').submit();
 		
 	}
@@ -24,7 +26,10 @@
 	<aui:fieldset>
 		
 		<aui:input name="searchForm" type="hidden" value="true" />	
-		<aui:input name="currentTo" type="hidden" />				
+		<aui:input name="currentTo" type="hidden" />
+		<aui:input name="emailSubject" type="hidden" />
+		<aui:input name="emailContent" type="hidden" />
+		
 		<aui:column>
 			<aui:input label="misc.user.firstName" name="firstName" size="20" value="" />
 			<aui:input label="misc.user.screenName" name="screenName" size="20" value="" />	

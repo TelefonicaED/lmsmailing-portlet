@@ -22,8 +22,6 @@
 <%
 	LmsPrefs prefs=LmsPrefsLocalServiceUtil.getLmsPrefs(themeDisplay.getCompanyId());
 
-	String body=""; 
-	String extractCodeFromEditor = renderResponse.getNamespace() + "extractCodeFromEditor()";
 	String criteria = request.getParameter("criteria");
 	
 	boolean backToEdit = ParamUtil.getBoolean(request, "backToEdit");
@@ -54,6 +52,9 @@
 			e.printStackTrace();
 		}
 	}
+	String emailSubject = ParamUtil.getString(request,"emailSubject");
+	String emailContent = ParamUtil.getString(request,"emailContent");
+	
 	long courseId=0;
 	Course course=null;
 	
@@ -251,6 +252,7 @@ else
 </aui:form>
 
 
+
 <div id="<portlet:namespace />student_search" class="aui-helper-hidden" >
 
 	<jsp:include page="/html/groupmailing/search_form.jsp" />
@@ -332,8 +334,11 @@ else
 		
 		<script type="text/javascript">
 		<!--
+			var <%=renderResponse.getNamespace() %><%= searchContainer.getId(request, renderResponse.getNamespace()) %>CurDelta = 5;
+			
 			function <portlet:namespace />ajaxMode<%= searchContainer.getId(request, renderResponse.getNamespace()) %>SearchContainer(A) {
 
+				
 				var searchContainer = A.one('#<%=renderResponse.getNamespace() %><%= searchContainer.getId(request, renderResponse.getNamespace()) %>SearchContainer').ancestor('.lfr-search-container');
 				
 				function <portlet:namespace />reload<%= searchContainer.getId(request, renderResponse.getNamespace()) %>SearchContainer(url){
@@ -345,7 +350,7 @@ else
 						params.p_p_state='<%=LiferayWindowState.EXCLUSIVE.toString() %>';
 						url = urlPieces[0];
 					}
-	
+					
 					A.io.request(
 						url,
 						{
@@ -370,11 +375,12 @@ else
 				
 				<portlet:namespace /><%= searchContainer.getCurParam() %>updateCur = function(box){
 					<portlet:namespace />reload<%= searchContainer.getId(request, renderResponse.getNamespace()) 
-					%>SearchContainer('<%=HttpUtil.removeParameter(searchContainer.getIteratorURL().toString(), renderResponse.getNamespace() + searchContainer.getCurParam()) 
-						%>&<%= renderResponse.getNamespace() + searchContainer.getCurParam() %>=' + A.one(box).val());
+					%>SearchContainer('<%=HttpUtil.removeParameter(HttpUtil.removeParameter(searchContainer.getIteratorURL().toString(), renderResponse.getNamespace() + searchContainer.getDeltaParam()), renderResponse.getNamespace() + searchContainer.getCurParam()) 
+					%>&<%= renderResponse.getNamespace() + searchContainer.getDeltaParam() %>='+<%=renderResponse.getNamespace() %><%=searchContainer.getId(request, renderResponse.getNamespace())%>CurDelta+'&<%= renderResponse.getNamespace() + searchContainer.getCurParam() %>=' + A.one(box).val());
 				};
 
 				<portlet:namespace /><%= searchContainer.getDeltaParam() %>updateDelta = function(box){
+					<%=renderResponse.getNamespace() %><%= searchContainer.getId(request, renderResponse.getNamespace()) %>CurDelta = A.one(box).val();
 					<portlet:namespace />reload<%= searchContainer.getId(request, renderResponse.getNamespace()) 
 						%>SearchContainer('<%=HttpUtil.removeParameter(searchContainer.getIteratorURL().toString(), renderResponse.getNamespace() + searchContainer.getDeltaParam()) 
 							%>&<%= renderResponse.getNamespace() + searchContainer.getDeltaParam() %>=' + A.one(box).val());
@@ -442,7 +448,7 @@ else
 		<aui:input type="hidden" name="toNames" value="<%=toNames%>"/>
 			
 		<div class="mail_subject" >
-			<aui:input name="subject" title="groupmailing.messages.subject" size="120">
+			<aui:input name="subject" title="groupmailing.messages.subject" size="120" value="<%=emailSubject %>">
 				<aui:validator name="maxLength">120</aui:validator>
 				<aui:validator name="required"></aui:validator>
 			</aui:input>
@@ -450,12 +456,12 @@ else
 		
 		<div class="mail_content" >
 			<aui:field-wrapper label="body">
-				<liferay-ui:input-editor name="body" />
+				<liferay-ui:input-editor name="body" initMethod="initBodyEditor"/>
 				<script type="text/javascript">
 			    <!--				
-				    function <portlet:namespace />initEditor()
+				    function <portlet:namespace />initBodyEditor()
 				    {
-				    	return "<%=JavaScriptUtil.markupToStringLiteral(body)%>";
+				    	return "<%=JavaScriptUtil.markupToStringLiteral(emailContent)%>";
 				    }
 			        //-->
 			    </script>
