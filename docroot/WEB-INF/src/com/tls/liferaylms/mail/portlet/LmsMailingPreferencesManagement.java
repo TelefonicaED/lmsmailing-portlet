@@ -1,4 +1,4 @@
-package com.tls.liferaylms.portlet;
+package com.tls.liferaylms.mail.portlet;
 
 import java.io.IOException;
 
@@ -69,23 +69,29 @@ public class LmsMailingPreferencesManagement extends MVCPortlet {
 		ThemeDisplay themeDisplay = (ThemeDisplay) renderRequest.getAttribute(WebKeys.THEME_DISPLAY);
 		
 		boolean internalMessagingActive = false;
+		boolean sendAlwaysMessage = false;
 		String deregisterMailExpando = "deregister-mail";
 		try {
 			internalMessagingActive = PrefsPropsUtil.getBoolean(themeDisplay.getCompanyId(), MailStringPool.INTERNAL_MESSAGING_KEY);
+			sendAlwaysMessage = PrefsPropsUtil.getBoolean(themeDisplay.getCompanyId(), MailStringPool.SEND_ALWAYS_MESSAGE_KEY);
 			deregisterMailExpando = PrefsPropsUtil.getString(themeDisplay.getCompanyId(), MailStringPool.DEREGISTER_MAIL_KEY);
 			if(log.isDebugEnabled()){
 				log.debug("Company Id "+themeDisplay.getCompanyId());
 				log.debug("Initial Value 1 " +  PropsUtil.get(MailStringPool.INTERNAL_MESSAGING_KEY));
 				log.debug("Initial Value 2 " +  PropsUtil.get(MailStringPool.DEREGISTER_MAIL_KEY));
+				log.debug("Initial Value 3 " +  PropsUtil.get(MailStringPool.SEND_ALWAYS_MESSAGE_KEY));
 				log.debug("Real Value 1 " +  PrefsPropsUtil.getString(MailStringPool.INTERNAL_MESSAGING_KEY));
 				log.debug("Real Value 2 " +  PrefsPropsUtil.getString(MailStringPool.DEREGISTER_MAIL_KEY));
+				log.debug("Real Value 3 " +  PrefsPropsUtil.getString(MailStringPool.SEND_ALWAYS_MESSAGE_KEY));
 				log.debug("Company Value 1 " +  internalMessagingActive);
-				log.debug("Company Value 1 " +  deregisterMailExpando);	
+				log.debug("Company Value 2 " +  deregisterMailExpando);
+				log.debug("Company Value 3 " +  sendAlwaysMessage);
 			}
 		} catch (SystemException e) {
 			e.printStackTrace();
 		}	
 		renderRequest.setAttribute("internalMessagingActive",internalMessagingActive);
+		renderRequest.setAttribute("sendAlwaysMessage",sendAlwaysMessage);
 		renderRequest.setAttribute("deregisterMailExpando", deregisterMailExpando);
 		
 		PortletURL updateURL = renderResponse.createActionURL();
@@ -104,11 +110,12 @@ public class LmsMailingPreferencesManagement extends MVCPortlet {
 			log.debug(":::updatePrefs:::");
 			ThemeDisplay themeDisplay = (ThemeDisplay)actionRequest.getAttribute(WebKeys.THEME_DISPLAY);
 			boolean internalMessagingActive = ParamUtil.getBoolean(actionRequest,"internalMessagingActive");
+			boolean sendAlwaysMessage = ParamUtil.getBoolean(actionRequest,"sendAlwaysMessage");
 			String deregisterMailExpando = ParamUtil.getString(actionRequest,"deregisterMailExpando");
-			boolean error= savePreference(MailStringPool.DEREGISTER_MAIL_KEY,deregisterMailExpando , themeDisplay.getCompanyId());
-			boolean error2 = savePreference(MailStringPool.INTERNAL_MESSAGING_KEY ,String.valueOf(internalMessagingActive) , themeDisplay.getCompanyId());
-			
-			if(error || error2){
+			boolean errorDeregisterExpando = savePreference(MailStringPool.DEREGISTER_MAIL_KEY,deregisterMailExpando , themeDisplay.getCompanyId());
+			boolean errorInternalMessaging = savePreference(MailStringPool.INTERNAL_MESSAGING_KEY ,String.valueOf(internalMessagingActive) , themeDisplay.getCompanyId());
+			boolean errorSendAlwaysMessage = savePreference(MailStringPool.SEND_ALWAYS_MESSAGE_KEY ,String.valueOf(sendAlwaysMessage) , themeDisplay.getCompanyId());
+			if(errorDeregisterExpando || errorInternalMessaging || errorSendAlwaysMessage){
 				SessionErrors.add(actionRequest, "update-ko");
 			}else{
 				SessionMessages.add(actionRequest, "update-ok");

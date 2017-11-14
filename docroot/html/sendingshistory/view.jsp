@@ -60,9 +60,7 @@ deltaConfigurable="true" iteratorURL="<%=portletURL%>" >
 		</liferay-ui:search-container-column-text>
 		
 		<%
-		try{
-			template = MailTemplateLocalServiceUtil.getMailTemplate(send.getTemplateId());
-		}catch(NoSuchMailTemplateException e){}
+		template = MailTemplateLocalServiceUtil.fetchMailTemplate(send.getTemplateId());
 		%>
 		<c:choose>
 			<c:when test="<%= template!=null %>">

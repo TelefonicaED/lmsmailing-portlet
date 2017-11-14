@@ -8,5 +8,6 @@
 		<portlet id="mailjob"></portlet>
 		<portlet id="processmailjob"></portlet>
 		<portlet id="sendingsHistory"></portlet>
+		<portlet id="deregisteracademymail"></portlet>
 	</category>
 </display>
