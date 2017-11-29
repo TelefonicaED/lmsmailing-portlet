@@ -8,21 +8,29 @@
 
 
 <script type="text/javascript">
-	function changeTab(){
-		var processed = document.getElementById("processed");
-		var nprocessed = document.getElementById("non-processed");
-		
-		if(processed.style.display=="none"){
-			processed.style.display="block";
-			nprocessed.style.display="none";
-		}else{
-			processed.style.display="none";
-			nprocessed.style.display="block";
-		}
-	}
+
+$(document).ready(function(){
+    $(".aui-tabview-list li").click(function(){
+        var isActualTab = $(this).hasClass("current");
+        if(isActualTab != true){
+        	var processed = document.getElementById("processed");
+			var nprocessed = document.getElementById("non-processed");
+			
+			if(processed.style.display=="none"){
+				processed.style.display="block";
+				nprocessed.style.display="none";
+			}else{
+				processed.style.display="none";
+				nprocessed.style.display="block";
+			}
+        }
+    });
+});
+
 </script>
 
-<liferay-ui:tabs names="processed-plural,non-processed-plural" refresh="false" onClick="changeTab()" value="${tab}" />
+
+<liferay-ui:tabs names="processed-plural,non-processed-plural" refresh="false" value="${tab}" />
 
 <aui:button value="groupmailing.new-mail-job" type="button" onClick="${newURL}" />
 
