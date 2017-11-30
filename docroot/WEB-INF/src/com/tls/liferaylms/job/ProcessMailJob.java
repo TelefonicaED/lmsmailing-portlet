@@ -16,6 +16,7 @@ import com.liferay.portal.kernel.messaging.Message;
 import com.liferay.portal.kernel.messaging.MessageBusUtil;
 import com.liferay.portal.kernel.messaging.MessageListener;
 import com.liferay.portal.kernel.messaging.MessageListenerException;
+import com.liferay.portal.kernel.util.PrefsPropsUtil;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.model.Company;
 import com.liferay.portal.model.Group;
@@ -23,6 +24,7 @@ import com.liferay.portal.model.User;
 import com.liferay.portal.service.CompanyLocalServiceUtil;
 import com.liferay.portal.service.GroupLocalServiceUtil;
 import com.liferay.portal.util.PortalUtil;
+import com.liferay.portlet.announcements.model.AnnouncementsEntry;
 import com.liferay.util.bridges.mvc.MVCPortlet;
 import com.tls.liferaylms.job.condition.Condition;
 import com.tls.liferaylms.job.condition.ConditionUtil;
@@ -34,6 +36,7 @@ import com.tls.liferaylms.mail.service.AuditSendMailsLocalServiceUtil;
 import com.tls.liferaylms.mail.service.MailJobLocalServiceUtil;
 import com.tls.liferaylms.mail.service.MailTemplateLocalServiceUtil;
 import com.tls.liferaylms.util.MailStringPool;
+import com.tls.liferaylms.util.MailUtil;
 
 public class ProcessMailJob extends MVCPortlet implements MessageListener{
 	private static Log log = LogFactoryUtil.getLog(ProcessMailJob.class);
@@ -59,6 +62,11 @@ public class ProcessMailJob extends MVCPortlet implements MessageListener{
 		List<MailJob> mailJobs = MailJobLocalServiceUtil.getNotProcessedMailJobs();
 		
 		for(MailJob mailJob : mailJobs){
+			
+			
+			
+			
+			
 			if(log.isDebugEnabled())log.debug(mailJob.getConditionClassName());
 			Condition condition = null;
 			try {
@@ -121,6 +129,10 @@ public class ProcessMailJob extends MVCPortlet implements MessageListener{
 					if(log.isDebugEnabled())e.printStackTrace();
 				}
 				
+				
+				
+				
+				
 				if(users!=null&&mailTemplate!=null&&company!=null&&group!=null){
 
 					//Guardar una auditoria del envio de emails.
@@ -140,7 +152,22 @@ public class ProcessMailJob extends MVCPortlet implements MessageListener{
 					}catch(Exception e){
 						e.printStackTrace();
 					}
-
+					long entryId = -1;
+					try{
+						
+						boolean internalMessagingActive = PrefsPropsUtil.getBoolean(mailJob.getCompanyId(), MailStringPool.INTERNAL_MESSAGING_KEY);
+						
+						if(internalMessagingActive){
+							log.debug("Sending internal message ");
+							AnnouncementsEntry entry = MailUtil.createInternalMessageNotification(mailTemplate.getSubject(), mailTemplate.getBody(), mailJob.getGroupId(), mailJob.getUserId(), mailJob.getCompanyId());
+							if(entry!=null){
+								entryId = entry.getEntryId();
+							}
+						}
+					}catch(Exception e){
+						e.printStackTrace();
+					}
+					
 					for(User user : users){
 						log.debug(user.getFullName());
 						try{
@@ -150,7 +177,7 @@ public class ProcessMailJob extends MVCPortlet implements MessageListener{
 							message.put("templateId",mailTemplate.getIdTemplate());
 
 							message.put("to", user.getEmailAddress());
-
+							message.put("entryId", entryId);
 							message.put("subject", 	mailTemplate.getSubject());
 							message.put("body", 	mailTemplate.getBody());
 							message.put("groupId", 	mailJob.getGroupId());

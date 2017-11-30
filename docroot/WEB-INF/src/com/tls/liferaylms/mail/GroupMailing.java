@@ -17,6 +17,7 @@ import com.liferay.portal.kernel.messaging.MessageBusUtil;
 import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.ParamUtil;
+import com.liferay.portal.kernel.util.PrefsPropsUtil;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
@@ -26,9 +27,13 @@ import com.liferay.portal.service.UserLocalServiceUtil;
 import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portal.util.comparator.UserFirstNameComparator;
 import com.liferay.portlet.PortletPreferencesFactoryUtil;
+import com.liferay.portlet.announcements.model.AnnouncementsEntry;
+import com.liferay.portlet.announcements.service.AnnouncementsEntryLocalServiceUtil;
 import com.liferay.util.bridges.mvc.MVCPortlet;
 import com.tls.liferaylms.mail.model.MailTemplate;
 import com.tls.liferaylms.mail.service.MailTemplateLocalServiceUtil;
+import com.tls.liferaylms.util.MailStringPool;
+import com.tls.liferaylms.util.MailUtil;
 
 /**
  * Portlet implementation class GroupMailing
@@ -68,10 +73,22 @@ public class GroupMailing extends MVCPortlet{
 			}
 			boolean ownTeam = (preferences.getValue("ownTeam", "false")).compareTo("true") == 0;
 			
+			long entryId = -1;
+			boolean internalMessagingActive = PrefsPropsUtil.getBoolean(themeDisplay.getCompanyId(), MailStringPool.INTERNAL_MESSAGING_KEY);
+			
+			if(internalMessagingActive){
+				_log.debug("Sending internal message ");
+				AnnouncementsEntry entry = MailUtil.createInternalMessageNotification(template.getSubject(),changeToURL(template.getBody(), themeDisplay.getURLPortal()), themeDisplay.getScopeGroupId(), themeDisplay.getUserId(), themeDisplay.getCompanyId());
+				if(entry!=null){
+					entryId = entry.getEntryId();
+				}
+			}
+			
+			
 			Message message=new Message();
 			
 			message.put("templateId",idTemplate);
-			
+			message.put("entryId", entryId);
 			message.put("to", "all");
 			message.put("ownTeam", ownTeam);
 			message.put("isOmniadmin", permissionChecker.isOmniadmin());
@@ -109,7 +126,8 @@ public class GroupMailing extends MVCPortlet{
 		String testing 	= ParamUtil.getString(actionRequest, "testing", "false");
 		
 		String to 	= ParamUtil.getString(actionRequest, "to", "");
-		
+		long entryId = -1;
+		boolean internalMessagingActive = PrefsPropsUtil.getBoolean(themeDisplay.getCompanyId(), MailStringPool.INTERNAL_MESSAGING_KEY);
 		
 		if (_log.isDebugEnabled()) _log.debug("To: " + to);
 		if (_log.isDebugEnabled()) _log.debug("to.isEmpty(): " + to.isEmpty());
@@ -122,6 +140,15 @@ public class GroupMailing extends MVCPortlet{
 			return;
 		}
 	
+		if(internalMessagingActive){
+			_log.debug("Sending internal message ");
+			AnnouncementsEntry entry = MailUtil.createInternalMessageNotification(subject, changeToURL(body, themeDisplay.getURLPortal()), themeDisplay.getScopeGroupId(), themeDisplay.getUserId(), themeDisplay.getCompanyId());
+			if(entry!=null){
+				entryId = entry.getEntryId();
+			}
+		}
+		
+		
 		if(to.isEmpty()){
 			
 			if (_log.isDebugEnabled()) _log.debug("Enviamos a todos los usuarios");
@@ -141,7 +168,7 @@ public class GroupMailing extends MVCPortlet{
 			message.put("to", "all");
 			message.put("ownTeam", ownTeam);
 			message.put("isOmniadmin", permissionChecker.isOmniadmin());
-			
+			message.put("entryId", entryId);
 			message.put("subject", 	subject);
 			message.put("body", 	changeToURL(body, themeDisplay.getURLPortal()));
 			message.put("groupId", 	themeDisplay.getScopeGroupId());
@@ -153,7 +180,7 @@ public class GroupMailing extends MVCPortlet{
 			
 			message.put("url", 		themeDisplay.getURLPortal());
 			message.put("urlcourse",themeDisplay.getURLPortal()+themeDisplay.getPathFriendlyURLPublic()+themeDisplay.getScopeGroup().getFriendlyURL());
-				
+			
 			MessageBusUtil.sendMessage("lms/mailing", message);
 		}else if (to.contains("team_")){
 			
@@ -169,7 +196,7 @@ public class GroupMailing extends MVCPortlet{
 				Message message=new Message();
 				
 				message.put("templateId",-1);
-
+				message.put("entryId", entryId);
 				message.put("to", user.getEmailAddress());
 				message.put("userName", user.getFullName());
 				message.put("subject", 	subject);
@@ -201,7 +228,7 @@ public class GroupMailing extends MVCPortlet{
 					Message message=new Message();
 					
 					message.put("templateId",-1);
-					
+					message.put("entryId", entryId);
 					message.put("to", user.getEmailAddress());
 					message.put("userName", user.getFullName());
 					message.put("subject", 	subject);
