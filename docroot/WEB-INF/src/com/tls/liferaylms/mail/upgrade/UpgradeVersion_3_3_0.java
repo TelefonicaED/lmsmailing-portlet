@@ -25,7 +25,7 @@ public class UpgradeVersion_3_3_0 extends UpgradeProcess {
 				 				"(SELECT plid, "+
 				 				"REPLACE(typeSettings,'deregisteracademymail_WAR_liferaylmsportlet','deregisteracademymail_WAR_lmsmailingportlet') "
 				 				+ "as settings "
-				 				+ "FROM layout"
+				 				+ "FROM layout "
 				 				+ "WHERE typeSettings LIKE '%deregisteracademymail_WAR_liferaylmsportle') AS t1 "
 				 				+ "set la.typeSettings = t1.settings "
 				 				+ "WHERE la.plid=t1.plid; ";
