@@ -84,140 +84,142 @@ public class ProcessMailJob extends MVCPortlet implements MessageListener{
 				if(log.isDebugEnabled())e.printStackTrace();
 			}
 			
-			
-			if(log.isDebugEnabled()){
-				log.debug(mailJob.getIdJob());
-				Set<User> users = condition.getUsersToSend();
-				if(users!=null){
-					for(User user : users){
-						log.debug(user.getFullName());
-					}
-				}
-				
-				log.debug(date.shouldBeProcessed());
-			}
-			
-			if(date.shouldBeProcessed()){
-				Set<User> users = condition.getUsersToSend();
-
-				MailTemplate mailTemplate = null;
-				try {
-					mailTemplate = MailTemplateLocalServiceUtil.getMailTemplate(mailJob.getIdTemplate());
-				} catch (PortalException e) {
-					if(log.isDebugEnabled())e.printStackTrace();
-				} catch (SystemException e) {
-					if(log.isDebugEnabled())e.printStackTrace();
-				}
-				
-				Company company = null;
-				String companyName = StringPool.BLANK;
-				try {
-					company = CompanyLocalServiceUtil.getCompanyById(mailJob.getCompanyId());
-					companyName = company.getName();
-				} catch (PortalException e) {
-					if(log.isDebugEnabled())e.printStackTrace();
-				} catch (SystemException e) {
-					if(log.isDebugEnabled())e.printStackTrace();
-				}
-				
-				Group group = null;
-				try {
-					group = GroupLocalServiceUtil.getGroup(mailJob.getGroupId());
-				} catch (PortalException e) {
-					if(log.isDebugEnabled())e.printStackTrace();
-				} catch (SystemException e) {
-					if(log.isDebugEnabled())e.printStackTrace();
-				}
-				
-				
-				
-				
-				
-				if(users!=null&&mailTemplate!=null&&company!=null&&group!=null){
-
-					//Guardar una auditoria del envio de emails.
-					AuditSendMails auditSendMails = null;
-					try{
-						auditSendMails = AuditSendMailsLocalServiceUtil.createAuditSendMails(CounterLocalServiceUtil.increment(AuditSendMails.class.getName()));
-						auditSendMails.setUserId(mailJob.getUserId());
-						auditSendMails.setGroupId(mailJob.getGroupId());
-						auditSendMails.setTemplateId(mailJob.getIdTemplate());
-						auditSendMails.setCompanyId(mailJob.getCompanyId());
-						
-						auditSendMails.setSubject(mailTemplate.getSubject());
-						auditSendMails.setBody(mailTemplate.getBody());
-						
-						
-						AuditSendMailsLocalServiceUtil.addAuditSendMails(auditSendMails); 
-					}catch(Exception e){
-						e.printStackTrace();
-					}
-					long entryId = -1;
-					try{
-						
-						boolean internalMessagingActive = PrefsPropsUtil.getBoolean(mailJob.getCompanyId(), MailStringPool.INTERNAL_MESSAGING_KEY);
-						
-						if(internalMessagingActive){
-							log.debug("Sending internal message ");
-							AnnouncementsEntry entry = MailUtil.createInternalMessageNotification(mailTemplate.getSubject(), mailTemplate.getBody(), mailJob.getGroupId(), mailJob.getUserId(), mailJob.getCompanyId());
-							if(entry!=null){
-								entryId = entry.getEntryId();
-							}
+			if(condition!=null && date!=null){
+				if(log.isDebugEnabled()){
+					log.debug(mailJob.getIdJob());
+					Set<User> users = condition.getUsersToSend();
+					if(users!=null){
+						for(User user : users){
+							log.debug(user.getFullName());
 						}
-					}catch(Exception e){
-						e.printStackTrace();
 					}
 					
-					for(User user : users){
-						log.debug(user.getFullName());
-						try{
-
-							Message message=new Message();
-
-							message.put("templateId",mailTemplate.getIdTemplate());
-
-							message.put("to", user.getEmailAddress());
-							message.put("entryId", entryId);
-							message.put("subject", 	mailTemplate.getSubject());
-							message.put("body", 	mailTemplate.getBody());
-							message.put("groupId", 	mailJob.getGroupId());
-							message.put("userId",  	mailJob.getUserId());
-							message.put("testing", 	StringPool.FALSE);
-
-							message.put("portal", 	companyName);
-							message.put("community",group.getName());
-
-							String portalUrl = PortalUtil.getPortalURL(company.getVirtualHostname(), PortalUtil.getPortalPort(false), false);
-							message.put("url", 		portalUrl);
-							message.put("urlcourse",portalUrl+PortalUtil.getPathFriendlyURLPublic()+group.getFriendlyURL());
-
-							MessageBusUtil.sendMessage("lms/mailing", message);
-
-//							LmsMailMessageListener.addAuditReceiverMail(auditSendMails.getAuditSendMailsId(), user.getEmailAddress(), LmsMailMessageListener.STATUS_OK);
-						}catch(Exception e){
-							e.printStackTrace();
-//							LmsMailMessageListener.addAuditReceiverMail(auditSendMails.getAuditSendMailsId(), user.getEmailAddress(), LmsMailMessageListener.STATUS_KO);
-						}
-					}
-
-					//Guardar una auditoria del envio de emails.
-//					try {
-//						auditSendMails.setSendDate(new Date(System.currentTimeMillis()));
-//						auditSendMails.setNumberOfPost(users.size());
-//						AuditSendMailsLocalServiceUtil.updateAuditSendMails(auditSendMails);
-//					} catch (SystemException e) {
-//						// TODO Auto-generated catch block
-//						e.printStackTrace();
-//					} 
+					log.debug(date.shouldBeProcessed());
 				}
 				
-				try {
-					mailJob.setProcessed(true);
-					MailJobLocalServiceUtil.updateMailJob(mailJob);
-				} catch (SystemException e) {
-					if(log.isDebugEnabled())e.printStackTrace();
+				if(date.shouldBeProcessed()){
+					Set<User> users = condition.getUsersToSend();
+
+					MailTemplate mailTemplate = null;
+					try {
+						mailTemplate = MailTemplateLocalServiceUtil.getMailTemplate(mailJob.getIdTemplate());
+					} catch (PortalException e) {
+						if(log.isDebugEnabled())e.printStackTrace();
+					} catch (SystemException e) {
+						if(log.isDebugEnabled())e.printStackTrace();
+					}
+					
+					Company company = null;
+					String companyName = StringPool.BLANK;
+					try {
+						company = CompanyLocalServiceUtil.getCompanyById(mailJob.getCompanyId());
+						companyName = company.getName();
+					} catch (PortalException e) {
+						if(log.isDebugEnabled())e.printStackTrace();
+					} catch (SystemException e) {
+						if(log.isDebugEnabled())e.printStackTrace();
+					}
+					
+					Group group = null;
+					try {
+						group = GroupLocalServiceUtil.getGroup(mailJob.getGroupId());
+					} catch (PortalException e) {
+						if(log.isDebugEnabled())e.printStackTrace();
+					} catch (SystemException e) {
+						if(log.isDebugEnabled())e.printStackTrace();
+					}
+					
+					
+					
+					
+					
+					if(users!=null&&mailTemplate!=null&&company!=null&&group!=null){
+
+						//Guardar una auditoria del envio de emails.
+						AuditSendMails auditSendMails = null;
+						try{
+							auditSendMails = AuditSendMailsLocalServiceUtil.createAuditSendMails(CounterLocalServiceUtil.increment(AuditSendMails.class.getName()));
+							auditSendMails.setUserId(mailJob.getUserId());
+							auditSendMails.setGroupId(mailJob.getGroupId());
+							auditSendMails.setTemplateId(mailJob.getIdTemplate());
+							auditSendMails.setCompanyId(mailJob.getCompanyId());
+							
+							auditSendMails.setSubject(mailTemplate.getSubject());
+							auditSendMails.setBody(mailTemplate.getBody());
+							
+							
+							AuditSendMailsLocalServiceUtil.addAuditSendMails(auditSendMails); 
+						}catch(Exception e){
+							e.printStackTrace();
+						}
+						long entryId = -1;
+						try{
+							
+							boolean internalMessagingActive = PrefsPropsUtil.getBoolean(mailJob.getCompanyId(), MailStringPool.INTERNAL_MESSAGING_KEY);
+							
+							if(internalMessagingActive){
+								log.debug("Sending internal message ");
+								AnnouncementsEntry entry = MailUtil.createInternalMessageNotification(mailTemplate.getSubject(), mailTemplate.getBody(), mailJob.getGroupId(), mailJob.getUserId(), mailJob.getCompanyId());
+								if(entry!=null){
+									entryId = entry.getEntryId();
+								}
+							}
+						}catch(Exception e){
+							e.printStackTrace();
+						}
+						
+						for(User user : users){
+							log.debug(user.getFullName());
+							try{
+
+								Message message=new Message();
+
+								message.put("templateId",mailTemplate.getIdTemplate());
+
+								message.put("to", user.getEmailAddress());
+								message.put("entryId", entryId);
+								message.put("subject", 	mailTemplate.getSubject());
+								message.put("body", 	mailTemplate.getBody());
+								message.put("groupId", 	mailJob.getGroupId());
+								message.put("userId",  	mailJob.getUserId());
+								message.put("testing", 	StringPool.FALSE);
+
+								message.put("portal", 	companyName);
+								message.put("community",group.getName());
+
+								String portalUrl = PortalUtil.getPortalURL(company.getVirtualHostname(), PortalUtil.getPortalPort(false), false);
+								message.put("url", 		portalUrl);
+								message.put("urlcourse",portalUrl+PortalUtil.getPathFriendlyURLPublic()+group.getFriendlyURL());
+
+								MessageBusUtil.sendMessage("lms/mailing", message);
+
+//								LmsMailMessageListener.addAuditReceiverMail(auditSendMails.getAuditSendMailsId(), user.getEmailAddress(), LmsMailMessageListener.STATUS_OK);
+							}catch(Exception e){
+								e.printStackTrace();
+//								LmsMailMessageListener.addAuditReceiverMail(auditSendMails.getAuditSendMailsId(), user.getEmailAddress(), LmsMailMessageListener.STATUS_KO);
+							}
+						}
+
+						//Guardar una auditoria del envio de emails.
+//						try {
+//							auditSendMails.setSendDate(new Date(System.currentTimeMillis()));
+//							auditSendMails.setNumberOfPost(users.size());
+//							AuditSendMailsLocalServiceUtil.updateAuditSendMails(auditSendMails);
+//						} catch (SystemException e) {
+//							// TODO Auto-generated catch block
+//							e.printStackTrace();
+//						} 
+					}
+					
+					try {
+						mailJob.setProcessed(true);
+						MailJobLocalServiceUtil.updateMailJob(mailJob);
+					} catch (SystemException e) {
+						if(log.isDebugEnabled())e.printStackTrace();
+					}
 				}
-			}
+			}	
+			
 		}
 
 		if(log.isDebugEnabled())log.debug(MailStringPool.END+this.getClass().getName());
