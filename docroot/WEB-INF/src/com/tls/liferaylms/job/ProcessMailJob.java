@@ -187,7 +187,13 @@ public class ProcessMailJob extends MVCPortlet implements MessageListener{
 								message.put("portal", 	companyName);
 								message.put("community",group.getName());
 
-								String portalUrl = PortalUtil.getPortalURL(company.getVirtualHostname(), PortalUtil.getPortalPort(false), false);
+								String portalUrl = PortalUtil.getPortalURL(company.getVirtualHostname(), 80, false);
+						    	//QUITANDO PUERTOS
+								String[] urls = portalUrl.split(":");
+								portalUrl = urls[0] + ":" +urls[1];  // http:prueba.es:8080		
+								log.debug("url: " + portalUrl);
+								
+								
 								message.put("url", 		portalUrl);
 								message.put("urlcourse",portalUrl+PortalUtil.getPathFriendlyURLPublic()+group.getFriendlyURL());
 

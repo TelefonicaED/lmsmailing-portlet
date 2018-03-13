@@ -21,10 +21,12 @@ import com.liferay.portal.kernel.util.PrefsPropsUtil;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
+import com.liferay.portal.model.Company;
 import com.liferay.portal.model.User;
 import com.liferay.portal.security.permission.PermissionChecker;
 import com.liferay.portal.service.UserLocalServiceUtil;
 import com.liferay.portal.theme.ThemeDisplay;
+import com.liferay.portal.util.PortalUtil;
 import com.liferay.portal.util.comparator.UserFirstNameComparator;
 import com.liferay.portlet.PortletPreferencesFactoryUtil;
 import com.liferay.portlet.announcements.model.AnnouncementsEntry;
@@ -102,8 +104,8 @@ public class GroupMailing extends MVCPortlet{
 			message.put("portal", 	themeDisplay.getCompany().getName());
 			message.put("community",themeDisplay.getScopeGroupName());
 			
-			message.put("url", 		themeDisplay.getURLPortal());
-			message.put("urlcourse",themeDisplay.getURLPortal()+themeDisplay.getPathFriendlyURLPublic()+themeDisplay.getScopeGroup().getFriendlyURL());
+			message.put("url", 	getURLPortal(themeDisplay.getCompany()));
+			message.put("urlcourse",getURLPortal(themeDisplay.getCompany())+themeDisplay.getPathFriendlyURLPublic()+themeDisplay.getScopeGroup().getFriendlyURL());
 				
 			MessageBusUtil.sendMessage("lms/mailing", message);
 			
@@ -167,8 +169,8 @@ public class GroupMailing extends MVCPortlet{
 			message.put("portal", 	themeDisplay.getCompany().getName());
 			message.put("community",themeDisplay.getScopeGroupName());
 			
-			message.put("url", 		themeDisplay.getURLPortal());
-			message.put("urlcourse",themeDisplay.getURLPortal()+themeDisplay.getPathFriendlyURLPublic()+themeDisplay.getScopeGroup().getFriendlyURL());
+			message.put("url", 		getURLPortal(themeDisplay.getCompany()));
+			message.put("urlcourse",getURLPortal(themeDisplay.getCompany())+themeDisplay.getPathFriendlyURLPublic()+themeDisplay.getScopeGroup().getFriendlyURL());
 			MessageBusUtil.sendMessage("lms/mailing", message);
 		}else{
 			if(to.isEmpty()){
@@ -200,8 +202,8 @@ public class GroupMailing extends MVCPortlet{
 				message.put("portal", 	themeDisplay.getCompany().getName());
 				message.put("community",themeDisplay.getScopeGroupName());
 				
-				message.put("url", 		themeDisplay.getURLPortal());
-				message.put("urlcourse",themeDisplay.getURLPortal()+themeDisplay.getPathFriendlyURLPublic()+themeDisplay.getScopeGroup().getFriendlyURL());
+				message.put("url", 		getURLPortal(themeDisplay.getCompany()));
+				message.put("urlcourse",getURLPortal(themeDisplay.getCompany())+themeDisplay.getPathFriendlyURLPublic()+themeDisplay.getScopeGroup().getFriendlyURL());
 				
 				MessageBusUtil.sendMessage("lms/mailing", message);
 			}else if (to.contains("team_")){
@@ -230,8 +232,8 @@ public class GroupMailing extends MVCPortlet{
 					message.put("portal", 	themeDisplay.getCompany().getName());
 					message.put("community",themeDisplay.getScopeGroupName());
 					
-					message.put("url", 		themeDisplay.getURLPortal());
-					message.put("urlcourse",themeDisplay.getURLPortal()+themeDisplay.getPathFriendlyURLPublic()+themeDisplay.getScopeGroup().getFriendlyURL());
+					message.put("url", 		getURLPortal(themeDisplay.getCompany()));
+					message.put("urlcourse",getURLPortal(themeDisplay.getCompany())+themeDisplay.getPathFriendlyURLPublic()+themeDisplay.getScopeGroup().getFriendlyURL());
 					MessageBusUtil.sendMessage("lms/mailing", message);
 				}
 			}else {
@@ -262,8 +264,8 @@ public class GroupMailing extends MVCPortlet{
 						message.put("portal", 	themeDisplay.getCompany().getName());
 						message.put("community",themeDisplay.getScopeGroupName());
 						
-						message.put("url", 		themeDisplay.getURLPortal());
-						message.put("urlcourse",themeDisplay.getURLPortal()+themeDisplay.getPathFriendlyURLPublic()+themeDisplay.getScopeGroup().getFriendlyURL());
+						message.put("url", 	getURLPortal(themeDisplay.getCompany()));
+						message.put("urlcourse",getURLPortal(themeDisplay.getCompany())+themeDisplay.getPathFriendlyURLPublic()+themeDisplay.getScopeGroup().getFriendlyURL());
 							
 						MessageBusUtil.sendMessage("lms/mailing", message);
 						
@@ -281,6 +283,16 @@ public class GroupMailing extends MVCPortlet{
 		
 		actionResponse.setRenderParameter("jspPage", "/html/groupmailing/view.jsp");
 	}
+	
+	private String getURLPortal(Company company){
+		String url = PortalUtil.getPortalURL(company.getVirtualHostname(), 80, true);
+    	//QUITANDO PUERTOS
+		String[] urls = url.split(":");
+		url = urls[0] + ":" +urls[1];  // http:prueba.es:8080		
+		_log.debug("url: " + url);
+		return url;
+	}
+	
 	
 	//Para imagenes
 	private String changeToURL(String text, String url){
