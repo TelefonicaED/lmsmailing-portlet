@@ -3,12 +3,15 @@ package com.tls.liferaylms.util;
 import java.util.Calendar;
 import java.util.Date;
 
+import javax.portlet.ActionRequest;
+
 import com.liferay.counter.service.CounterLocalServiceUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.mail.MailMessage;
 import com.liferay.portal.kernel.util.Constants;
 import com.liferay.portal.kernel.util.StringPool;
+import com.liferay.portal.model.Company;
 import com.liferay.portal.model.Group;
 import com.liferay.portal.util.PortalUtil;
 import com.liferay.portlet.announcements.model.AnnouncementsEntry;
@@ -30,6 +33,7 @@ public class MailUtil {
 			String content = mailMessage.getBody();
 			String type = "announcements.type.general";
 			log.debug("-- Sending Interal Messaging Notification");
+			log.debug("-- Content "+content);
 			Date now = new Date();
 			log.debug("NOW " + now);
 			Calendar displayDate = Calendar.getInstance();
@@ -122,5 +126,45 @@ public class MailUtil {
 		}
 		return ae;
 	}
+	
+	
+	public static String getURLPortal(Company company, ActionRequest request){
+		String url = "";
+		if(request.getScheme().equals("https")){
+			url = PortalUtil.getPortalURL(company.getVirtualHostname(), 80, true);
+		}else{
+			url = PortalUtil.getPortalURL(company.getVirtualHostname(), 80, false);
+		}
+		
+    	//QUITANDO PUERTOS
+		String[] urls = url.split(":");
+		url = urls[0] + ":" +urls[1];  // http:prueba.es:8080		
+		log.debug("url: " + url);
+		return url;
+	}
+	
+	public static String createMessage(String text, String portal, String community, String student, String teacher, String url, String urlcourse){
+		String res = "";
+		res = text.replace("[@portal]", 	portal);
+		res = res.replace ("[@course]", 	community);
+		res = res.replace ("[@student]", 	student);
+		res = res.replace ("[@teacher]", 	teacher);
+		res = res.replace ("[@url]", 		"<a href=\""+url+"\">"+portal+"</a>");
+		res = res.replace ("[@urlcourse]", 	"<a href=\""+urlcourse+"\">"+community+"</a>");	
 
+		//Para poner la url desde la pï¿½gina para que se vean los correos.
+		res = changeToURL(res, url);
+		
+		return res;
+	}
+
+	
+	public static String changeToURL(String text, String url){
+		String res ="";
+
+		//Para imï¿½genes
+		res = text.replaceAll("src=\"/image/image_gallery", "src=\""+url+"/image/image_gallery");
+		
+		return res;
+	}
 }
