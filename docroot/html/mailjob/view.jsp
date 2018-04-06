@@ -4,9 +4,11 @@
 <%@ include file="/init.jsp"%>
 
 <portlet:actionURL var="newURL" name="newMailJob"> 
+	<portlet:param name="activeTab" value="${tab}"/>
 </portlet:actionURL>
 
-
+<liferay-ui:success key="delete-mailjob-ok" message="mailjob.delete-mailjob-ok"/>
+<liferay-ui:error key="delete-mailjob-ko" message="mailjob.delete-mailjob-ko"/>
 <script type="text/javascript">
 
 $(document).ready(function(){
@@ -31,10 +33,7 @@ $(document).ready(function(){
 
 
 <liferay-ui:tabs names="processed-plural,non-processed-plural" refresh="false" value="${tab}" />
-
 <aui:button value="groupmailing.new-mail-job" type="button" onClick="${newURL}" />
-
-
 <%
 	PortletURL processedURL = renderResponse.createRenderURL();
 	processedURL.setParameter("tab","processed-plural");
@@ -175,6 +174,12 @@ nonProcessedURL.setParameter("tab","non-processed-plural");
 						<liferay-ui:icon image="unchecked" alt="unchecked"></liferay-ui:icon>
 					</c:otherwise>
 				</c:choose>
+			</liferay-ui:search-container-column-text>
+			<liferay-ui:search-container-column-text name="">
+				<portlet:actionURL name="deleteMailJob" var="deleteURL">
+						<portlet:param name="mailJobId" value="<%=String.valueOf(mailJob.getPrimaryKey()) %>" />
+				</portlet:actionURL>
+				<liferay-ui:icon-delete url="<%=deleteURL.toString() %>" />
 			</liferay-ui:search-container-column-text>			
 			
 		</liferay-ui:search-container-row>

@@ -183,13 +183,13 @@ public class LmsMailMessageListener implements MessageListener {
 			log.debug("--- EXPANDO 1: "+userSender.getExpandoBridge().getAttribute(deregisterMailExpando,false));
 			
 			if(!deregisterMail){
-				body = createMessage(body, portal, community, userSender.getFullName(), UserLocalServiceUtil.getUserById(userId).getFullName(), url, urlcourse);
+				body = MailUtil.createMessage(body, portal, community, userSender.getFullName(), UserLocalServiceUtil.getUserById(userId).getFullName(), url, urlcourse);
 
 				String calculatedBody = LanguageUtil.get(Locale.getDefault(),"mail.header");
 				calculatedBody += body;
 				calculatedBody += LanguageUtil.get(Locale.getDefault(),"mail.footer");
 				
-				subject = createMessage(subject, portal, community, userSender.getFullName(), userSender.getFullName(),url,urlcourse);
+				subject = MailUtil.createMessage(subject, portal, community, userSender.getFullName(), userSender.getFullName(),url,urlcourse);
 				//Guardar una auditoria del envio de emails.
 				auditSendMails = AuditSendMailsLocalServiceUtil.createAuditSendMails(CounterLocalServiceUtil.increment(AuditSendMails.class.getName()));
 				auditSendMails.setUserId(userId);
@@ -244,10 +244,10 @@ public class LmsMailMessageListener implements MessageListener {
 					InternetAddress to = new InternetAddress(toMail, student.getFullName());
 
 					String calculatedBody = LanguageUtil.get(student.getLocale(),"mail.header");
-					calculatedBody += createMessage(body, portal, community, student.getFullName(), userSender.getFullName(),url,urlcourse);
+					calculatedBody += MailUtil.createMessage(body, portal, community, student.getFullName(), userSender.getFullName(),url,urlcourse);
 					calculatedBody += LanguageUtil.get(student.getLocale(),"mail.footer");
 					
-					String calculatedsubject = createMessage(subject, portal, community, student.getFullName(), userSender.getFullName(),url,urlcourse);
+					String calculatedsubject = MailUtil.createMessage(subject, portal, community, student.getFullName(), userSender.getFullName(),url,urlcourse);
 					
 					if(log.isDebugEnabled()) {
 						log.debug("Se envia el siguiente correo...");
@@ -555,7 +555,7 @@ public class LmsMailMessageListener implements MessageListener {
 		res = res.replace ("[@urlcourse]", 	"<a href=\""+urlcourse+"\">"+community+"</a>");	
 
 		//Se cambiala URL des.
-		res = changeToURL(res, url);
+		res = MailUtil.changeToURL(res, url);
 		
 		return res;
 	}
@@ -572,29 +572,9 @@ public class LmsMailMessageListener implements MessageListener {
 		}
 	}
 
-	private String createMessage(String text, String portal, String community, String student, String teacher, String url, String urlcourse){
-		String res = "";
-		res = text.replace("[@portal]", 	portal);
-		res = res.replace ("[@course]", 	community);
-		res = res.replace ("[@student]", 	student);
-		res = res.replace ("[@teacher]", 	teacher);
-		res = res.replace ("[@url]", 		"<a href=\""+url+"\">"+portal+"</a>");
-		res = res.replace ("[@urlcourse]", 	"<a href=\""+urlcourse+"\">"+community+"</a>");	
+	
 
-		//Para poner la url desde la pï¿½gina para que se vean los correos.
-		res = changeToURL(res, url);
-		
-		return res;
-	}
-
-	private String changeToURL(String text, String url){
-		String res ="";
-
-		//Para imï¿½genes
-		res = text.replaceAll("src=\"/image/image_gallery", "src=\""+url+"/image/image_gallery");
-		
-		return res;
-	}
+	
 
 	private static Log _log = LogFactoryUtil.getLog(LmsMailMessageListener.class);
 

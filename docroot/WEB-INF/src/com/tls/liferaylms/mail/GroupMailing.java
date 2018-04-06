@@ -8,7 +8,6 @@ import javax.portlet.ActionResponse;
 import javax.portlet.PortletPreferences;
 import javax.portlet.ProcessAction;
 
-import com.liferay.lms.service.ModuleLocalServiceUtil;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -28,7 +27,6 @@ import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portal.util.comparator.UserFirstNameComparator;
 import com.liferay.portlet.PortletPreferencesFactoryUtil;
 import com.liferay.portlet.announcements.model.AnnouncementsEntry;
-import com.liferay.portlet.announcements.service.AnnouncementsEntryLocalServiceUtil;
 import com.liferay.util.bridges.mvc.MVCPortlet;
 import com.tls.liferaylms.mail.model.MailTemplate;
 import com.tls.liferaylms.mail.service.MailTemplateLocalServiceUtil;
@@ -78,7 +76,11 @@ public class GroupMailing extends MVCPortlet{
 			
 			if(internalMessagingActive){
 				_log.debug("Sending internal message ");
-				AnnouncementsEntry entry = MailUtil.createInternalMessageNotification(template.getSubject(),changeToURL(template.getBody(), themeDisplay.getURLPortal()), themeDisplay.getScopeGroupId(), themeDisplay.getUserId(), themeDisplay.getCompanyId());
+				String content =  MailUtil.createMessage(changeToURL(template.getBody(), themeDisplay.getURLPortal()), themeDisplay.getCompany().getName(), 
+						themeDisplay.getScopeGroupName(), themeDisplay.getUser().getFullName(), themeDisplay.getUser().getFullName(), 
+						MailUtil.getURLPortal(themeDisplay.getCompany(),actionRequest), MailUtil.getURLPortal(themeDisplay.getCompany(),actionRequest)+themeDisplay.getPathFriendlyURLPublic()+themeDisplay.getScopeGroup().getFriendlyURL());
+			
+				AnnouncementsEntry entry = MailUtil.createInternalMessageNotification(template.getSubject(),content, themeDisplay.getScopeGroupId(), themeDisplay.getUserId(), themeDisplay.getCompanyId());
 				if(entry!=null){
 					entryId = entry.getEntryId();
 				}
@@ -102,8 +104,8 @@ public class GroupMailing extends MVCPortlet{
 			message.put("portal", 	themeDisplay.getCompany().getName());
 			message.put("community",themeDisplay.getScopeGroupName());
 			
-			message.put("url", 		themeDisplay.getURLPortal());
-			message.put("urlcourse",themeDisplay.getURLPortal()+themeDisplay.getPathFriendlyURLPublic()+themeDisplay.getScopeGroup().getFriendlyURL());
+			message.put("url", 	MailUtil.getURLPortal(themeDisplay.getCompany(),actionRequest));
+			message.put("urlcourse",MailUtil.getURLPortal(themeDisplay.getCompany(),actionRequest)+themeDisplay.getPathFriendlyURLPublic()+themeDisplay.getScopeGroup().getFriendlyURL());
 				
 			MessageBusUtil.sendMessage("lms/mailing", message);
 			
@@ -124,6 +126,7 @@ public class GroupMailing extends MVCPortlet{
 		String body 	= ParamUtil.getString(actionRequest, "body", "");
 
 		String testing 	= ParamUtil.getString(actionRequest, "testing", "false");
+		boolean testMessage = testing.equals(StringPool.TRUE);
 		
 		String to 	= ParamUtil.getString(actionRequest, "to", "");
 		long entryId = -1;
@@ -142,33 +145,26 @@ public class GroupMailing extends MVCPortlet{
 	
 		if(internalMessagingActive){
 			_log.debug("Sending internal message ");
-			AnnouncementsEntry entry = MailUtil.createInternalMessageNotification(subject, changeToURL(body, themeDisplay.getURLPortal()), themeDisplay.getScopeGroupId(), themeDisplay.getUserId(), themeDisplay.getCompanyId());
+			
+			String content =  MailUtil.createMessage(changeToURL(body, themeDisplay.getURLPortal()), themeDisplay.getCompany().getName(), 
+					themeDisplay.getScopeGroupName(), themeDisplay.getUser().getFullName(), themeDisplay.getUser().getFullName(), 
+					MailUtil.getURLPortal(themeDisplay.getCompany(),actionRequest), MailUtil.getURLPortal(themeDisplay.getCompany(),actionRequest)+themeDisplay.getPathFriendlyURLPublic()+themeDisplay.getScopeGroup().getFriendlyURL());
+			
+			AnnouncementsEntry entry = MailUtil.createInternalMessageNotification(subject, content, themeDisplay.getScopeGroupId(), themeDisplay.getUserId(), themeDisplay.getCompanyId());
 			if(entry!=null){
 				entryId = entry.getEntryId();
 			}
 		}
 		
-		
-		if(to.isEmpty()){
+		if(testMessage){
+			if (_log.isDebugEnabled()) _log.debug("Testing Mode: " + themeDisplay.getUser().getEmailAddress());
 			
-			if (_log.isDebugEnabled()) _log.debug("Enviamos a todos los usuarios");
-			
-			PermissionChecker permissionChecker = themeDisplay.getPermissionChecker();
-			PortletPreferences preferences = null;
-			String portletResource = ParamUtil.getString(actionRequest, "portletResource");
-			if (Validator.isNotNull(portletResource)) {
-				preferences = PortletPreferencesFactoryUtil.getPortletSetup(actionRequest, portletResource);
-			}else{
-				preferences = actionRequest.getPreferences();
-			}
-			boolean ownTeam = (preferences.getValue("ownTeam", "false")).compareTo("true") == 0;
-
 			Message message=new Message();
+			
 			message.put("templateId",-1);
-			message.put("to", "all");
-			message.put("ownTeam", ownTeam);
-			message.put("isOmniadmin", permissionChecker.isOmniadmin());
 			message.put("entryId", entryId);
+			message.put("to", themeDisplay.getUser().getEmailAddress());
+			message.put("userName", themeDisplay.getUser().getFullName());
 			message.put("subject", 	subject);
 			message.put("body", 	changeToURL(body, themeDisplay.getURLPortal()));
 			message.put("groupId", 	themeDisplay.getScopeGroupId());
@@ -178,27 +174,30 @@ public class GroupMailing extends MVCPortlet{
 			message.put("portal", 	themeDisplay.getCompany().getName());
 			message.put("community",themeDisplay.getScopeGroupName());
 			
-			message.put("url", 		themeDisplay.getURLPortal());
-			message.put("urlcourse",themeDisplay.getURLPortal()+themeDisplay.getPathFriendlyURLPublic()+themeDisplay.getScopeGroup().getFriendlyURL());
-			
+			message.put("url", 		MailUtil.getURLPortal(themeDisplay.getCompany(),actionRequest));
+			message.put("urlcourse",MailUtil.getURLPortal(themeDisplay.getCompany(),actionRequest)+themeDisplay.getPathFriendlyURLPublic()+themeDisplay.getScopeGroup().getFriendlyURL());
 			MessageBusUtil.sendMessage("lms/mailing", message);
-		}else if (to.contains("team_")){
-			
-			String teamId = to.replace("team_", "");
-			if (_log.isDebugEnabled()) _log.debug("Enviamos al grupo de usuarios " + teamId);
-			LinkedHashMap<String, Object> userParams = new LinkedHashMap<String, Object>();
-			userParams.put("usersTeams", Long.parseLong(teamId));
-			OrderByComparator obc = new UserFirstNameComparator(true);
-			List<User> teamUsers = UserLocalServiceUtil.search(themeDisplay.getCompanyId(), "", 0, userParams, QueryUtil.ALL_POS, QueryUtil.ALL_POS, obc);	
-			for (User user : teamUsers) {
-				if (_log.isDebugEnabled()) _log.debug("user: " + user.getEmailAddress());
+		}else{
+			if(to.isEmpty()){
 				
+				if (_log.isDebugEnabled()) _log.debug("Enviamos a todos los usuarios");
+				
+				PermissionChecker permissionChecker = themeDisplay.getPermissionChecker();
+				PortletPreferences preferences = null;
+				String portletResource = ParamUtil.getString(actionRequest, "portletResource");
+				if (Validator.isNotNull(portletResource)) {
+					preferences = PortletPreferencesFactoryUtil.getPortletSetup(actionRequest, portletResource);
+				}else{
+					preferences = actionRequest.getPreferences();
+				}
+				boolean ownTeam = (preferences.getValue("ownTeam", "false")).compareTo("true") == 0;
+
 				Message message=new Message();
-				
 				message.put("templateId",-1);
+				message.put("to", "all");
+				message.put("ownTeam", ownTeam);
+				message.put("isOmniadmin", permissionChecker.isOmniadmin());
 				message.put("entryId", entryId);
-				message.put("to", user.getEmailAddress());
-				message.put("userName", user.getFullName());
 				message.put("subject", 	subject);
 				message.put("body", 	changeToURL(body, themeDisplay.getURLPortal()));
 				message.put("groupId", 	themeDisplay.getScopeGroupId());
@@ -208,21 +207,19 @@ public class GroupMailing extends MVCPortlet{
 				message.put("portal", 	themeDisplay.getCompany().getName());
 				message.put("community",themeDisplay.getScopeGroupName());
 				
-				message.put("url", 		themeDisplay.getURLPortal());
-				message.put("urlcourse",themeDisplay.getURLPortal()+themeDisplay.getPathFriendlyURLPublic()+themeDisplay.getScopeGroup().getFriendlyURL());
+				message.put("url", 		MailUtil.getURLPortal(themeDisplay.getCompany(),actionRequest));
+				message.put("urlcourse",MailUtil.getURLPortal(themeDisplay.getCompany(),actionRequest)+themeDisplay.getPathFriendlyURLPublic()+themeDisplay.getScopeGroup().getFriendlyURL());
+				
 				MessageBusUtil.sendMessage("lms/mailing", message);
-			}
-		}else {
-			
-			if (_log.isDebugEnabled()) _log.debug("Enviamos a los usuarios seleccionados");
-			
-			String userIds[] = to.split(",");
-			
-			for(String id:userIds){
-
-				if(!id.trim().isEmpty()){
-					
-					User user = UserLocalServiceUtil.getUser(Long.valueOf(id));
+			}else if (to.contains("team_")){
+				
+				String teamId = to.replace("team_", "");
+				if (_log.isDebugEnabled()) _log.debug("Enviamos al grupo de usuarios " + teamId);
+				LinkedHashMap<String, Object> userParams = new LinkedHashMap<String, Object>();
+				userParams.put("usersTeams", Long.parseLong(teamId));
+				OrderByComparator obc = new UserFirstNameComparator(true);
+				List<User> teamUsers = UserLocalServiceUtil.search(themeDisplay.getCompanyId(), "", 0, userParams, QueryUtil.ALL_POS, QueryUtil.ALL_POS, obc);	
+				for (User user : teamUsers) {
 					if (_log.isDebugEnabled()) _log.debug("user: " + user.getEmailAddress());
 					
 					Message message=new Message();
@@ -236,20 +233,54 @@ public class GroupMailing extends MVCPortlet{
 					message.put("groupId", 	themeDisplay.getScopeGroupId());
 					message.put("userId",  	themeDisplay.getUserId());
 					message.put("testing", 	testing);
-
+					
 					message.put("portal", 	themeDisplay.getCompany().getName());
 					message.put("community",themeDisplay.getScopeGroupName());
 					
-					message.put("url", 		themeDisplay.getURLPortal());
-					message.put("urlcourse",themeDisplay.getURLPortal()+themeDisplay.getPathFriendlyURLPublic()+themeDisplay.getScopeGroup().getFriendlyURL());
-						
+					message.put("url", 		MailUtil.getURLPortal(themeDisplay.getCompany(),actionRequest));
+					message.put("urlcourse",MailUtil.getURLPortal(themeDisplay.getCompany(),actionRequest)+themeDisplay.getPathFriendlyURLPublic()+themeDisplay.getScopeGroup().getFriendlyURL());
 					MessageBusUtil.sendMessage("lms/mailing", message);
+				}
+			}else {
+				
+				if (_log.isDebugEnabled()) _log.debug("Enviamos a los usuarios seleccionados");
+				
+				String userIds[] = to.split(",");
+				
+				for(String id:userIds){
+
+					if(!id.trim().isEmpty()){
+						
+						User user = UserLocalServiceUtil.getUser(Long.valueOf(id));
+						if (_log.isDebugEnabled()) _log.debug("user: " + user.getEmailAddress());
+						
+						Message message=new Message();
+						
+						message.put("templateId",-1);
+						message.put("entryId", entryId);
+						message.put("to", user.getEmailAddress());
+						message.put("userName", user.getFullName());
+						message.put("subject", 	subject);
+						message.put("body", 	changeToURL(body, themeDisplay.getURLPortal()));
+						message.put("groupId", 	themeDisplay.getScopeGroupId());
+						message.put("userId",  	themeDisplay.getUserId());
+						message.put("testing", 	testing);
+
+						message.put("portal", 	themeDisplay.getCompany().getName());
+						message.put("community",themeDisplay.getScopeGroupName());
+						
+						message.put("url", 	MailUtil.getURLPortal(themeDisplay.getCompany(), actionRequest));
+						message.put("urlcourse", MailUtil.getURLPortal(themeDisplay.getCompany(),actionRequest)+themeDisplay.getPathFriendlyURLPublic()+themeDisplay.getScopeGroup().getFriendlyURL());
+							
+						MessageBusUtil.sendMessage("lms/mailing", message);
+						
+					}
 					
 				}
 				
 			}
-			
 		}
+		
 	
 		if(_log.isInfoEnabled()){
 			_log.trace("ManageTemplates: sendNewMail\nTo: "+to+"\nSubject:\n" + subject +"\nBody:\n"+body);
@@ -257,6 +288,9 @@ public class GroupMailing extends MVCPortlet{
 		
 		actionResponse.setRenderParameter("jspPage", "/html/groupmailing/view.jsp");
 	}
+	
+	
+	
 	
 	//Para imagenes
 	private String changeToURL(String text, String url){

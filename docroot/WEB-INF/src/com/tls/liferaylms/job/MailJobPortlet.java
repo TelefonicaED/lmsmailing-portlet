@@ -19,11 +19,14 @@ import com.liferay.lms.model.Module;
 import com.liferay.lms.service.CourseLocalServiceUtil;
 import com.liferay.lms.service.LearningActivityLocalServiceUtil;
 import com.liferay.lms.service.ModuleLocalServiceUtil;
+import com.liferay.portal.kernel.dao.orm.Session;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.messaging.MessageListenerException;
+import com.liferay.portal.kernel.servlet.SessionErrors;
+import com.liferay.portal.kernel.servlet.SessionMessages;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.WebKeys;
@@ -233,7 +236,7 @@ public class MailJobPortlet extends MVCPortlet {
 		long[] alConditionState = ParamUtil.getLongValues(request, MailStringPool.CONDITION_STATE, null);
 		Long idJob = ParamUtil.getLong(request, MailStringPool.ID_JOB, 0);
 		Long days = ParamUtil.getLong(request, MailStringPool.DAYS, 0);
-		
+		response.setRenderParameter("tab","non-processed-plural"); 
 		StringBuffer conditionState = new StringBuffer();
 		
 		if(alConditionState!=null){
@@ -306,6 +309,26 @@ public class MailJobPortlet extends MVCPortlet {
 		}
 		
 	}
+	
+	@ProcessAction(name = "deleteMailJob")
+	public void deleteMailJob(ActionRequest request, ActionResponse response) {
+		long mailJobId = ParamUtil.getLong(request, "mailJobId", 0);
+		response.setRenderParameter("tab","non-processed-plural");  
+		try{
+			if(mailJobId>0){
+					MailJobLocalServiceUtil.deleteMailJob(mailJobId);
+					SessionMessages.add(request, "delete-mailjob-ok");
+			}else{
+				SessionErrors.add(request, "delete-mailjob-ko");
+			}
+		
+		} catch (Exception e) {
+			if(log.isDebugEnabled())e.printStackTrace();
+			if(log.isErrorEnabled())log.error(e.getMessage());
+			SessionErrors.add(request, "delete-mailjob-ko");
+		}
+		
+	}
 
 	@ProcessAction(name = "save")
 	public void save(ActionRequest request, ActionResponse response) {		
@@ -314,7 +337,7 @@ public class MailJobPortlet extends MVCPortlet {
 		Long conditionActivity = ParamUtil.getLong(request, MailStringPool.CONDITION_ACTIVITY, 0);
 		long[] alConditionState = ParamUtil.getLongValues(request, MailStringPool.CONDITION_STATE, null);
 		Long days = ParamUtil.getLong(request, MailStringPool.DAYS, 0);
-		
+		response.setRenderParameter("tab","non-processed-plural"); 
 		StringBuffer conditionState = new StringBuffer();
 		
 		if(alConditionState!=null){
