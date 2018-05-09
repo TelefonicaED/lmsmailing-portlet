@@ -8,6 +8,8 @@ import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
 
 import com.liferay.counter.service.CounterLocalServiceUtil;
+import com.liferay.lms.model.Course;
+import com.liferay.lms.service.CourseLocalServiceUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.log.Log;
@@ -129,6 +131,9 @@ public class ProcessMailJob extends MVCPortlet implements MessageListener{
 						if(log.isDebugEnabled())e.printStackTrace();
 					}
 					
+					String tutors = "";
+					if(group!=null)
+						tutors = MailUtil.getTutors(group.getGroupId());
 					
 					
 					
@@ -177,6 +182,7 @@ public class ProcessMailJob extends MVCPortlet implements MessageListener{
 								message.put("templateId",mailTemplate.getIdTemplate());
 
 								message.put("to", user.getEmailAddress());
+								message.put("tutors", tutors);
 								message.put("entryId", entryId);
 								message.put("subject", 	mailTemplate.getSubject());
 								message.put("body", 	mailTemplate.getBody());

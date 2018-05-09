@@ -135,6 +135,7 @@ public class LmsMailMessageListener implements MessageListener {
 		String urlcourse = message.getString("urlcourse");
 		String templateId = Validator.isNull(message.getString("templateId")) ? "-1" : message.getString("templateId") ;
 		String toMail = message.getString("to");
+		String tutors = message.getString("tutors");
 		String userName = message.getString("userName");
 		boolean ownTeam = message.getBoolean("ownTeam");
 		boolean isOmniadmin = message.getBoolean("isOmniadmin");
@@ -183,13 +184,22 @@ public class LmsMailMessageListener implements MessageListener {
 			log.debug("--- EXPANDO 1: "+userSender.getExpandoBridge().getAttribute(deregisterMailExpando,false));
 			
 			if(!deregisterMail){
-				body = MailUtil.createMessage(body, portal, community, userSender.getFullName(), UserLocalServiceUtil.getUserById(userId).getFullName(), url, urlcourse);
+				body = MailUtil.createMessage(body, portal, community, userSender.getFullName(), tutors, url, urlcourse);
 
 				String calculatedBody = LanguageUtil.get(Locale.getDefault(),"mail.header");
 				calculatedBody += body;
 				calculatedBody += LanguageUtil.get(Locale.getDefault(),"mail.footer");
 				
-				subject = MailUtil.createMessage(subject, portal, community, userSender.getFullName(), userSender.getFullName(),url,urlcourse);
+				subject = MailUtil.createMessage(subject, portal, community, userSender.getFullName(), tutors, url, urlcourse);
+				
+				if(log.isDebugEnabled()) {
+					log.debug("Se envia el siguiente correo...");
+					log.debug("De: " + from);
+					log.debug("A: " + toMail + " " + userSender.getFullName());
+					log.debug("Profesores: " + tutors);
+					log.debug("Asunto: " + subject);
+					log.debug("Cuerpo: " + calculatedBody);
+				}				
 				//Guardar una auditoria del envio de emails.
 				auditSendMails = AuditSendMailsLocalServiceUtil.createAuditSendMails(CounterLocalServiceUtil.increment(AuditSendMails.class.getName()));
 				auditSendMails.setUserId(userId);
@@ -244,15 +254,16 @@ public class LmsMailMessageListener implements MessageListener {
 					InternetAddress to = new InternetAddress(toMail, student.getFullName());
 
 					String calculatedBody = LanguageUtil.get(student.getLocale(),"mail.header");
-					calculatedBody += MailUtil.createMessage(body, portal, community, student.getFullName(), userSender.getFullName(),url,urlcourse);
+					calculatedBody += MailUtil.createMessage(body, portal, community, student.getFullName(), tutors, url, urlcourse);
 					calculatedBody += LanguageUtil.get(student.getLocale(),"mail.footer");
 					
-					String calculatedsubject = MailUtil.createMessage(subject, portal, community, student.getFullName(), userSender.getFullName(),url,urlcourse);
+					String calculatedsubject = MailUtil.createMessage(subject, portal, community, student.getFullName(), tutors, url, urlcourse);
 					
 					if(log.isDebugEnabled()) {
 						log.debug("Se envia el siguiente correo...");
 						log.debug("De: " + from);
 						log.debug("A: " + toMail + " " + student.getFullName());
+						log.debug("Profesores: " + tutors);
 						log.debug("Asunto: " + calculatedsubject);
 						log.debug("Cuerpo: " + calculatedBody);
 					}
@@ -371,9 +382,14 @@ public class LmsMailMessageListener implements MessageListener {
 			}
 			
 
-			String bodyTemplate = createTemplateMessage(body, portal, community, userSender.getFullName(), url, urlcourse);
-			String subjectTemplate = createTemplateMessage(subject, portal, community, userSender.getFullName(), url, urlcourse);
+			String bodyTemplate = createTemplateMessage(body, portal, community, tutors, url, urlcourse);
+			String subjectTemplate = createTemplateMessage(subject, portal, community, tutors, url, urlcourse);
 			String calculatedBody, calculatedSubject;
+			
+			if(_log.isDebugEnabled()) {
+				log.debug("bodyTemplate: " + bodyTemplate);
+				log.debug("subjectTemplate: " + subjectTemplate);
+			}
 			
 			Transport transport = session.getTransport(protocol);
 			
@@ -452,6 +468,7 @@ public class LmsMailMessageListener implements MessageListener {
 								log.debug("Se envia el siguiente correo...");
 								log.debug("De: " + from);
 								log.debug("A: " + toMail + " " + userName);
+								log.debug("Profesores: " + tutors);
 								log.debug("Asunto: " + calculatedSubject);
 								log.debug("Cuerpo: " + calculatedBody);
 							}
