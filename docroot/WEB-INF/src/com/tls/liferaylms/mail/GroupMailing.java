@@ -1,5 +1,6 @@
 package com.tls.liferaylms.mail;
 
+import java.text.Format;
 import java.util.LinkedHashMap;
 import java.util.List;
 
@@ -8,12 +9,15 @@ import javax.portlet.ActionResponse;
 import javax.portlet.PortletPreferences;
 import javax.portlet.ProcessAction;
 
+import com.liferay.lms.model.Course;
+import com.liferay.lms.service.CourseLocalServiceUtil;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.messaging.Message;
 import com.liferay.portal.kernel.messaging.MessageBusUtil;
 import com.liferay.portal.kernel.servlet.SessionErrors;
+import com.liferay.portal.kernel.util.FastDateFormatFactoryUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.PrefsPropsUtil;
@@ -76,9 +80,11 @@ public class GroupMailing extends MVCPortlet{
 			
 			if(internalMessagingActive){
 				_log.debug("Sending internal message ");
+				
 				String content =  MailUtil.createMessage(changeToURL(template.getBody(), themeDisplay.getURLPortal()), themeDisplay.getCompany().getName(), 
 						themeDisplay.getScopeGroupName(), themeDisplay.getUser().getFullName(), themeDisplay.getUser().getFullName(), 
-						MailUtil.getURLPortal(themeDisplay.getCompany(),actionRequest), MailUtil.getURLPortal(themeDisplay.getCompany(),actionRequest)+themeDisplay.getPathFriendlyURLPublic()+themeDisplay.getScopeGroup().getFriendlyURL());
+						MailUtil.getURLPortal(themeDisplay.getCompany(),actionRequest), MailUtil.getURLPortal(themeDisplay.getCompany(),actionRequest)+themeDisplay.getPathFriendlyURLPublic()+themeDisplay.getScopeGroup().getFriendlyURL(),
+						MailUtil.getCourseStartDate(themeDisplay.getScopeGroupId(), themeDisplay.getLocale(), themeDisplay.getTimeZone()), MailUtil.getCourseEndDate(themeDisplay.getScopeGroupId(), themeDisplay.getLocale(), themeDisplay.getTimeZone()));
 			
 				AnnouncementsEntry entry = MailUtil.createInternalMessageNotification(template.getSubject(),content, themeDisplay.getScopeGroupId(), themeDisplay.getUserId(), themeDisplay.getCompanyId());
 				if(entry!=null){
@@ -148,7 +154,8 @@ public class GroupMailing extends MVCPortlet{
 			
 			String content =  MailUtil.createMessage(changeToURL(body, themeDisplay.getURLPortal()), themeDisplay.getCompany().getName(), 
 					themeDisplay.getScopeGroupName(), themeDisplay.getUser().getFullName(), themeDisplay.getUser().getFullName(), 
-					MailUtil.getURLPortal(themeDisplay.getCompany(),actionRequest), MailUtil.getURLPortal(themeDisplay.getCompany(),actionRequest)+themeDisplay.getPathFriendlyURLPublic()+themeDisplay.getScopeGroup().getFriendlyURL());
+					MailUtil.getURLPortal(themeDisplay.getCompany(),actionRequest), MailUtil.getURLPortal(themeDisplay.getCompany(),actionRequest)+themeDisplay.getPathFriendlyURLPublic()+themeDisplay.getScopeGroup().getFriendlyURL(), 
+					MailUtil.getCourseStartDate(themeDisplay.getScopeGroupId(), themeDisplay.getLocale(), themeDisplay.getTimeZone()), MailUtil.getCourseEndDate(themeDisplay.getScopeGroupId(), themeDisplay.getLocale(), themeDisplay.getTimeZone()));
 			
 			AnnouncementsEntry entry = MailUtil.createInternalMessageNotification(subject, content, themeDisplay.getScopeGroupId(), themeDisplay.getUserId(), themeDisplay.getCompanyId());
 			if(entry!=null){
