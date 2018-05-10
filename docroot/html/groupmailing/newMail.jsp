@@ -1,3 +1,5 @@
+<%@page import="com.tls.liferaylms.mail.service.MailTemplateLocalServiceUtil"%>
+<%@page import="com.tls.liferaylms.mail.model.MailTemplate"%>
 <%@page import="com.liferay.portlet.PortletPreferencesFactoryUtil"%>
 <%@page import="javax.portlet.PortletPreferences"%>
 <%@page import="com.liferay.portal.service.TeamLocalServiceUtil"%>
@@ -54,6 +56,13 @@
 	}
 	String emailSubject = ParamUtil.getString(request,"emailSubject");
 	String emailContent = ParamUtil.getString(request,"emailContent");
+	
+	long idTemplate = GetterUtil.getLong(ParamUtil.getString(request,"idTemplate"), 0L);
+	if(idTemplate > 0){
+		MailTemplate template = MailTemplateLocalServiceUtil.getMailTemplate(idTemplate);
+		emailSubject = template.getSubject();
+		emailContent = template.getBody();
+	}
 	
 	long courseId=0;
 	Course course=null;
