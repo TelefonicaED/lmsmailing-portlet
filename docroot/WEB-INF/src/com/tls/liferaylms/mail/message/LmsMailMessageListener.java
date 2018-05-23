@@ -11,6 +11,7 @@ import javax.mail.Session;
 import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
+import javax.portlet.PortletPreferences;
 
 import com.liferay.counter.service.CounterLocalServiceUtil;
 import com.liferay.lms.model.Course;
@@ -38,9 +39,11 @@ import com.liferay.portal.model.Group;
 import com.liferay.portal.model.Team;
 import com.liferay.portal.model.User;
 import com.liferay.portal.service.GroupLocalServiceUtil;
+import com.liferay.portal.service.PortalPreferencesLocalServiceUtil;
 import com.liferay.portal.service.RoleLocalServiceUtil;
 import com.liferay.portal.service.TeamLocalServiceUtil;
 import com.liferay.portal.service.UserLocalServiceUtil;
+import com.liferay.portal.util.comparator.UserFirstNameComparator;
 import com.liferay.portal.util.comparator.UserLastNameComparator;
 import com.liferay.util.mail.MailEngine;
 import com.tls.liferaylms.mail.model.AuditReceiverMail;
@@ -311,7 +314,13 @@ public class LmsMailMessageListener implements MessageListener {
 				Course course = CourseLocalServiceUtil.getCourseByGroupCreatedId(groupId);
 				LmsPrefs prefs = LmsPrefsLocalServiceUtil.getLmsPrefs(companyId);
 				
-				OrderByComparator obc = new   UserLastNameComparator(true);			
+				OrderByComparator obc = null;		
+				PortletPreferences portalPreferences = PortalPreferencesLocalServiceUtil.getPreferences(companyId, companyId, 1);
+				if(Boolean.parseBoolean(portalPreferences.getValue("users.first.last.name", "false"))){
+					obc = new UserLastNameComparator(true);
+				}else{
+					obc = new UserFirstNameComparator(true);
+				}
 				LinkedHashMap userParams = new LinkedHashMap();
 
 				if (Validator.isNotNull(course)){

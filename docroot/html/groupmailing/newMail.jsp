@@ -1,3 +1,4 @@
+<%@page import="com.liferay.portal.service.PortalPreferencesLocalServiceUtil"%>
 <%@page import="com.liferay.portlet.PortletPreferencesFactoryUtil"%>
 <%@page import="javax.portlet.PortletPreferences"%>
 <%@page import="com.liferay.portal.service.TeamLocalServiceUtil"%>
@@ -263,7 +264,13 @@ else
 			<%
 			List<User> userListPage  = null;
 			String middleName = null;
-			OrderByComparator obc = new   UserLastNameComparator(true);			
+			OrderByComparator obc = null;		
+			PortletPreferences portalPreferences = PortalPreferencesLocalServiceUtil.getPreferences(themeDisplay.getCompanyId(), themeDisplay.getCompanyId(), 1);
+			if(Boolean.parseBoolean(portalPreferences.getValue("users.first.last.name", "false"))){
+				obc = new UserLastNameComparator(true); 
+			}else{
+				obc = new UserFirstNameComparator(true);
+			}
 			LinkedHashMap userParams = new LinkedHashMap();
 			int userCount = 0;
 
