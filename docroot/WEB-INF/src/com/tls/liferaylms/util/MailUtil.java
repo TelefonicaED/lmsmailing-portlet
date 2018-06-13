@@ -25,12 +25,10 @@ public class MailUtil {
 	private static Log log = LogFactoryUtil.getLog(MailUtil.class);
 
 	public static void sendInternalMessageNotification(Long entryId,
-			MailMessage mailMessage, long groupId, long senderUserId,
+			String title, String content, long groupId, long senderUserId,
 			long userId, long companyId) {
 		long classNameId = PortalUtil.getClassNameId(Group.class.getName());
 		try {
-			String title = mailMessage.getSubject();
-			String content = mailMessage.getBody();
 			String type = "announcements.type.general";
 			log.debug("-- Sending Interal Messaging Notification");
 			log.debug("-- Content "+content);

@@ -208,7 +208,7 @@ public class LmsMailMessageListener implements MessageListener {
 				try{
 					MailMessage mailm = new MailMessage(from, to, subject, calculatedBody, true);
 					if(internalMessagingActive){
-						MailUtil.sendInternalMessageNotification(entryId,mailm, groupId, userId, userSender.getUserId(), companyId);
+						MailUtil.sendInternalMessageNotification(entryId,subject, body, groupId, userId, userSender.getUserId(), companyId);
 					}
 					MailServiceUtil.sendEmail(mailm);
 					addAuditReceiverMail(auditSendMails.getAuditSendMailsId(), userSender.getEmailAddress(), MailConstants.STATUS_OK, false);
@@ -245,9 +245,9 @@ public class LmsMailMessageListener implements MessageListener {
 				
 				if(!deregisterMail){
 					InternetAddress to = new InternetAddress(toMail, student.getFullName());
-
+					String content = MailUtil.createMessage(body, portal, community, student.getFullName(), userSender.getFullName(),url,urlcourse);
 					String calculatedBody = LanguageUtil.get(student.getLocale(),"mail.header");
-					calculatedBody += MailUtil.createMessage(body, portal, community, student.getFullName(), userSender.getFullName(),url,urlcourse);
+					calculatedBody += content;
 					calculatedBody += LanguageUtil.get(student.getLocale(),"mail.footer");
 					
 					String calculatedsubject = MailUtil.createMessage(subject, portal, community, student.getFullName(), userSender.getFullName(),url,urlcourse);
@@ -294,7 +294,7 @@ public class LmsMailMessageListener implements MessageListener {
 					try{
 						MailMessage mailm = new MailMessage(from, to, calculatedsubject, calculatedBody ,true);
 						if(internalMessagingActive){
-							MailUtil.sendInternalMessageNotification(entryId,mailm, groupId,userId, student.getUserId(), companyId);
+							MailUtil.sendInternalMessageNotification(entryId,calculatedsubject, content, groupId,userId, student.getUserId(), companyId);
 						}
 						MailEngine.send(mailm);
 						addAuditReceiverMail(auditSendMails.getAuditSendMailsId(), toMail, MailConstants.STATUS_OK, hasDate);
@@ -452,9 +452,9 @@ public class LmsMailMessageListener implements MessageListener {
 							}
 							
 							calculatedSubject = createMessage(subjectTemplate, student.getFullName());
-							
+							String content = createMessage(bodyTemplate, student.getFullName());
 							calculatedBody = LanguageUtil.get(student.getLocale(),"mail.header");
-							calculatedBody += createMessage(bodyTemplate, student.getFullName());
+							calculatedBody += content;
 							calculatedBody += LanguageUtil.get(student.getLocale(),"mail.footer");
 							
 							if(log.isDebugEnabled()) {
@@ -470,7 +470,7 @@ public class LmsMailMessageListener implements MessageListener {
 							
 							try{
 								if(internalMessagingActive){
-									MailUtil.sendInternalMessageNotification(entryId,mailm, groupId, userId, student.getUserId(), companyId);
+									MailUtil.sendInternalMessageNotification(entryId,calculatedSubject,content, groupId, userId, student.getUserId(), companyId);
 								}
 								sendMail(mailm,transport,session);
 								addAuditReceiverMail(auditSendMails.getAuditSendMailsId(), student.getEmailAddress(), MailConstants.STATUS_OK, false);
