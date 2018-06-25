@@ -2,10 +2,13 @@ package com.tls.liferaylms.util;
 
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
 import javax.portlet.ActionRequest;
 
 import com.liferay.counter.service.CounterLocalServiceUtil;
+import com.liferay.lms.model.Course;
+import com.liferay.lms.service.CourseLocalServiceUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.mail.MailMessage;
@@ -13,6 +16,8 @@ import com.liferay.portal.kernel.util.Constants;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.model.Company;
 import com.liferay.portal.model.Group;
+import com.liferay.portal.model.User;
+import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portal.util.PortalUtil;
 import com.liferay.portlet.announcements.model.AnnouncementsEntry;
 import com.liferay.portlet.announcements.model.AnnouncementsEntryConstants;
@@ -164,5 +169,36 @@ public class MailUtil {
 		res = text.replaceAll("src=\"/image/image_gallery", "src=\""+url+"/image/image_gallery");
 		
 		return res;
+	}
+	
+	public static String getTutors(long courseGroupCreatedId) {
+		long courseId=0;
+		Course course=null;
+		List<User> courseTutors = null;
+		String tutors = "";
+		
+		try{
+			course=CourseLocalServiceUtil.getCourseByGroupCreatedId( courseGroupCreatedId );
+			if(course!=null){
+				courseId=course.getCourseId();
+				courseTutors = CourseLocalServiceUtil.getTeachersFromCourse(courseId);
+				if(courseTutors!=null && courseTutors.size()>0){
+					int numTutors = courseTutors.size();
+					tutors = courseTutors.get(0).getFullName();
+					if(numTutors>1)
+					{
+						for(int idx=1; idx<=numTutors; idx++)
+							tutors = tutors.concat(StringPool.COMMA_AND_SPACE)
+										.concat(courseTutors.get(idx).getFullName());
+					}
+				}
+				else
+					log.debug("There are no course tutors.  CourseId: " + courseId );
+			}
+			else
+				log.debug("NULL course for groupCreatedId: " + courseGroupCreatedId);
+		}catch(Exception e){}
+		
+		return tutors;
 	}
 }
