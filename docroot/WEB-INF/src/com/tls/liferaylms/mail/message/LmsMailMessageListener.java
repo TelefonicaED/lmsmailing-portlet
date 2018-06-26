@@ -252,7 +252,7 @@ public class LmsMailMessageListener implements MessageListener {
 				
 				if(!deregisterMail){
 					InternetAddress to = new InternetAddress(toMail, student.getFullName());
-					String content = MailUtil.createMessage(body, portal, community, student.getFullName(), userSender.getFullName(),url,urlcourse);
+					String content = MailUtil.createMessage(body, portal, community, student.getFullName(), userSender.getFullName(),url,urlcourse, MailUtil.getCourseStartDate(groupId, student.getLocale(), student.getTimeZone()), MailUtil.getCourseEndDate(groupId, student.getLocale(), student.getTimeZone()));
 					
 					String calculatedBody = LanguageUtil.get(student.getLocale(),"mail.header");
 					calculatedBody += MailUtil.createMessage(body, portal, community, student.getFullName(), userSender.getFullName(),url,urlcourse, MailUtil.getCourseStartDate(groupId, student.getLocale(), student.getTimeZone()), MailUtil.getCourseEndDate(groupId, student.getLocale(), student.getTimeZone()));
