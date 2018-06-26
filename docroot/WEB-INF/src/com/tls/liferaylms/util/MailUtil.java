@@ -1,18 +1,25 @@
 package com.tls.liferaylms.util;
 
+import java.text.Format;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
+import java.util.TimeZone;
 
 import javax.portlet.ActionRequest;
 
 import com.liferay.counter.service.CounterLocalServiceUtil;
 import com.liferay.lms.model.Course;
 import com.liferay.lms.service.CourseLocalServiceUtil;
+import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.mail.MailMessage;
 import com.liferay.portal.kernel.util.Constants;
+import com.liferay.portal.kernel.util.FastDateFormatConstants;
+import com.liferay.portal.kernel.util.FastDateFormatFactoryUtil;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.model.Company;
 import com.liferay.portal.model.Group;
@@ -146,7 +153,7 @@ public class MailUtil {
 		return url;
 	}
 	
-	public static String createMessage(String text, String portal, String community, String student, String teacher, String url, String urlcourse){
+	public static String createMessage(String text, String portal, String community, String student, String teacher, String url, String urlcourse, String startDate, String endDate){
 		String res = "";
 		res = text.replace("[@portal]", 	portal);
 		res = res.replace ("[@course]", 	community);
@@ -154,6 +161,8 @@ public class MailUtil {
 		res = res.replace ("[@teacher]", 	teacher);
 		res = res.replace ("[@url]", 		"<a href=\""+url+"\">"+portal+"</a>");
 		res = res.replace ("[@urlcourse]", 	"<a href=\""+urlcourse+"\">"+community+"</a>");	
+		res = res.replace ("[@startDate]", startDate);
+		res = res.replace ("[@endDate]", endDate);
 
 		//Para poner la url desde la pï¿½gina para que se vean los correos.
 		res = changeToURL(res, url);
@@ -161,7 +170,37 @@ public class MailUtil {
 		return res;
 	}
 
+	public static String getCourseStartDate(long groupId, Locale locale ,TimeZone timeZone){
+		
+		String startDate = "";
+		Course course;
+		try {
+			course = CourseLocalServiceUtil.fetchByGroupCreatedId(groupId);
+			if(course!=null){
+				SimpleDateFormat dateFormatDate = new SimpleDateFormat("dd/MM/yyyy");
+				startDate = dateFormatDate.format(course.getExecutionStartDate());
+			}
+		} catch (SystemException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return startDate;
+	}
 	
+	public static String getCourseEndDate(long groupId, Locale locale ,TimeZone timeZone){
+		
+		String endDate = "";
+		try {
+			Course course = CourseLocalServiceUtil.fetchByGroupCreatedId(groupId);
+			if(course!=null){
+				SimpleDateFormat dateFormatDate = new SimpleDateFormat("dd/MM/yyyy");
+				endDate  = dateFormatDate.format(course.getExecutionEndDate());
+			}
+		} catch (SystemException e) {
+			e.printStackTrace();
+		}
+		return endDate;
+	}
 	public static String changeToURL(String text, String url){
 		String res ="";
 
@@ -190,7 +229,7 @@ public class MailUtil {
 						for(int idx=1; idx<=numTutors; idx++)
 							tutors = tutors.concat(StringPool.COMMA_AND_SPACE)
 										.concat(courseTutors.get(idx).getFullName());
-					}
+}
 				}
 				else
 					log.debug("There are no course tutors.  CourseId: " + courseId );
