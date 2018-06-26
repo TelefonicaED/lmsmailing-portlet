@@ -62,9 +62,9 @@ public class LmsMailingPreferencesManagement extends MVCPortlet {
 			}
 		}catch(Exception e){
 			e.printStackTrace();
-		}
-		
-	}	
+		}	
+	}
+	
 	public void showViewDefault(RenderRequest renderRequest, RenderResponse renderResponse) throws IOException, PortletException {	
 		ThemeDisplay themeDisplay = (ThemeDisplay) renderRequest.getAttribute(WebKeys.THEME_DISPLAY);
 		
@@ -100,10 +100,6 @@ public class LmsMailingPreferencesManagement extends MVCPortlet {
 		
 		include(viewJSP, renderRequest, renderResponse);
 	}
-
-	
-	
-	
 	
 	public void updatePrefs(ActionRequest actionRequest, ActionResponse actionResponse) throws SystemException {
 		try{
@@ -126,10 +122,6 @@ public class LmsMailingPreferencesManagement extends MVCPortlet {
 		}
 	}
 
-
-
-
-	
 	private boolean savePreference(String key,String value, long companyId) throws SystemException {
 	
 		PortletPreferences prefs= PortalPreferencesLocalServiceUtil.getPreferences(companyId, companyId, 1);
