@@ -11,6 +11,7 @@ import javax.mail.Session;
 import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
+import javax.portlet.PortletPreferences;
 
 import com.liferay.counter.service.CounterLocalServiceUtil;
 import com.liferay.lms.model.Course;
@@ -38,9 +39,11 @@ import com.liferay.portal.model.Group;
 import com.liferay.portal.model.Team;
 import com.liferay.portal.model.User;
 import com.liferay.portal.service.GroupLocalServiceUtil;
+import com.liferay.portal.service.PortalPreferencesLocalServiceUtil;
 import com.liferay.portal.service.RoleLocalServiceUtil;
 import com.liferay.portal.service.TeamLocalServiceUtil;
 import com.liferay.portal.service.UserLocalServiceUtil;
+import com.liferay.portal.util.comparator.UserFirstNameComparator;
 import com.liferay.portal.util.comparator.UserLastNameComparator;
 import com.liferay.util.mail.MailEngine;
 import com.tls.liferaylms.mail.model.AuditReceiverMail;
@@ -135,6 +138,7 @@ public class LmsMailMessageListener implements MessageListener {
 		String urlcourse = message.getString("urlcourse");
 		String templateId = Validator.isNull(message.getString("templateId")) ? "-1" : message.getString("templateId") ;
 		String toMail = message.getString("to");
+		String tutors = message.getString("tutors");
 		String userName = message.getString("userName");
 		boolean ownTeam = message.getBoolean("ownTeam");
 		boolean isOmniadmin = message.getBoolean("isOmniadmin");
@@ -193,6 +197,7 @@ public class LmsMailMessageListener implements MessageListener {
 				calculatedBody += body;
 				calculatedBody += LanguageUtil.get(Locale.getDefault(),"mail.footer");
 				
+	
 				subject = MailUtil.createMessage(subject, portal, community, userSender.getFullName(), userSender.getFullName(),url,urlcourse, 
 						MailUtil.getCourseStartDate(groupId, userSender.getLocale(), userSender.getTimeZone()), MailUtil.getCourseEndDate(groupId, userSender.getLocale(), userSender.getTimeZone()));
 				//Guardar una auditoria del envio de emails.
@@ -210,7 +215,7 @@ public class LmsMailMessageListener implements MessageListener {
 				try{
 					MailMessage mailm = new MailMessage(from, to, subject, calculatedBody, true);
 					if(internalMessagingActive){
-						MailUtil.sendInternalMessageNotification(entryId,mailm, groupId, userId, userSender.getUserId(), companyId);
+						MailUtil.sendInternalMessageNotification(entryId,subject, body, groupId, userId, userSender.getUserId(), companyId);
 					}
 					MailServiceUtil.sendEmail(mailm);
 					addAuditReceiverMail(auditSendMails.getAuditSendMailsId(), userSender.getEmailAddress(), MailConstants.STATUS_OK, false);
@@ -247,7 +252,7 @@ public class LmsMailMessageListener implements MessageListener {
 				
 				if(!deregisterMail){
 					InternetAddress to = new InternetAddress(toMail, student.getFullName());
-
+					String content = MailUtil.createMessage(body, portal, community, student.getFullName(), userSender.getFullName(),url,urlcourse);
 					
 					String calculatedBody = LanguageUtil.get(student.getLocale(),"mail.header");
 					calculatedBody += MailUtil.createMessage(body, portal, community, student.getFullName(), userSender.getFullName(),url,urlcourse, MailUtil.getCourseStartDate(groupId, student.getLocale(), student.getTimeZone()), MailUtil.getCourseEndDate(groupId, student.getLocale(), student.getTimeZone()));
@@ -259,6 +264,7 @@ public class LmsMailMessageListener implements MessageListener {
 						log.debug("Se envia el siguiente correo...");
 						log.debug("De: " + from);
 						log.debug("A: " + toMail + " " + student.getFullName());
+						log.debug("Profesores: " + tutors);
 						log.debug("Asunto: " + calculatedsubject);
 						log.debug("Cuerpo: " + calculatedBody);
 					}
@@ -297,7 +303,7 @@ public class LmsMailMessageListener implements MessageListener {
 					try{
 						MailMessage mailm = new MailMessage(from, to, calculatedsubject, calculatedBody ,true);
 						if(internalMessagingActive){
-							MailUtil.sendInternalMessageNotification(entryId,mailm, groupId,userId, student.getUserId(), companyId);
+							MailUtil.sendInternalMessageNotification(entryId,calculatedsubject, content, groupId,userId, student.getUserId(), companyId);
 						}
 						MailEngine.send(mailm);
 						addAuditReceiverMail(auditSendMails.getAuditSendMailsId(), toMail, MailConstants.STATUS_OK, hasDate);
@@ -317,7 +323,13 @@ public class LmsMailMessageListener implements MessageListener {
 				Course course = CourseLocalServiceUtil.getCourseByGroupCreatedId(groupId);
 				LmsPrefs prefs = LmsPrefsLocalServiceUtil.getLmsPrefs(companyId);
 				
-				OrderByComparator obc = new   UserLastNameComparator(true);			
+				OrderByComparator obc = null;		
+				PortletPreferences portalPreferences = PortalPreferencesLocalServiceUtil.getPreferences(companyId, companyId, 1);
+				if(Boolean.parseBoolean(portalPreferences.getValue("users.first.last.name", "false"))){
+					obc = new UserLastNameComparator(true);
+				}else{
+					obc = new UserFirstNameComparator(true);
+				}
 				LinkedHashMap userParams = new LinkedHashMap();
 
 				if (Validator.isNotNull(course)){
@@ -382,6 +394,11 @@ public class LmsMailMessageListener implements MessageListener {
 			String subjectTemplate = createTemplateMessage(subject, portal, community, userSender.getFullName(), url, urlcourse, 
 					MailUtil.getCourseStartDate(groupId, userSender.getLocale(), userSender.getTimeZone()), MailUtil.getCourseEndDate(groupId, userSender.getLocale(), userSender.getTimeZone()));
 			String calculatedBody, calculatedSubject;
+			
+			if(_log.isDebugEnabled()) {
+				log.debug("bodyTemplate: " + bodyTemplate);
+				log.debug("subjectTemplate: " + subjectTemplate);
+			}
 			
 			Transport transport = session.getTransport(protocol);
 			
@@ -451,15 +468,16 @@ public class LmsMailMessageListener implements MessageListener {
 							}
 							
 							calculatedSubject = createMessage(subjectTemplate, student.getFullName());
-							
+							String content = createMessage(bodyTemplate, student.getFullName());
 							calculatedBody = LanguageUtil.get(student.getLocale(),"mail.header");
-							calculatedBody += createMessage(bodyTemplate, student.getFullName());
+							calculatedBody += content;
 							calculatedBody += LanguageUtil.get(student.getLocale(),"mail.footer");
 							
 							if(log.isDebugEnabled()) {
 								log.debug("Se envia el siguiente correo...");
 								log.debug("De: " + from);
 								log.debug("A: " + toMail + " " + userName);
+								log.debug("Profesores: " + tutors);
 								log.debug("Asunto: " + calculatedSubject);
 								log.debug("Cuerpo: " + calculatedBody);
 							}
@@ -469,7 +487,7 @@ public class LmsMailMessageListener implements MessageListener {
 							
 							try{
 								if(internalMessagingActive){
-									MailUtil.sendInternalMessageNotification(entryId,mailm, groupId, userId, student.getUserId(), companyId);
+									MailUtil.sendInternalMessageNotification(entryId,calculatedSubject,content, groupId, userId, student.getUserId(), companyId);
 								}
 								sendMail(mailm,transport,session);
 								addAuditReceiverMail(auditSendMails.getAuditSendMailsId(), student.getEmailAddress(), MailConstants.STATUS_OK, false);

@@ -44,16 +44,6 @@ public class GroupMailing extends MVCPortlet{
 	
 	private static Log _log = LogFactoryUtil.getLog(GroupMailing.class);
 	
-	public void preview(ActionRequest actionRequest, ActionResponse actionResponse)
-			throws Exception 
-			{	
-		int idTemplate=ParamUtil.getInteger(actionRequest, "template");
-		
-		actionResponse.setRenderParameter("idTemplate", String.valueOf(idTemplate));
-				
-		actionResponse.setRenderParameter("jspPage", "/html/groupmailing/preview.jsp");
-	}
-	
 	public void sendMails(ActionRequest actionRequest, ActionResponse actionResponse)
 	throws Exception 
 	{	
@@ -74,6 +64,8 @@ public class GroupMailing extends MVCPortlet{
 				preferences = actionRequest.getPreferences();
 			}
 			boolean ownTeam = (preferences.getValue("ownTeam", "false")).compareTo("true") == 0;
+			
+			String tutors = MailUtil.getTutors(themeDisplay.getScopeGroupId());
 			
 			long entryId = -1;
 			boolean internalMessagingActive = PrefsPropsUtil.getBoolean(themeDisplay.getCompanyId(), MailStringPool.INTERNAL_MESSAGING_KEY);
@@ -98,6 +90,7 @@ public class GroupMailing extends MVCPortlet{
 			message.put("templateId",idTemplate);
 			message.put("entryId", entryId);
 			message.put("to", "all");
+			message.put("tutors", tutors);
 			message.put("ownTeam", ownTeam);
 			message.put("isOmniadmin", permissionChecker.isOmniadmin());
 			
@@ -134,7 +127,9 @@ public class GroupMailing extends MVCPortlet{
 		String testing 	= ParamUtil.getString(actionRequest, "testing", "false");
 		boolean testMessage = testing.equals(StringPool.TRUE);
 		
-		String to 	= ParamUtil.getString(actionRequest, "to", "");
+		String to 		= ParamUtil.getString(actionRequest, "to", "");
+		String tutors 	= MailUtil.getTutors(themeDisplay.getScopeGroupId());
+		
 		long entryId = -1;
 		boolean internalMessagingActive = PrefsPropsUtil.getBoolean(themeDisplay.getCompanyId(), MailStringPool.INTERNAL_MESSAGING_KEY);
 		
@@ -171,6 +166,7 @@ public class GroupMailing extends MVCPortlet{
 			message.put("templateId",-1);
 			message.put("entryId", entryId);
 			message.put("to", themeDisplay.getUser().getEmailAddress());
+			message.put("tutors", tutors);
 			message.put("userName", themeDisplay.getUser().getFullName());
 			message.put("subject", 	subject);
 			message.put("body", 	changeToURL(body, themeDisplay.getURLPortal()));
@@ -202,6 +198,7 @@ public class GroupMailing extends MVCPortlet{
 				Message message=new Message();
 				message.put("templateId",-1);
 				message.put("to", "all");
+				message.put("tutors", tutors);
 				message.put("ownTeam", ownTeam);
 				message.put("isOmniadmin", permissionChecker.isOmniadmin());
 				message.put("entryId", entryId);
@@ -234,6 +231,7 @@ public class GroupMailing extends MVCPortlet{
 					message.put("templateId",-1);
 					message.put("entryId", entryId);
 					message.put("to", user.getEmailAddress());
+					message.put("tutors", tutors);
 					message.put("userName", user.getFullName());
 					message.put("subject", 	subject);
 					message.put("body", 	changeToURL(body, themeDisplay.getURLPortal()));
@@ -266,6 +264,7 @@ public class GroupMailing extends MVCPortlet{
 						message.put("templateId",-1);
 						message.put("entryId", entryId);
 						message.put("to", user.getEmailAddress());
+						message.put("tutors", tutors);
 						message.put("userName", user.getFullName());
 						message.put("subject", 	subject);
 						message.put("body", 	changeToURL(body, themeDisplay.getURLPortal()));
@@ -290,14 +289,11 @@ public class GroupMailing extends MVCPortlet{
 		
 	
 		if(_log.isInfoEnabled()){
-			_log.trace("ManageTemplates: sendNewMail\nTo: "+to+"\nSubject:\n" + subject +"\nBody:\n"+body);
+			_log.trace("ManageTemplates: sendNewMail\nTo: "+to+"\ntutors: "+tutors+"\nSubject:\n" + subject +"\nBody:\n"+body);
 		}
 		
 		actionResponse.setRenderParameter("jspPage", "/html/groupmailing/view.jsp");
 	}
-	
-	
-	
 	
 	//Para imagenes
 	private String changeToURL(String text, String url){
@@ -308,5 +304,5 @@ public class GroupMailing extends MVCPortlet{
 		
 		return text;
 	}
-	
+
 }
