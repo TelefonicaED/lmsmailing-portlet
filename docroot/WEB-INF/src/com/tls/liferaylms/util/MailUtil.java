@@ -1,26 +1,26 @@
 package com.tls.liferaylms.util;
 
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
+import java.util.TimeZone;
 
 import javax.portlet.ActionRequest;
 
 import com.liferay.counter.service.CounterLocalServiceUtil;
 import com.liferay.lms.model.Course;
 import com.liferay.lms.service.CourseLocalServiceUtil;
+import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.mail.MailMessage;
-import com.liferay.portal.kernel.util.Constants;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.model.Company;
 import com.liferay.portal.model.Group;
 import com.liferay.portal.model.User;
-import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portal.util.PortalUtil;
 import com.liferay.portlet.announcements.model.AnnouncementsEntry;
-import com.liferay.portlet.announcements.model.AnnouncementsEntryConstants;
 import com.liferay.portlet.announcements.model.AnnouncementsFlagConstants;
 import com.liferay.portlet.announcements.service.AnnouncementsEntryLocalServiceUtil;
 import com.liferay.portlet.announcements.service.AnnouncementsFlagLocalServiceUtil;
@@ -146,7 +146,7 @@ public class MailUtil {
 		return url;
 	}
 	
-	public static String replaceMessageConstants(String text, String portal, String community, String student, String studentScreenName, String teacher, String url, String urlcourse){
+	public static String replaceMessageConstants(String text, String portal, String community, String student, String studentScreenName, String teacher, String url, String urlcourse, String startDate, String endDate){
 		String res = "";
 		
 		res = text.replace("[@portal]", 	portal);
@@ -154,6 +154,8 @@ public class MailUtil {
 		res = res.replace ("[@teacher]", 	teacher);
 		res = res.replace ("[@url]", 		"<a href=\""+url+"\">"+portal+"</a>");
 		res = res.replace ("[@urlcourse]", 	"<a href=\""+urlcourse+"\">"+community+"</a>");	
+		res = res.replace ("[@startDate]", startDate);
+		res = res.replace ("[@endDate]", endDate);
 		
 		//Cambiamos las variables nuevas:
 		res = res.replace("[$PORTAL$]", 	portal);
@@ -161,6 +163,8 @@ public class MailUtil {
 		res = res.replace ("[$TEACHER$]", 	teacher);
 		res = res.replace ("[$URL$]", 		"<a href=\""+url+"\">"+portal+"</a>");
 		res = res.replace ("[$PAGE_URL$]", 	"<a href=\""+urlcourse+"\">"+community+"</a>");	
+		res = res.replace ("[$START_DATE$]", startDate);
+		res = res.replace ("[$END_DATE$]", endDate);
 		
 		res = replaceStudent(res, student, studentScreenName);
 		//Se cambiala URL des.
@@ -169,7 +173,37 @@ public class MailUtil {
 		return res;
 	}
 
+	public static String getCourseStartDate(long groupId, Locale locale ,TimeZone timeZone){
 	
+		String startDate = "";
+		Course course;
+		try {
+			course = CourseLocalServiceUtil.fetchByGroupCreatedId(groupId);
+			if(course!=null){
+				SimpleDateFormat dateFormatDate = new SimpleDateFormat("dd/MM/yyyy");
+				startDate = dateFormatDate.format(course.getExecutionStartDate());
+			}
+		} catch (SystemException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return startDate;
+	}
+	
+	public static String getCourseEndDate(long groupId, Locale locale ,TimeZone timeZone){
+		
+		String endDate = "";
+		try {
+			Course course = CourseLocalServiceUtil.fetchByGroupCreatedId(groupId);
+			if(course!=null){
+				SimpleDateFormat dateFormatDate = new SimpleDateFormat("dd/MM/yyyy");
+				endDate  = dateFormatDate.format(course.getExecutionEndDate());
+			}
+		} catch (SystemException e) {
+			e.printStackTrace();
+		}
+		return endDate;
+	}
 	/*
 	 * Método que cambia cambia el nombre del usuario de la plantilla.
 	 */

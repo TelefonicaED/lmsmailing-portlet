@@ -187,22 +187,14 @@ public class LmsMailMessageListener implements MessageListener {
 			log.debug("--- EXPANDO 1: "+userSender.getExpandoBridge().getAttribute(deregisterMailExpando,false));
 			
 			if(!deregisterMail){
-				body = MailUtil.replaceMessageConstants(body, portal, community, userSender.getFullName(), userSender.getScreenName(), tutors, url, urlcourse);
-
+				body = MailUtil.replaceMessageConstants(body, portal, community, userSender.getFullName(), userSender.getScreenName(), tutors, url, urlcourse,
+						MailUtil.getCourseStartDate(groupId, userSender.getLocale(), userSender.getTimeZone()), MailUtil.getCourseEndDate(groupId, userSender.getLocale(), userSender.getTimeZone()));
 				String calculatedBody = LanguageUtil.get(Locale.getDefault(),"mail.header");
 				calculatedBody += body;
 				calculatedBody += LanguageUtil.get(Locale.getDefault(),"mail.footer");
 				
-				subject = MailUtil.replaceMessageConstants(subject, portal, community, userSender.getFullName(), userSender.getScreenName(), tutors, url, urlcourse);
-				
-				if(log.isDebugEnabled()) {
-					log.debug("Se envia el siguiente correo...");
-					log.debug("De: " + from);
-					log.debug("A: " + toMail + " " + userSender.getFullName());
-					log.debug("Profesores: " + tutors);
-					log.debug("Asunto: " + subject);
-					log.debug("Cuerpo: " + calculatedBody);
-				}				
+				subject = MailUtil.replaceMessageConstants(subject, portal, community, userSender.getFullName(), userSender.getScreenName(), tutors, url, urlcourse,
+						MailUtil.getCourseStartDate(groupId, userSender.getLocale(), userSender.getTimeZone()), MailUtil.getCourseEndDate(groupId, userSender.getLocale(), userSender.getTimeZone()));
 				//Guardar una auditoria del envio de emails.
 				auditSendMails = AuditSendMailsLocalServiceUtil.createAuditSendMails(CounterLocalServiceUtil.increment(AuditSendMails.class.getName()));
 				auditSendMails.setUserId(userId);
@@ -255,12 +247,13 @@ public class LmsMailMessageListener implements MessageListener {
 				
 				if(!deregisterMail){
 					InternetAddress to = new InternetAddress(toMail, student.getFullName());
-					String content = MailUtil.replaceMessageConstants(body, portal, community, student.getFullName(), student.getScreenName(), userSender.getFullName(),url,urlcourse);
+					String content = MailUtil.replaceMessageConstants(body, portal, community, student.getFullName(), student.getScreenName(), userSender.getFullName(),url,urlcourse,
+							MailUtil.getCourseStartDate(groupId, student.getLocale(), student.getTimeZone()), MailUtil.getCourseEndDate(groupId, student.getLocale(), student.getTimeZone()));
 					String calculatedBody = LanguageUtil.get(student.getLocale(),"mail.header");
-					calculatedBody += content;
+					calculatedBody += MailUtil.replaceMessageConstants(body, portal, community, student.getFullName(), student.getScreenName(),userSender.getFullName(),url,urlcourse, MailUtil.getCourseStartDate(groupId, student.getLocale(), student.getTimeZone()), MailUtil.getCourseEndDate(groupId, student.getLocale(), student.getTimeZone()));
 					calculatedBody += LanguageUtil.get(student.getLocale(),"mail.footer");
 					
-					String calculatedsubject = MailUtil.replaceMessageConstants(subject, portal, community, student.getFullName(), student.getScreenName(), tutors, url, urlcourse);
+					String calculatedsubject = MailUtil.replaceMessageConstants(subject, portal, community, student.getFullName(), student.getScreenName(), tutors, url, urlcourse, MailUtil.getCourseStartDate(groupId, student.getLocale(), student.getTimeZone()), MailUtil.getCourseEndDate(groupId, student.getLocale(), student.getTimeZone()));
 					
 					if(log.isDebugEnabled()) {
 						log.debug("Se envia el siguiente correo...");
@@ -391,8 +384,10 @@ public class LmsMailMessageListener implements MessageListener {
 			}
 			
 
-			String bodyTemplate = MailUtil.replaceMessageConstants(body, portal, community, null, null, tutors, url, urlcourse);
-			String subjectTemplate = MailUtil.replaceMessageConstants(subject, portal, community, null, null, tutors, url, urlcourse);
+			String bodyTemplate = MailUtil.replaceMessageConstants(body, portal, community, null, null, tutors, url, urlcourse,
+					MailUtil.getCourseStartDate(groupId, userSender.getLocale(), userSender.getTimeZone()), MailUtil.getCourseEndDate(groupId, userSender.getLocale(), userSender.getTimeZone()));
+			String subjectTemplate = MailUtil.replaceMessageConstants(subject, portal, community, null, null, tutors, url, urlcourse,
+					MailUtil.getCourseStartDate(groupId, userSender.getLocale(), userSender.getTimeZone()), MailUtil.getCourseEndDate(groupId, userSender.getLocale(), userSender.getTimeZone()));
 			String calculatedBody, calculatedSubject;
 			
 			if(_log.isDebugEnabled()) {
