@@ -187,13 +187,13 @@ public class LmsMailMessageListener implements MessageListener {
 			log.debug("--- EXPANDO 1: "+userSender.getExpandoBridge().getAttribute(deregisterMailExpando,false));
 			
 			if(!deregisterMail){
-				body = MailUtil.createMessage(body, portal, community, userSender.getFullName(), tutors, url, urlcourse);
+				body = MailUtil.replaceMessageConstants(body, portal, community, userSender.getFullName(), userSender.getScreenName(), tutors, url, urlcourse);
 
 				String calculatedBody = LanguageUtil.get(Locale.getDefault(),"mail.header");
 				calculatedBody += body;
 				calculatedBody += LanguageUtil.get(Locale.getDefault(),"mail.footer");
 				
-				subject = MailUtil.createMessage(subject, portal, community, userSender.getFullName(), tutors, url, urlcourse);
+				subject = MailUtil.replaceMessageConstants(subject, portal, community, userSender.getFullName(), userSender.getScreenName(), tutors, url, urlcourse);
 				
 				if(log.isDebugEnabled()) {
 					log.debug("Se envia el siguiente correo...");
@@ -255,12 +255,12 @@ public class LmsMailMessageListener implements MessageListener {
 				
 				if(!deregisterMail){
 					InternetAddress to = new InternetAddress(toMail, student.getFullName());
-					String content = MailUtil.createMessage(body, portal, community, student.getFullName(), userSender.getFullName(),url,urlcourse);
+					String content = MailUtil.replaceMessageConstants(body, portal, community, student.getFullName(), student.getScreenName(), userSender.getFullName(),url,urlcourse);
 					String calculatedBody = LanguageUtil.get(student.getLocale(),"mail.header");
 					calculatedBody += content;
 					calculatedBody += LanguageUtil.get(student.getLocale(),"mail.footer");
 					
-					String calculatedsubject = MailUtil.createMessage(subject, portal, community, student.getFullName(), tutors, url, urlcourse);
+					String calculatedsubject = MailUtil.replaceMessageConstants(subject, portal, community, student.getFullName(), student.getScreenName(), tutors, url, urlcourse);
 					
 					if(log.isDebugEnabled()) {
 						log.debug("Se envia el siguiente correo...");
@@ -391,8 +391,8 @@ public class LmsMailMessageListener implements MessageListener {
 			}
 			
 
-			String bodyTemplate = createTemplateMessage(body, portal, community, tutors, url, urlcourse);
-			String subjectTemplate = createTemplateMessage(subject, portal, community, tutors, url, urlcourse);
+			String bodyTemplate = MailUtil.replaceMessageConstants(body, portal, community, null, null, tutors, url, urlcourse);
+			String subjectTemplate = MailUtil.replaceMessageConstants(subject, portal, community, null, null, tutors, url, urlcourse);
 			String calculatedBody, calculatedSubject;
 			
 			if(_log.isDebugEnabled()) {
@@ -467,8 +467,8 @@ public class LmsMailMessageListener implements MessageListener {
 								_log.debug("Se envia un correo electronico al siguiente usuario: " + student.getEmailAddress());
 							}
 							
-							calculatedSubject = createMessage(subjectTemplate, student.getFullName());
-							String content = createMessage(bodyTemplate, student.getFullName());
+							calculatedSubject = MailUtil.replaceStudent(subjectTemplate, student.getFullName(), student.getScreenName());
+							String content = MailUtil.replaceStudent(bodyTemplate, student.getFullName(), student.getScreenName());
 							calculatedBody = LanguageUtil.get(student.getLocale(),"mail.header");
 							calculatedBody += content;
 							calculatedBody += LanguageUtil.get(student.getLocale(),"mail.footer");
@@ -568,40 +568,6 @@ public class LmsMailMessageListener implements MessageListener {
 		
 	}
 	
-	
-	/*
-	 * Método que crea una plantilla de mensaje enviado para evitar tantos replaces. Se sustituyen todas las variables excepto las relacionadas con el usuario.
-	 */
-	private String createTemplateMessage (String text, String portal, String community, String teacher, String url, String urlcourse){
-		String res = "";
-		res = text.replace("[@portal]", 	portal);
-		res = res.replace ("[@course]", 	community);
-		res = res.replace ("[@teacher]", 	teacher);
-		res = res.replace ("[@url]", 		"<a href=\""+url+"\">"+portal+"</a>");
-		res = res.replace ("[@urlcourse]", 	"<a href=\""+urlcourse+"\">"+community+"</a>");	
-
-		//Se cambiala URL des.
-		res = MailUtil.changeToURL(res, url);
-		
-		return res;
-	}
-	
-	/*
-	 * Método que cambia cambia el nombre del usuario de la plantilla.
-	 */
-	private String createMessage(String text, String student) {
-		if(text != null) {
-			return text.replace ("[@student]", 	student);
-		}
-		else {
-			return "";
-		}
-	}
-
-	
-
-	
-
 	private static Log _log = LogFactoryUtil.getLog(LmsMailMessageListener.class);
 
 }

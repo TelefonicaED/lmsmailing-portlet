@@ -68,8 +68,8 @@ public class GroupMailing extends MVCPortlet{
 			
 			if(internalMessagingActive){
 				_log.debug("Sending internal message ");
-				String content =  MailUtil.createMessage(changeToURL(template.getBody(), themeDisplay.getURLPortal()), themeDisplay.getCompany().getName(), 
-						themeDisplay.getScopeGroupName(), themeDisplay.getUser().getFullName(), themeDisplay.getUser().getFullName(), 
+				String content =  MailUtil.replaceMessageConstants(changeToURL(template.getBody(), themeDisplay.getURLPortal()), themeDisplay.getCompany().getName(), 
+						themeDisplay.getScopeGroupName(), themeDisplay.getUser().getFullName(), themeDisplay.getUser().getScreenName(),  themeDisplay.getUser().getFullName(), 
 						MailUtil.getURLPortal(themeDisplay.getCompany(),actionRequest), MailUtil.getURLPortal(themeDisplay.getCompany(),actionRequest)+themeDisplay.getPathFriendlyURLPublic()+themeDisplay.getScopeGroup().getFriendlyURL());
 			
 				AnnouncementsEntry entry = MailUtil.createInternalMessageNotification(template.getSubject(),content, themeDisplay.getScopeGroupId(), themeDisplay.getUserId(), themeDisplay.getCompanyId());
@@ -141,8 +141,8 @@ public class GroupMailing extends MVCPortlet{
 		if(internalMessagingActive){
 			_log.debug("Sending internal message ");
 			
-			String content =  MailUtil.createMessage(changeToURL(body, themeDisplay.getURLPortal()), themeDisplay.getCompany().getName(), 
-					themeDisplay.getScopeGroupName(), themeDisplay.getUser().getFullName(), themeDisplay.getUser().getFullName(), 
+			String content =  MailUtil.replaceMessageConstants(changeToURL(body, themeDisplay.getURLPortal()), themeDisplay.getCompany().getName(), 
+					themeDisplay.getScopeGroupName(), themeDisplay.getUser().getFullName(), themeDisplay.getUser().getScreenName(),  themeDisplay.getUser().getFullName(), 
 					MailUtil.getURLPortal(themeDisplay.getCompany(),actionRequest), MailUtil.getURLPortal(themeDisplay.getCompany(),actionRequest)+themeDisplay.getPathFriendlyURLPublic()+themeDisplay.getScopeGroup().getFriendlyURL());
 			
 			AnnouncementsEntry entry = MailUtil.createInternalMessageNotification(subject, content, themeDisplay.getScopeGroupId(), themeDisplay.getUserId(), themeDisplay.getCompanyId());

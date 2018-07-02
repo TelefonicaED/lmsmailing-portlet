@@ -146,19 +146,51 @@ public class MailUtil {
 		return url;
 	}
 	
-	public static String createMessage(String text, String portal, String community, String student, String teacher, String url, String urlcourse){
+	public static String replaceMessageConstants(String text, String portal, String community, String student, String studentScreenName, String teacher, String url, String urlcourse){
 		String res = "";
+		
 		res = text.replace("[@portal]", 	portal);
 		res = res.replace ("[@course]", 	community);
-		res = res.replace ("[@student]", 	student);
 		res = res.replace ("[@teacher]", 	teacher);
 		res = res.replace ("[@url]", 		"<a href=\""+url+"\">"+portal+"</a>");
 		res = res.replace ("[@urlcourse]", 	"<a href=\""+urlcourse+"\">"+community+"</a>");	
-
-		//Para poner la url desde la pï¿½gina para que se vean los correos.
-		res = changeToURL(res, url);
+		
+		//Cambiamos las variables nuevas:
+		res = res.replace("[$PORTAL$]", 	portal);
+		res = res.replace ("[$TITLE_COURSE$]", 	community);
+		res = res.replace ("[$TEACHER$]", 	teacher);
+		res = res.replace ("[$URL$]", 		"<a href=\""+url+"\">"+portal+"</a>");
+		res = res.replace ("[$PAGE_URL$]", 	"<a href=\""+urlcourse+"\">"+community+"</a>");	
+		
+		res = replaceStudent(res, student, studentScreenName);
+		//Se cambiala URL des.
+		res = MailUtil.changeToURL(res, url);
 		
 		return res;
+	}
+
+	
+	/*
+	 * Método que cambia cambia el nombre del usuario de la plantilla.
+	 */
+	public static String replaceStudent(String text, String student, String studentScreenName) {
+		if(text != null) {
+			if(student!=null){
+				text = text.replace ("[@student]", 	student);
+				//Cambiamos la variable nueva
+				text = text.replace("[$USER_FULLNAME$]", student);
+			}
+			
+			//Cambiamos la variable nueva
+			if(studentScreenName!=null){
+				text = text.replace("[$USER_SCREENNAME$]", studentScreenName);
+			}
+			
+			return text;
+		}
+		else {
+			return "";
+		}
 	}
 
 	
