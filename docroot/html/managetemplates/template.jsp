@@ -47,12 +47,13 @@
 		    <div class="tokens">
 		    	<p><%=LanguageUtil.get(pageContext,"groupmailing.messages.explain")%></p>
 		    	<ul>
-		    		<li>[@portal] - <%=LanguageUtil.get(pageContext,"groupmailing.messages.portal")%></li>
-		    		<li>[@course] - <%=LanguageUtil.get(pageContext,"groupmailing.messages.course")%></li>
-		    		<li>[@student] - <%=LanguageUtil.get(pageContext,"groupmailing.messages.student")%></li>
-		    		<li>[@teacher] - <%=LanguageUtil.get(pageContext,"groupmailing.messages.teacher")%></li>
-		    		<li>[@urlcourse] - <%=LanguageUtil.get(pageContext,"groupmailing.messages.urlcourse")%></li>
-		    		<li>[@url] - <%=LanguageUtil.get(pageContext,"groupmailing.messages.url")%></li>
+		    		<li>[$PORTAL$] - <%=LanguageUtil.get(pageContext,"groupmailing.messages.portal")%></li>
+		    		<li>[$TITLE_COURSE$] - <%=LanguageUtil.get(pageContext,"groupmailing.messages.course")%></li>
+		    		<li>[$USER_FULLNAME$] - <%=LanguageUtil.get(pageContext,"groupmailing.messages.student")%></li>
+		    		<li>[$USER_SCREENNAME$] - <%=LanguageUtil.get(pageContext,"the-user-screen-name")%></li>
+		    		<li>[$TEACHER$] - <%=LanguageUtil.get(pageContext,"groupmailing.messages.teacher")%></li>
+		    		<li>[$PAGE_URL$] - <%=LanguageUtil.get(pageContext,"groupmailing.messages.urlcourse")%></li>
+		    		<li>[$URL$] - <%=LanguageUtil.get(pageContext,"groupmailing.messages.url")%></li>
 		    		<li>[@startDate] - <%=LanguageUtil.get(pageContext,"start-execution-date")%></li>
 		    		<li>[@endDate] - <%=LanguageUtil.get(pageContext,"end-execution-date")%></li>
 		    	</ul>

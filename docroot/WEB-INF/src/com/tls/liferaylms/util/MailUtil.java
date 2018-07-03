@@ -1,6 +1,5 @@
 package com.tls.liferaylms.util;
 
-import java.text.Format;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -16,18 +15,12 @@ import com.liferay.lms.service.CourseLocalServiceUtil;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.mail.MailMessage;
-import com.liferay.portal.kernel.util.Constants;
-import com.liferay.portal.kernel.util.FastDateFormatConstants;
-import com.liferay.portal.kernel.util.FastDateFormatFactoryUtil;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.model.Company;
 import com.liferay.portal.model.Group;
 import com.liferay.portal.model.User;
-import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portal.util.PortalUtil;
 import com.liferay.portlet.announcements.model.AnnouncementsEntry;
-import com.liferay.portlet.announcements.model.AnnouncementsEntryConstants;
 import com.liferay.portlet.announcements.model.AnnouncementsFlagConstants;
 import com.liferay.portlet.announcements.service.AnnouncementsEntryLocalServiceUtil;
 import com.liferay.portlet.announcements.service.AnnouncementsFlagLocalServiceUtil;
@@ -153,25 +146,35 @@ public class MailUtil {
 		return url;
 	}
 	
-	public static String createMessage(String text, String portal, String community, String student, String teacher, String url, String urlcourse, String startDate, String endDate){
+	public static String replaceMessageConstants(String text, String portal, String community, String student, String studentScreenName, String teacher, String url, String urlcourse, String startDate, String endDate){
 		String res = "";
+		
 		res = text.replace("[@portal]", 	portal);
 		res = res.replace ("[@course]", 	community);
-		res = res.replace ("[@student]", 	student);
 		res = res.replace ("[@teacher]", 	teacher);
 		res = res.replace ("[@url]", 		"<a href=\""+url+"\">"+portal+"</a>");
 		res = res.replace ("[@urlcourse]", 	"<a href=\""+urlcourse+"\">"+community+"</a>");	
 		res = res.replace ("[@startDate]", startDate);
 		res = res.replace ("[@endDate]", endDate);
-
-		//Para poner la url desde la pï¿½gina para que se vean los correos.
-		res = changeToURL(res, url);
+		
+		//Cambiamos las variables nuevas:
+		res = res.replace("[$PORTAL$]", 	portal);
+		res = res.replace ("[$TITLE_COURSE$]", 	community);
+		res = res.replace ("[$TEACHER$]", 	teacher);
+		res = res.replace ("[$URL$]", 		"<a href=\""+url+"\">"+portal+"</a>");
+		res = res.replace ("[$PAGE_URL$]", 	"<a href=\""+urlcourse+"\">"+community+"</a>");	
+		res = res.replace ("[$START_DATE$]", startDate);
+		res = res.replace ("[$END_DATE$]", endDate);
+		
+		res = replaceStudent(res, student, studentScreenName);
+		//Se cambiala URL des.
+		res = MailUtil.changeToURL(res, url);
 		
 		return res;
 	}
 
 	public static String getCourseStartDate(long groupId, Locale locale ,TimeZone timeZone){
-		
+	
 		String startDate = "";
 		Course course;
 		try {
@@ -201,6 +204,30 @@ public class MailUtil {
 		}
 		return endDate;
 	}
+	/*
+	 * Método que cambia cambia el nombre del usuario de la plantilla.
+	 */
+	public static String replaceStudent(String text, String student, String studentScreenName) {
+		if(text != null) {
+			if(student!=null){
+				text = text.replace ("[@student]", 	student);
+				//Cambiamos la variable nueva
+				text = text.replace("[$USER_FULLNAME$]", student);
+			}
+			
+			//Cambiamos la variable nueva
+			if(studentScreenName!=null){
+				text = text.replace("[$USER_SCREENNAME$]", studentScreenName);
+			}
+			
+			return text;
+		}
+		else {
+			return "";
+		}
+	}
+
+	
 	public static String changeToURL(String text, String url){
 		String res ="";
 
@@ -229,7 +256,7 @@ public class MailUtil {
 						for(int idx=1; idx<=numTutors; idx++)
 							tutors = tutors.concat(StringPool.COMMA_AND_SPACE)
 										.concat(courseTutors.get(idx).getFullName());
-}
+					}
 				}
 				else
 					log.debug("There are no course tutors.  CourseId: " + courseId );
