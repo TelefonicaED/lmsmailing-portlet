@@ -54,8 +54,8 @@
 		    		<li>[$TEACHER$] - <%=LanguageUtil.get(pageContext,"groupmailing.messages.teacher")%></li>
 		    		<li>[$PAGE_URL$] - <%=LanguageUtil.get(pageContext,"groupmailing.messages.urlcourse")%></li>
 		    		<li>[$URL$] - <%=LanguageUtil.get(pageContext,"groupmailing.messages.url")%></li>
-		    		<li>[@startDate] - <%=LanguageUtil.get(pageContext,"start-execution-date")%></li>
-		    		<li>[@endDate] - <%=LanguageUtil.get(pageContext,"end-execution-date")%></li>
+		    		<li>[$START_DATE$] - <%=LanguageUtil.get(pageContext,"start-execution-date")%></li>
+		    		<li>[$END_DATE$] - <%=LanguageUtil.get(pageContext,"end-execution-date")%></li>
 		    	</ul>
 
 		    </div>
