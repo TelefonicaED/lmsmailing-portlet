@@ -314,7 +314,7 @@ public class LmsMailMessageListener implements MessageListener {
 			}
 			List<User> users = new ArrayList<User>();
 			if (ownTeam) {
-				List<Team> userTeams = TeamLocalServiceUtil.getUserTeams(userId);
+				List<Team> userTeams = TeamLocalServiceUtil.getUserTeams(userId, groupId);
 				Course course = CourseLocalServiceUtil.getCourseByGroupCreatedId(groupId);
 				LmsPrefs prefs = LmsPrefsLocalServiceUtil.getLmsPrefs(companyId);
 				
