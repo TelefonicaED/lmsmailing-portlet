@@ -40,6 +40,7 @@ public class GroupMailingConfiguration implements ConfigurationAction {
 		}
 		
 		prefs.setValue("ownTeam", actionRequest.getParameter("ownTeam"));
+		prefs.setValue("filterByCommunity", actionRequest.getParameter("filterByCommunity"));
 		
 		prefs.store();
 		
