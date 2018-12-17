@@ -312,6 +312,12 @@ else
 			  	}
 			  	
 			  	userParams.put("usersGroups", new Long(themeDisplay.getScopeGroupId()));
+			} else {
+				boolean filterByCommunity = (preferences.getValue("filterByCommunity", "false")).compareTo("true") == 0;
+				if(filterByCommunity){
+					userParams.put("inMyCommunity", new CustomSQLParam("WHERE User_.userId IN "
+				              + " (SELECT distinct(Users_groups.userId) FROM Users_groups WHERE Users_groups.groupId = "+String.valueOf(themeDisplay.getScopeGroupId())+")", null));
+				}
 			}
 			
 			if ((firstName.trim().length()==0) || (lastName.trim().length()==0) ||
