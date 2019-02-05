@@ -6,7 +6,7 @@
 
 <div class="managetemplates">
 
-	<liferay-ui:icon-menu showWhenSingleIcon="<%=true %>">
+	<liferay-ui:icon-menu showWhenSingleIcon="<%=true %>" message="actions">
 	
 		<portlet:renderURL var="newTemplateURL">
 			<portlet:param name="jspPage" value="/html/managetemplates/template.jsp"></portlet:param>
