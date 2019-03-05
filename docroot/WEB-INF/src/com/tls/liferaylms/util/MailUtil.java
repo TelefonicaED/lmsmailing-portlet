@@ -146,7 +146,7 @@ public class MailUtil {
 		return url;
 	}
 	
-	public static String replaceMessageConstants(String text, String portal, String community, String student, String studentScreenName, String teacher, String url, String urlcourse, String startDate, String endDate){
+	public static String replaceMessageConstants(String text, String portal, String community, String student, String studentScreenName, String teacher, String url, String urlcourse, String startDate, String endDate, String userSender){
 		String res = "";
 		
 		res = text.replace("[@portal]", 	portal);
@@ -161,6 +161,7 @@ public class MailUtil {
 		res = res.replace("[$PORTAL$]", 	portal);
 		res = res.replace ("[$TITLE_COURSE$]", 	community);
 		res = res.replace ("[$TEACHER$]", 	teacher);
+		res = res.replace ("[$USER_SENDER$]", 	userSender);
 		res = res.replace ("[$URL$]", 		"<a href=\""+url+"\">"+portal+"</a>");
 		res = res.replace ("[$PAGE_URL$]", 	"<a href=\""+urlcourse+"\">"+community+"</a>");	
 		res = res.replace ("[$START_DATE$]", startDate);
