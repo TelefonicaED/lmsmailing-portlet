@@ -1,2 +1,15 @@
 *.class
-classes
+docroot/WEB-INF/lib/lmsmailing-portlet-service.jar
+docroot/WEB-INF/classes
+docroot/WEB-INF/src/service.properties
+/bin/
+.settings
+/.classpath
+/.project
+/.tern-project
+docroot/css/.sass-cache/
+docroot/WEB-INF/src/com/tls/liferaylms/mail/service/base/
+docroot/WEB-INF/service/com/tls/liferaylms/mail/model
+docroot/WEB-INF/service/com/tls/liferaylms/mail/service
+docroot/WEB-INF/service/com/tls/liferaylms/mail/NoSuch*.java
+docroot/WEB-INF/sql

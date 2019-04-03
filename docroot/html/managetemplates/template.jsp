@@ -52,6 +52,7 @@
 		    		<li>[$USER_FULLNAME$] - <%=LanguageUtil.get(pageContext,"groupmailing.messages.student")%></li>
 		    		<li>[$USER_SCREENNAME$] - <%=LanguageUtil.get(pageContext,"the-user-screen-name")%></li>
 		    		<li>[$TEACHER$] - <%=LanguageUtil.get(pageContext,"groupmailing.messages.teacher")%></li>
+		    		<li>[$USER_SENDER$] - <%=LanguageUtil.get(pageContext,"groupmailing.messages.user-sender")%></li>
 		    		<li>[$PAGE_URL$] - <%=LanguageUtil.get(pageContext,"groupmailing.messages.urlcourse")%></li>
 		    		<li>[$URL$] - <%=LanguageUtil.get(pageContext,"groupmailing.messages.url")%></li>
 		    		<li>[$START_DATE$] - <%=LanguageUtil.get(pageContext,"start-execution-date")%></li>

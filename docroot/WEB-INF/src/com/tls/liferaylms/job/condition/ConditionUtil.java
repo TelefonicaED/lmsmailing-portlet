@@ -54,9 +54,14 @@ public class ConditionUtil {
 	}
 
 	public static Condition instance(String name, MailJob mailJob) throws ClassNotFoundException {
-		Class c = Class.forName(packageClass+name);
-		Constructor[] cons = c.getConstructors();
-
+		Class c = null;
+		Constructor[] cons = null;
+		try{
+			c=Class.forName(packageClass+name);
+			cons= c.getConstructors();
+		}catch(Exception e){
+			e.printStackTrace();
+		}
 		if(cons!=null&&cons.length>0){
 			Condition condition;
 			try {
@@ -73,6 +78,9 @@ public class ConditionUtil {
 				if(log.isDebugEnabled())e.printStackTrace();
 				if(log.isErrorEnabled())log.error(e.getMessage());
 			} catch (InvocationTargetException e) {
+				if(log.isDebugEnabled())e.printStackTrace();
+				if(log.isErrorEnabled())log.error(e.getMessage());
+			}catch (Exception e) {
 				if(log.isDebugEnabled())e.printStackTrace();
 				if(log.isErrorEnabled())log.error(e.getMessage());
 			}
