@@ -151,8 +151,14 @@ public class LmsMailMessageListener implements MessageListener {
 			_log.debug("type_::"+type_);
 
 		
-		String fromName = PrefsPropsUtil.getString(companyId, PropsKeys.ADMIN_EMAIL_FROM_NAME);
-		String fromAddress = PrefsPropsUtil.getString(companyId, PropsKeys.ADMIN_EMAIL_FROM_ADDRESS);
+		String fromName = message.getString("fromName");
+		String fromAddress = message.getString("fromAddress");
+		if(Validator.isNull(fromName)){
+			fromName = PrefsPropsUtil.getString(companyId, PropsKeys.ADMIN_EMAIL_FROM_NAME);
+		}
+		if(Validator.isNull(fromAddress)){
+			fromAddress = PrefsPropsUtil.getString(companyId, PropsKeys.ADMIN_EMAIL_FROM_ADDRESS);
+		}
 		
 		long nUsers = 0,millis = 0;
 		String numberUsers = PrefsPropsUtil.getString("lmsmailing.sendmails.number.users");
