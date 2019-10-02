@@ -13,7 +13,9 @@ import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.messaging.Message;
 import com.liferay.portal.kernel.messaging.MessageBusUtil;
+import com.liferay.portal.kernel.sanitizer.SanitizerUtil;
 import com.liferay.portal.kernel.servlet.SessionErrors;
+import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.PrefsPropsUtil;
@@ -117,8 +119,16 @@ public class GroupMailing extends MVCPortlet{
 		ThemeDisplay themeDisplay = (ThemeDisplay) actionRequest.getAttribute(WebKeys.THEME_DISPLAY);
 		
 		String subject 	= ParamUtil.getString(actionRequest, "subject", "");
+		
+		_log.debug("SUBJECT "+subject);
+		
+		subject = SanitizerUtil.sanitize(themeDisplay.getCompanyId(), themeDisplay.getScopeGroupId(), themeDisplay.getUserId(), StringPool.BLANK, 0, ContentTypes.TEXT_HTML, subject);
+	    _log.debug("SUBJECT AFTER SANITIZE "+subject);
+		
+		
 		String body 	= ParamUtil.getString(actionRequest, "body", "");
-
+		body = SanitizerUtil.sanitize(themeDisplay.getCompanyId(), themeDisplay.getScopeGroupId(), themeDisplay.getUserId(), StringPool.BLANK, 0, ContentTypes.TEXT_HTML, body);
+		 _log.debug("BODY AFTER SANITIZE "+body);	
 		String testing 	= ParamUtil.getString(actionRequest, "testing", "false");
 		boolean testMessage = testing.equals(StringPool.TRUE);
 		
