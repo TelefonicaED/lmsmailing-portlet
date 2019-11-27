@@ -1,0 +1,14 @@
+<custom-sql>
+	<sql id="com.tls.liferaylms.mail.service.persistence.MailRelationFinder.findRelationTypesByCompanyId">
+		<![CDATA[   
+			SELECT DISTINCT rel.type_
+				FROM socialrelation rel
+					[$WHERECOMPANYID$]
+		]]>
+	</sql>
+	<sql id="com.tls.liferaylms.mail.service.persistence.MailRelationFinder.whereCompanyId">
+		<![CDATA[   
+			WHERE companyId = ?
+		]]>
+	</sql>
+</custom-sql>
