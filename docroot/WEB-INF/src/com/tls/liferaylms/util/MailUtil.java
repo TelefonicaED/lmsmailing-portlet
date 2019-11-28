@@ -1,6 +1,7 @@
 package com.tls.liferaylms.util;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -16,6 +17,7 @@ import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.StringPool;
+import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.Company;
 import com.liferay.portal.model.Group;
 import com.liferay.portal.model.User;
@@ -24,6 +26,7 @@ import com.liferay.portlet.announcements.model.AnnouncementsEntry;
 import com.liferay.portlet.announcements.model.AnnouncementsFlagConstants;
 import com.liferay.portlet.announcements.service.AnnouncementsEntryLocalServiceUtil;
 import com.liferay.portlet.announcements.service.AnnouncementsFlagLocalServiceUtil;
+import com.tls.liferaylms.mail.service.MailRelationLocalServiceUtil;
 
 public class MailUtil {
 
@@ -267,5 +270,21 @@ public class MailUtil {
 		}catch(Exception e){}
 		
 		return tutors;
+	}
+	
+	public static List<User> getSocialRelationUsers(User user, List<Integer> socialRelationTypeIds, List<User> socialRelationUsers, long companyId){
+		List<User> socialRelationUsersTmp = new ArrayList<User>();
+		for(int relationTypeId:socialRelationTypeIds){
+			socialRelationUsersTmp = MailRelationLocalServiceUtil.findUsersByCompanyIdSocialRelationTypeIdToUserId(user.getUserId(), relationTypeId, companyId);
+			log.debug("::socialRelationUsersTmp OK::: " + Validator.isNotNull(socialRelationUsersTmp));
+			if(Validator.isNotNull(socialRelationUsersTmp) && socialRelationUsersTmp.size()>0){
+				log.debug("::socialRelationUsersTmp.size()::: " + socialRelationUsersTmp.size());
+				for(User userRelated:socialRelationUsersTmp){
+					if(!socialRelationUsers.contains(userRelated))
+						socialRelationUsers.add(userRelated);
+				}
+			}
+		}
+		return socialRelationUsers;
 	}
 }

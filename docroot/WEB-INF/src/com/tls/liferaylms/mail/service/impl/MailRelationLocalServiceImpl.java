@@ -18,6 +18,7 @@ import java.util.List;
 
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.model.User;
 import com.tls.liferaylms.mail.service.base.MailRelationLocalServiceBaseImpl;
 
 /**
@@ -45,6 +46,16 @@ public class MailRelationLocalServiceImpl
 	private static Log log = LogFactoryUtil.getLog(MailRelationLocalServiceImpl.class);
 	
 	public List<Integer> findRelationTypeIdsByCompanyId(long companyId){
+		log.debug(":::findRelationTypeIdsByCompanyId::: companyId :: " + companyId);
 		return mailRelationFinder.findRelationTypesByCompanyId(companyId);
+	}
+	
+	public List<User> findUsersByCompanyIdSocialRelationTypeIdToUserId(long userId, int socialRelationTypeId, long companyId){
+		if(log.isDebugEnabled()){
+			log.debug(":::findUsersByCompanyIdSocialRelationTypeIdToUserId::: userId :: " + userId);
+			log.debug(":::findUsersByCompanyIdSocialRelationTypeIdToUserId::: socialRelationTypeId :: " + socialRelationTypeId);
+			log.debug(":::findUsersByCompanyIdSocialRelationTypeIdToUserId::: companyId :: " + companyId);
+		}
+		return mailRelationFinder.findUsersByCompanyIdSocialRelationTypeIdToUserId(userId, socialRelationTypeId, companyId);
 	}
 }

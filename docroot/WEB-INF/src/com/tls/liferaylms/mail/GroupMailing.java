@@ -1,5 +1,6 @@
 package com.tls.liferaylms.mail;
 
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 
@@ -31,6 +32,7 @@ import com.liferay.portlet.PortletPreferencesFactoryUtil;
 import com.liferay.portlet.announcements.model.AnnouncementsEntry;
 import com.liferay.util.bridges.mvc.MVCPortlet;
 import com.tls.liferaylms.mail.model.MailTemplate;
+import com.tls.liferaylms.mail.service.MailRelationLocalServiceUtil;
 import com.tls.liferaylms.mail.service.MailTemplateLocalServiceUtil;
 import com.tls.liferaylms.util.MailStringPool;
 import com.tls.liferaylms.util.MailUtil;
@@ -148,6 +150,24 @@ public class GroupMailing extends MVCPortlet{
 			actionResponse.setRenderParameter("jspPage","/html/groupmailing/view.jsp");
 			return;
 		}
+		
+		//Envío de copia a usuarios relacionados
+		List<Integer> mailRelationTypeIds = MailRelationLocalServiceUtil.findRelationTypeIdsByCompanyId(themeDisplay.getCompanyId());
+		List<Integer> sendCopyToTypeIds = new ArrayList<Integer>();
+		if(Validator.isNotNull(mailRelationTypeIds) && mailRelationTypeIds.size()>0){
+			String sendMailToRelationType = StringPool.BLANK;
+			boolean isActiveSendMailToRelationType = Boolean.FALSE;
+			for(int mailRelationTypeId:mailRelationTypeIds){
+				sendMailToRelationType = "sendMailToType_"+mailRelationTypeId;
+				isActiveSendMailToRelationType = ParamUtil.getBoolean(actionRequest, sendMailToRelationType, Boolean.FALSE);
+				if(isActiveSendMailToRelationType)
+					sendCopyToTypeIds.add(mailRelationTypeId);
+			}
+		}
+		//Enviar email a usuarios relacionados
+		boolean sendCopyToSocialRelation = sendCopyToTypeIds.size()>0;
+		if(_log.isDebugEnabled())
+			_log.debug(":::sendCopyToSocialRelation:: " + sendCopyToSocialRelation); 
 	
 		if(internalMessagingActive){
 			_log.debug("Sending internal message ");
@@ -178,6 +198,7 @@ public class GroupMailing extends MVCPortlet{
 			message.put("groupId", 	themeDisplay.getScopeGroupId());
 			message.put("userId",  	themeDisplay.getUserId());
 			message.put("testing", 	testing);
+			message.put("sendToRelatedUsers", sendCopyToSocialRelation);
 			
 			message.put("portal", 	themeDisplay.getCompany().getName());
 			message.put("community",themeDisplay.getScopeGroupName());
@@ -212,6 +233,8 @@ public class GroupMailing extends MVCPortlet{
 				message.put("groupId", 	themeDisplay.getScopeGroupId());
 				message.put("userId",  	themeDisplay.getUserId());
 				message.put("testing", 	testing);
+				message.put("sendToRelatedUsers", sendCopyToSocialRelation);
+				message.put("mailRelationTypeIds", mailRelationTypeIds);
 				
 				message.put("portal", 	themeDisplay.getCompany().getName());
 				message.put("community",themeDisplay.getScopeGroupName());
@@ -220,6 +243,7 @@ public class GroupMailing extends MVCPortlet{
 				message.put("urlcourse",MailUtil.getURLPortal(themeDisplay.getCompany(),actionRequest)+themeDisplay.getPathFriendlyURLPublic()+themeDisplay.getScopeGroup().getFriendlyURL());
 				
 				MessageBusUtil.sendMessage("lms/mailing", message);
+				
 			}else if (to.contains("team_")){
 				
 				String teamId = to.replace("team_", "");
@@ -228,8 +252,13 @@ public class GroupMailing extends MVCPortlet{
 				userParams.put("usersTeams", Long.parseLong(teamId));
 				OrderByComparator obc = new UserFirstNameComparator(true);
 				List<User> teamUsers = UserLocalServiceUtil.search(themeDisplay.getCompanyId(), "", 0, userParams, QueryUtil.ALL_POS, QueryUtil.ALL_POS, obc);	
+				List<User> socialRelationUsers = new ArrayList<User>();
+				
 				for (User user : teamUsers) {
 					if (_log.isDebugEnabled()) _log.debug("user: " + user.getEmailAddress());
+					
+					//Si corresponde se buscan los usuarios con relaciones sociales con los usuarios del equipo
+					socialRelationUsers = sendCopyToSocialRelation ? MailUtil.getSocialRelationUsers(user, sendCopyToTypeIds, socialRelationUsers, themeDisplay.getCompanyId()) : new ArrayList<User>();
 					
 					Message message=new Message();
 					
@@ -243,6 +272,8 @@ public class GroupMailing extends MVCPortlet{
 					message.put("groupId", 	themeDisplay.getScopeGroupId());
 					message.put("userId",  	themeDisplay.getUserId());
 					message.put("testing", 	testing);
+					message.put("sendToRelatedUsers", sendCopyToSocialRelation);
+					message.put("isUserRelated", false);
 					
 					message.put("portal", 	themeDisplay.getCompany().getName());
 					message.put("community",themeDisplay.getScopeGroupName());
@@ -251,18 +282,53 @@ public class GroupMailing extends MVCPortlet{
 					message.put("urlcourse",MailUtil.getURLPortal(themeDisplay.getCompany(),actionRequest)+themeDisplay.getPathFriendlyURLPublic()+themeDisplay.getScopeGroup().getFriendlyURL());
 					MessageBusUtil.sendMessage("lms/mailing", message);
 				}
+				
+				//Envio de emails a usuarios relacionados si corresponde
+				_log.debug(":::socialRelationUsers.size():: " + socialRelationUsers.size());
+				if(socialRelationUsers.size()>0){
+					for(User socialRelatedUser:socialRelationUsers){
+						
+						Message message=new Message();
+						
+						message.put("templateId",-1);
+						message.put("entryId", entryId);
+						message.put("to", socialRelatedUser.getEmailAddress());
+						message.put("tutors", tutors);
+						message.put("userName", socialRelatedUser.getFullName());
+						message.put("subject", 	subject);
+						message.put("body", 	changeToURL(body, themeDisplay.getURLPortal()));
+						message.put("groupId", 	themeDisplay.getScopeGroupId());
+						message.put("userId",  	themeDisplay.getUserId());
+						message.put("testing", 	testing);
+						message.put("sendToRelatedUsers", sendCopyToSocialRelation);
+						message.put("isUserRelated", true);
+						
+						message.put("portal", 	themeDisplay.getCompany().getName());
+						message.put("community",themeDisplay.getScopeGroupName());
+						
+						message.put("url", 		MailUtil.getURLPortal(themeDisplay.getCompany(),actionRequest));
+						message.put("urlcourse",MailUtil.getURLPortal(themeDisplay.getCompany(),actionRequest)+themeDisplay.getPathFriendlyURLPublic()+themeDisplay.getScopeGroup().getFriendlyURL());
+						MessageBusUtil.sendMessage("lms/mailing", message);
+					}
+				}
+				
 			}else {
 				
 				if (_log.isDebugEnabled()) _log.debug("Enviamos a los usuarios seleccionados");
 				
 				String userIds[] = to.split(",");
 				
+				List<User> socialRelationUsers = new ArrayList<User>();
+				
 				for(String id:userIds){
-
+					
 					if(!id.trim().isEmpty()){
 						
 						User user = UserLocalServiceUtil.getUser(Long.valueOf(id));
 						if (_log.isDebugEnabled()) _log.debug("user: " + user.getEmailAddress());
+						
+						//Si corresponde se buscan los usuarios con relaciones sociales con los usuarios seleccionados
+						socialRelationUsers = sendCopyToSocialRelation ? MailUtil.getSocialRelationUsers(user, sendCopyToTypeIds, socialRelationUsers, themeDisplay.getCompanyId()) : new ArrayList<User>();
 						
 						Message message=new Message();
 						
@@ -276,6 +342,8 @@ public class GroupMailing extends MVCPortlet{
 						message.put("groupId", 	themeDisplay.getScopeGroupId());
 						message.put("userId",  	themeDisplay.getUserId());
 						message.put("testing", 	testing);
+						message.put("sendToRelatedUsers", sendCopyToSocialRelation);
+						message.put("isUserRelated", false);
 
 						message.put("portal", 	themeDisplay.getCompany().getName());
 						message.put("community",themeDisplay.getScopeGroupName());
@@ -284,11 +352,38 @@ public class GroupMailing extends MVCPortlet{
 						message.put("urlcourse", MailUtil.getURLPortal(themeDisplay.getCompany(),actionRequest)+themeDisplay.getPathFriendlyURLPublic()+themeDisplay.getScopeGroup().getFriendlyURL());
 							
 						MessageBusUtil.sendMessage("lms/mailing", message);
+					}
+						
+					//Envio de emails a usuarios relacionados si corresponde
+					_log.debug(":::socialRelationUsers.size():: " + socialRelationUsers.size());
+					if(socialRelationUsers.size()>0){
+						for(User socialRelatedUser:socialRelationUsers){
+							
+							Message message=new Message();
+							
+							message.put("templateId",-1);
+							message.put("entryId", entryId);
+							message.put("to", socialRelatedUser.getEmailAddress());
+							message.put("tutors", tutors);
+							message.put("userName", socialRelatedUser.getFullName());
+							message.put("subject", 	subject);
+							message.put("body", 	changeToURL(body, themeDisplay.getURLPortal()));
+							message.put("groupId", 	themeDisplay.getScopeGroupId());
+							message.put("userId",  	themeDisplay.getUserId());
+							message.put("testing", 	testing);
+							message.put("sendToRelatedUsers", sendCopyToSocialRelation);
+							message.put("isUserRelated", true);
+							
+							message.put("portal", 	themeDisplay.getCompany().getName());
+							message.put("community",themeDisplay.getScopeGroupName());
+							
+							message.put("url", 		MailUtil.getURLPortal(themeDisplay.getCompany(),actionRequest));
+							message.put("urlcourse",MailUtil.getURLPortal(themeDisplay.getCompany(),actionRequest)+themeDisplay.getPathFriendlyURLPublic()+themeDisplay.getScopeGroup().getFriendlyURL());
+							MessageBusUtil.sendMessage("lms/mailing", message);
+						}
 						
 					}
-					
 				}
-				
 			}
 		}
 		

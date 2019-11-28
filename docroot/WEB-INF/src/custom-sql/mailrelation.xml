@@ -6,9 +6,29 @@
 					[$WHERECOMPANYID$]
 		]]>
 	</sql>
+	<sql id="com.tls.liferaylms.mail.service.persistence.MailRelationFinder.findUsersByCompanyIdSocialRelationTypeIdToUserId">
+		<![CDATA[   
+			SELECT u.*
+				FROM user_ u 
+					INNER JOIN socialrelation rel ON rel.userId2=u.userId
+						[$WHERECOMPANYID$]
+						[$WHEREUSERID$]
+						[$WHERESOCIALRELATIONTYPEID$]
+		]]>
+	</sql>
 	<sql id="com.tls.liferaylms.mail.service.persistence.MailRelationFinder.whereCompanyId">
 		<![CDATA[   
-			WHERE companyId = ?
+			WHERE rel.companyId = ?
+		]]>
+	</sql>
+	<sql id="com.tls.liferaylms.mail.service.persistence.MailRelationFinder.whereUserId">
+		<![CDATA[   
+			AND rel.userId1 = ?
+		]]>
+	</sql>
+	<sql id="com.tls.liferaylms.mail.service.persistence.MailRelationFinder.whereSocialRelationTypeId">
+		<![CDATA[   
+			AND rel.type_ = ?
 		]]>
 	</sql>
 </custom-sql>

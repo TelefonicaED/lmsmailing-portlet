@@ -34,6 +34,7 @@ import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.PrefsPropsUtil;
 import com.liferay.portal.kernel.util.PropsKeys;
+import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.Group;
 import com.liferay.portal.model.Team;
@@ -138,6 +139,9 @@ public class LmsMailMessageListener implements MessageListener {
 		String urlcourse = message.getString("urlcourse");
 		String templateId = Validator.isNull(message.getString("templateId")) ? "-1" : message.getString("templateId") ;
 		String toMail = message.getString("to");
+		boolean sendToRelatedUsers = Validator.isNotNull(message.getBoolean("sendToRelatedUsers")) && message.getBoolean("sendToRelatedUsers");
+		boolean isUserRelated = sendToRelatedUsers && Validator.isNotNull(message.getBoolean("isUserRelated")) && message.getBoolean("isUserRelated");
+		List<Integer> sendToRelationTypeIds = (List<Integer>) message.get("mailRelationTypeIds");
 		String tutors = message.getString("tutors");
 		String userName = message.getString("userName");
 		boolean ownTeam = message.getBoolean("ownTeam");
@@ -233,9 +237,8 @@ public class LmsMailMessageListener implements MessageListener {
 			
 		}else if(toMail != null && !toMail.equals("all")) {
 			if(_log.isDebugEnabled()) {
-				_log.debug("Se entra en el envio individual de correos.");
+				_log.debug("Se entra en el envio individual de correos. -- isUserRelated -- " + isUserRelated);
 			}
-			
 			User student = UserLocalServiceUtil.fetchUserByEmailAddress(userSender.getCompanyId(), toMail);
 			
 			if(student != null && student.isActive() && Validator.isEmailAddress(student.getEmailAddress())) {
@@ -246,20 +249,29 @@ public class LmsMailMessageListener implements MessageListener {
 					}
 				}
 				
-				log.debug("---STUDENT MAIL 2: "+userSender.getEmailAddress());
-				log.debug("---STUDENT ID 2: "+userSender.getUserId());
-				log.debug("---DEREGISTER MAIL 2: "+deregisterMail);
-				log.debug("--- EXPANDO 2: "+userSender.getExpandoBridge().getAttribute(deregisterMailExpando,false));
+				if(log.isDebugEnabled()){
+					log.debug("---STUDENT MAIL 2: "+userSender.getEmailAddress());
+					log.debug("---STUDENT ID 2: "+userSender.getUserId());
+					log.debug("---DEREGISTER MAIL 2: "+deregisterMail);
+					log.debug("--- EXPANDO 2: "+userSender.getExpandoBridge().getAttribute(deregisterMailExpando,false));
+				}
 				
 				if(!deregisterMail){
+					
+					String toFullName = (isUserRelated) ? LanguageUtil.get(student.getLocale(),"groupmailing.messages.student-full-name") : student.getFullName();
+					String toScreenName = (isUserRelated) ? LanguageUtil.get(student.getLocale(),"groupmailing.messages.student-screen-name") : student.getScreenName();
+					
 					InternetAddress to = new InternetAddress(toMail, student.getFullName());
-					String content = MailUtil.replaceMessageConstants(body, portal, community, student.getFullName(), student.getScreenName(), tutors,url,urlcourse,
+					String content = MailUtil.replaceMessageConstants(body, portal, community, toFullName, toScreenName, tutors,url,urlcourse,
 							MailUtil.getCourseStartDate(groupId, student.getLocale(), student.getTimeZone()), MailUtil.getCourseEndDate(groupId, student.getLocale(), student.getTimeZone()), userSender.getFullName());
-					String calculatedBody = LanguageUtil.get(student.getLocale(),"mail.header");
-					calculatedBody += MailUtil.replaceMessageConstants(body, portal, community, student.getFullName(), student.getScreenName(),tutors,url,urlcourse, MailUtil.getCourseStartDate(groupId, student.getLocale(), student.getTimeZone()), MailUtil.getCourseEndDate(groupId, student.getLocale(), student.getTimeZone()), userSender.getFullName());
+					String calculatedBody = StringPool.BLANK;
+					if(isUserRelated)
+						calculatedBody += LanguageUtil.get(student.getLocale(), "groupmailing.messages.email-sent-to-students");
+					calculatedBody += LanguageUtil.get(student.getLocale(),"mail.header");
+					calculatedBody += MailUtil.replaceMessageConstants(body, portal, community, toFullName, toScreenName,tutors,url,urlcourse, MailUtil.getCourseStartDate(groupId, student.getLocale(), student.getTimeZone()), MailUtil.getCourseEndDate(groupId, student.getLocale(), student.getTimeZone()), userSender.getFullName());
 					calculatedBody += LanguageUtil.get(student.getLocale(),"mail.footer");
 					
-					String calculatedsubject = MailUtil.replaceMessageConstants(subject, portal, community, student.getFullName(), student.getScreenName(), tutors, url, urlcourse, MailUtil.getCourseStartDate(groupId, student.getLocale(), student.getTimeZone()), MailUtil.getCourseEndDate(groupId, student.getLocale(), student.getTimeZone()), userSender.getFullName());
+					String calculatedsubject = MailUtil.replaceMessageConstants(subject, portal, community, toFullName, toScreenName, tutors, url, urlcourse, MailUtil.getCourseStartDate(groupId, student.getLocale(), student.getTimeZone()), MailUtil.getCourseEndDate(groupId, student.getLocale(), student.getTimeZone()), userSender.getFullName());
 					
 					if(log.isDebugEnabled()) {
 						log.debug("Se envia el siguiente correo...");
@@ -369,11 +381,21 @@ public class LmsMailMessageListener implements MessageListener {
 				users = UserLocalServiceUtil.getGroupUsers(groupId);
 			}
 			
+			//Envío de correos a usuarios relacionados
+			boolean sendCopyToSocialRelation = sendToRelatedUsers && Validator.isNotNull(sendToRelationTypeIds) && sendToRelationTypeIds.size()>0;
+			List<User> sendToSocialRelationUsers = new ArrayList<User>();
+			if(sendCopyToSocialRelation){
+				for(User student:users)
+					sendToSocialRelationUsers = MailUtil.getSocialRelationUsers(student, sendToRelationTypeIds, sendToSocialRelationUsers, student.getCompanyId());
+			}
+			sendCopyToSocialRelation = sendCopyToSocialRelation && Validator.isNotNull(sendToSocialRelationUsers) && sendToSocialRelationUsers.size()>0;
+			
 			if(_log.isDebugEnabled()) {
 				_log.debug("Se envia a " + users.size() + " usuarios.");
+				_log.debug("Se envia a (relaciones sociales)" + sendToSocialRelationUsers.size() + " usuarios.");
 			}
 			
-			numUsersSender = users.size();
+			numUsersSender = users.size() + sendToSocialRelationUsers.size();
 			int sendMails = 0;
 			Session session = MailEngine.getSession();
 			String smtpHost = _getSMTPProperty(session, "host");
@@ -513,6 +535,95 @@ public class LmsMailMessageListener implements MessageListener {
 						}
 					
 						sendMails++;
+					}
+				}
+			}
+			
+			// Se envían los correos a las relaciones sociales si corresponde
+			if(sendCopyToSocialRelation){
+				for (User socialRelatedUser : sendToSocialRelationUsers) {
+					if (socialRelatedUser.isActive() && Validator.isEmailAddress(socialRelatedUser.getEmailAddress())) {
+						deregisterMail = false;
+						if(!sendAlwaysMessage){
+							if(socialRelatedUser.getExpandoBridge().getAttribute(deregisterMailExpando,false)!=null){
+								deregisterMail = Boolean.parseBoolean(String.valueOf(socialRelatedUser.getExpandoBridge().getAttribute(deregisterMailExpando,false)));
+							}
+						}
+						
+						log.debug("---STUDENT MAIL 3: "+userSender.getEmailAddress());
+						log.debug("---STUDENT ID 3: "+userSender.getUserId());
+						log.debug("---DEREGISTER MAIL 3: "+deregisterMail);
+						log.debug("--- EXPANDO 3: "+userSender.getExpandoBridge().getAttribute(deregisterMailExpando,false));
+						
+						
+						if(!deregisterMail){
+							if (nUsers > 0 && sendMails == nUsers) {
+								try {
+									if(_log.isDebugEnabled())
+										_log.debug("Se ha llegado al numero maximo de envios en el bloque, se para " + millis + " milisegundos.");
+								    Thread.sleep(millis);
+								}
+								catch(InterruptedException ex) {
+								    Thread.currentThread().interrupt();
+								}
+								sendMails = 0;
+							}
+							
+							try {
+								InternetAddress to = new InternetAddress(socialRelatedUser.getEmailAddress(), socialRelatedUser.getFullName());
+								if(_log.isDebugEnabled()) {
+									_log.debug("Se envia un correo electronico al siguiente usuario: " + socialRelatedUser.getEmailAddress());
+								}
+								String toFullName = LanguageUtil.get(socialRelatedUser.getLocale(),"groupmailing.messages.student-full-name");
+								String toScreenName = LanguageUtil.get(socialRelatedUser.getLocale(),"groupmailing.messages.student-screen-name");
+								
+								calculatedSubject = MailUtil.replaceStudent(subjectTemplate, toFullName, toScreenName);
+								String content = MailUtil.replaceStudent(bodyTemplate, toFullName, toScreenName);
+								calculatedBody = LanguageUtil.get(socialRelatedUser.getLocale(), "groupmailing.messages.email-sent-to-students");
+								calculatedBody += LanguageUtil.get(socialRelatedUser.getLocale(),"mail.header");
+								calculatedBody += content;
+								calculatedBody += LanguageUtil.get(socialRelatedUser.getLocale(),"mail.footer");
+								
+								if(log.isDebugEnabled()) {
+									log.debug("Se envia el siguiente correo...");
+									log.debug("De: " + from);
+									log.debug("A: " + toMail + " " + userName);
+									log.debug("Profesores: " + tutors);
+									log.debug("Asunto: " + calculatedSubject);
+									log.debug("Cuerpo: " + calculatedBody);
+								}
+								
+								MailMessage mailm = new MailMessage(from, to, calculatedSubject, calculatedBody ,true);
+								//MailEngine.send(mailm);
+								
+								try{
+									if(internalMessagingActive){
+										MailUtil.sendInternalMessageNotification(entryId,calculatedSubject,content, groupId, userId, socialRelatedUser.getUserId(), companyId);
+									}
+									sendMail(mailm,transport,session);
+									addAuditReceiverMail(auditSendMails.getAuditSendMailsId(), socialRelatedUser.getEmailAddress(), MailConstants.STATUS_OK, false);
+								}catch(MessagingException ex){
+									ex.printStackTrace();
+									addAuditReceiverMail(auditSendMails.getAuditSendMailsId(), socialRelatedUser.getEmailAddress(), MailConstants.STATUS_KO, false);
+									log.error("*****************ERROR al enviar mail["+socialRelatedUser.getEmailAddress()+"]*****************");
+									if(!transport.isConnected()){
+										log.debug("TRANSPORT NOT CONNECTED. RECONECTAMOS");
+										transport.connect(smtpHost, smtpPort, smtpuser, password);
+										log.debug("***Reenviando el mail que no se pudo enviar["+socialRelatedUser.getEmailAddress()+"]");
+										sendMail(mailm,transport,session);
+		
+										addAuditReceiverMail(auditSendMails.getAuditSendMailsId(), socialRelatedUser.getEmailAddress(), MailConstants.STATUS_OK, false);
+									}
+								}
+							}
+							catch(Exception meEx){
+		
+								addAuditReceiverMail(auditSendMails.getAuditSendMailsId(), socialRelatedUser.getEmailAddress(), MailConstants.STATUS_KO, false);
+								meEx.printStackTrace();
+							}
+						
+							sendMails++;
+						}
 					}
 				}
 			}
