@@ -16,6 +16,16 @@
 						[$WHERESOCIALRELATIONTYPEID$]
 		]]>
 	</sql>
+	<sql id="com.tls.liferaylms.mail.service.persistence.MailRelationFinder.findDistinctUsersByCompanyIdSocialRelationTypeIdToUserId">
+		<![CDATA[   
+			SELECT DISTINCT u.*
+				FROM user_ u 
+					INNER JOIN socialrelation rel ON rel.userId2=u.userId
+						[$WHERECOMPANYID$]
+						[$WHEREUSERID$]
+						[$WHERESOCIALRELATIONTYPEID$]
+		]]>
+	</sql>
 	<sql id="com.tls.liferaylms.mail.service.persistence.MailRelationFinder.whereCompanyId">
 		<![CDATA[   
 			WHERE rel.companyId = ?

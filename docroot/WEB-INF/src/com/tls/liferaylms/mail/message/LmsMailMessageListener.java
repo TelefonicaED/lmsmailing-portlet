@@ -51,6 +51,7 @@ import com.tls.liferaylms.mail.model.AuditReceiverMail;
 import com.tls.liferaylms.mail.model.AuditSendMails;
 import com.tls.liferaylms.mail.service.AuditReceiverMailLocalServiceUtil;
 import com.tls.liferaylms.mail.service.AuditSendMailsLocalServiceUtil;
+import com.tls.liferaylms.mail.service.MailRelationLocalServiceUtil;
 import com.tls.liferaylms.util.MailConstants;
 import com.tls.liferaylms.util.MailStringPool;
 import com.tls.liferaylms.util.MailUtil;
@@ -383,11 +384,7 @@ public class LmsMailMessageListener implements MessageListener {
 			
 			//Envío de correos a usuarios relacionados
 			boolean sendCopyToSocialRelation = sendToRelatedUsers && Validator.isNotNull(sendToRelationTypeIds) && sendToRelationTypeIds.size()>0;
-			List<User> sendToSocialRelationUsers = new ArrayList<User>();
-			if(sendCopyToSocialRelation){
-				for(User student:users)
-					sendToSocialRelationUsers = MailUtil.getSocialRelationUsers(student, sendToRelationTypeIds, sendToSocialRelationUsers, student.getCompanyId());
-			}
+			List<User> sendToSocialRelationUsers = MailRelationLocalServiceUtil.findUsersByCompanyIdSocialRelationTypeIdsToUsers(users, sendToRelationTypeIds, companyId);
 			sendCopyToSocialRelation = sendCopyToSocialRelation && Validator.isNotNull(sendToSocialRelationUsers) && sendToSocialRelationUsers.size()>0;
 			
 			if(_log.isDebugEnabled()) {
