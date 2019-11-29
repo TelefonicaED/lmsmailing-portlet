@@ -143,6 +143,7 @@ public class LmsMailMessageListener implements MessageListener {
 		boolean sendToRelatedUsers = Validator.isNotNull(message.getBoolean("sendToRelatedUsers")) && message.getBoolean("sendToRelatedUsers");
 		boolean isUserRelated = sendToRelatedUsers && Validator.isNotNull(message.getBoolean("isUserRelated")) && message.getBoolean("isUserRelated");
 		List<Integer> sendToRelationTypeIds = (List<Integer>) message.get("mailRelationTypeIds");
+		List<User> emailSentToUsersList = (List<User>) message.get("emailSentToUsersList");
 		String tutors = message.getString("tutors");
 		String userName = message.getString("userName");
 		boolean ownTeam = message.getBoolean("ownTeam");
@@ -267,7 +268,7 @@ public class LmsMailMessageListener implements MessageListener {
 							MailUtil.getCourseStartDate(groupId, student.getLocale(), student.getTimeZone()), MailUtil.getCourseEndDate(groupId, student.getLocale(), student.getTimeZone()), userSender.getFullName());
 					String calculatedBody = StringPool.BLANK;
 					if(isUserRelated)
-						calculatedBody += LanguageUtil.get(student.getLocale(), "groupmailing.messages.email-sent-to-students");
+						calculatedBody += MailUtil.getExtraContentSocialRelation(student, emailSentToUsersList);
 					calculatedBody += LanguageUtil.get(student.getLocale(),"mail.header");
 					calculatedBody += MailUtil.replaceMessageConstants(body, portal, community, toFullName, toScreenName,tutors,url,urlcourse, MailUtil.getCourseStartDate(groupId, student.getLocale(), student.getTimeZone()), MailUtil.getCourseEndDate(groupId, student.getLocale(), student.getTimeZone()), userSender.getFullName());
 					calculatedBody += LanguageUtil.get(student.getLocale(),"mail.footer");
@@ -318,7 +319,7 @@ public class LmsMailMessageListener implements MessageListener {
 						MailMessage mailm = new MailMessage(from, to, calculatedsubject, calculatedBody ,true);
 						if(internalMessagingActive){
 							if(isUserRelated)
-								content = LanguageUtil.get(student.getLocale(), "groupmailing.messages.email-sent-to-students") + content;
+								content = MailUtil.getExtraContentSocialRelation(student, emailSentToUsersList) + content;
 							MailUtil.sendInternalMessageNotification(entryId,calculatedsubject, content, groupId,userId, student.getUserId(), companyId);
 						}
 						MailEngine.send(mailm);
@@ -578,7 +579,7 @@ public class LmsMailMessageListener implements MessageListener {
 								
 								calculatedSubject = MailUtil.replaceStudent(subjectTemplate, toFullName, toScreenName);
 								String content = MailUtil.replaceStudent(bodyTemplate, toFullName, toScreenName);
-								calculatedBody = LanguageUtil.get(socialRelatedUser.getLocale(), "groupmailing.messages.email-sent-to-students");
+								calculatedBody = MailUtil.getExtraContentSocialRelation(socialRelatedUser, users);
 								calculatedBody += LanguageUtil.get(socialRelatedUser.getLocale(),"mail.header");
 								calculatedBody += content;
 								calculatedBody += LanguageUtil.get(socialRelatedUser.getLocale(),"mail.footer");
@@ -597,7 +598,7 @@ public class LmsMailMessageListener implements MessageListener {
 								
 								try{
 									if(internalMessagingActive){
-										content = LanguageUtil.get(socialRelatedUser.getLocale(), "groupmailing.messages.email-sent-to-students") + content;
+										content = MailUtil.getExtraContentSocialRelation(socialRelatedUser, users) + content;
 										MailUtil.sendInternalMessageNotification(entryId,calculatedSubject,content, groupId, userId, socialRelatedUser.getUserId(), companyId);
 									}
 									sendMail(mailm,transport,session);

@@ -14,6 +14,7 @@ import com.liferay.counter.service.CounterLocalServiceUtil;
 import com.liferay.lms.model.Course;
 import com.liferay.lms.service.CourseLocalServiceUtil;
 import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.StringPool;
@@ -286,5 +287,17 @@ public class MailUtil {
 			}
 		}
 		return socialRelationUsers;
+	}
+	
+	public static String getExtraContentSocialRelation(User user, List<User> listUsers){
+		String extraContent = "<p>" + LanguageUtil.get(user.getLocale(), "groupmailing.messages.email-sent-to-students") +"</p>";
+		if(Validator.isNotNull(listUsers) && listUsers.size()>0){
+			extraContent += "<p><em>";
+			for(User u:listUsers)
+				extraContent += u.getEmailAddress() + StringPool.SEMICOLON + StringPool.SPACE;
+			extraContent = extraContent.substring(0,extraContent.length()-2);
+			extraContent += "</em></p>";
+		}
+		return extraContent;
 	}
 }

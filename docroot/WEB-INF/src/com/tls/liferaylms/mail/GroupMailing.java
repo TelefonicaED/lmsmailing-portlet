@@ -302,6 +302,7 @@ public class GroupMailing extends MVCPortlet{
 						message.put("testing", 	testing);
 						message.put("sendToRelatedUsers", sendCopyToSocialRelation);
 						message.put("isUserRelated", true);
+						message.put("emailSentToUsersList", teamUsers);
 						
 						message.put("portal", 	themeDisplay.getCompany().getName());
 						message.put("community",themeDisplay.getScopeGroupName());
@@ -317,6 +318,7 @@ public class GroupMailing extends MVCPortlet{
 				if (_log.isDebugEnabled()) _log.debug("Enviamos a los usuarios seleccionados");
 				
 				String userIds[] = to.split(",");
+				List<User> sentToUsersList = new ArrayList<User>();
 				
 				List<User> socialRelationUsers = new ArrayList<User>();
 				
@@ -326,6 +328,7 @@ public class GroupMailing extends MVCPortlet{
 						
 						User user = UserLocalServiceUtil.getUser(Long.valueOf(id));
 						if (_log.isDebugEnabled()) _log.debug("user: " + user.getEmailAddress());
+						sentToUsersList.add(user);
 						
 						//Si corresponde se buscan los usuarios con relaciones sociales con los usuarios seleccionados
 						socialRelationUsers = sendCopyToSocialRelation ? MailUtil.getSocialRelationUsers(user, sendCopyToTypeIds, socialRelationUsers, themeDisplay.getCompanyId()) : new ArrayList<User>();
@@ -373,6 +376,7 @@ public class GroupMailing extends MVCPortlet{
 							message.put("testing", 	testing);
 							message.put("sendToRelatedUsers", sendCopyToSocialRelation);
 							message.put("isUserRelated", true);
+							message.put("emailSentToUsersList", sentToUsersList);
 							
 							message.put("portal", 	themeDisplay.getCompany().getName());
 							message.put("community",themeDisplay.getScopeGroupName());
