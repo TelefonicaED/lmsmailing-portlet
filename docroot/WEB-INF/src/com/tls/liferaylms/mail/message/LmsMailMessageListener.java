@@ -317,6 +317,8 @@ public class LmsMailMessageListener implements MessageListener {
 					try{
 						MailMessage mailm = new MailMessage(from, to, calculatedsubject, calculatedBody ,true);
 						if(internalMessagingActive){
+							if(isUserRelated)
+								content = LanguageUtil.get(student.getLocale(), "groupmailing.messages.email-sent-to-students") + content;
 							MailUtil.sendInternalMessageNotification(entryId,calculatedsubject, content, groupId,userId, student.getUserId(), companyId);
 						}
 						MailEngine.send(mailm);
@@ -595,6 +597,7 @@ public class LmsMailMessageListener implements MessageListener {
 								
 								try{
 									if(internalMessagingActive){
+										content = LanguageUtil.get(socialRelatedUser.getLocale(), "groupmailing.messages.email-sent-to-students") + content;
 										MailUtil.sendInternalMessageNotification(entryId,calculatedSubject,content, groupId, userId, socialRelatedUser.getUserId(), companyId);
 									}
 									sendMail(mailm,transport,session);
