@@ -17,6 +17,7 @@ import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.Company;
@@ -289,8 +290,15 @@ public class MailUtil {
 		return socialRelationUsers;
 	}
 	
-	public static String getExtraContentSocialRelation(User user, List<User> listUsers){
-		String extraContent = "<p>" + LanguageUtil.get(user.getLocale(), "groupmailing.messages.email-sent-to-students") +"</p>";
+	public static String getExtraContentSocialRelationHeader(User user){
+		Locale locale = LocaleUtil.getDefault();
+		if(Validator.isNotNull(user))
+			locale = user.getLocale();
+		return "<p>" + LanguageUtil.get(locale, "groupmailing.messages.email-sent-to-students") +"</p>";
+	}
+	
+	public static String getExtraContentSocialRelation(List<User> listUsers){
+		String extraContent = StringPool.BLANK;
 		if(Validator.isNotNull(listUsers) && listUsers.size()>0){
 			extraContent += "<p><em>";
 			for(User u:listUsers)
