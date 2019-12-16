@@ -276,6 +276,7 @@ public class MailUtil {
 	
 	public static List<User> getSocialRelationUsers(User user, List<Integer> socialRelationTypeIds, List<User> socialRelationUsers, long companyId){
 		List<User> socialRelationUsersTmp = new ArrayList<User>();
+		log.debug("Social Relation Users ");
 		for(int relationTypeId:socialRelationTypeIds){
 			socialRelationUsersTmp = MailRelationLocalServiceUtil.findUsersByCompanyIdSocialRelationTypeIdToUserId(user.getUserId(), relationTypeId, companyId);
 			log.debug("::socialRelationUsersTmp OK::: " + Validator.isNotNull(socialRelationUsersTmp));
@@ -297,8 +298,8 @@ public class MailUtil {
 		return "<p>" + LanguageUtil.get(locale, "groupmailing.messages.email-sent-to-students") +"</p>";
 	}
 	
-	public static String getExtraContentSocialRelation(List<User> listUsers){
-		String extraContent = StringPool.BLANK;
+	public static String getExtraContentSocialRelation(List<User> listUsers, Locale locale){
+		String extraContent = "<p>" + LanguageUtil.get(locale, "groupmailing.messages.email-received-by") +"</p>";
 		if(Validator.isNotNull(listUsers) && listUsers.size()>0){
 			extraContent += "<p><em>";
 			for(User u:listUsers)
@@ -306,6 +307,8 @@ public class MailUtil {
 			extraContent = extraContent.substring(0,extraContent.length()-2);
 			extraContent += "</em></p>";
 		}
+		extraContent += "<p>" + LanguageUtil.get(locale, "groupmailing.messages.email-sent") + "</p>";
+		extraContent += "<p>" + StringPool.UNDERLINE + StringPool.UNDERLINE + StringPool.UNDERLINE + StringPool.UNDERLINE + StringPool.UNDERLINE + StringPool.UNDERLINE + "</p>";
 		return extraContent;
 	}
 }

@@ -151,7 +151,7 @@ public class GroupMailing extends MVCPortlet{
 			return;
 		}
 		
-		//Envío de copia a usuarios relacionados
+		//Envï¿½o de copia a usuarios relacionados
 		List<Integer> mailRelationTypeIds = MailRelationLocalServiceUtil.findRelationTypeIdsByCompanyId(themeDisplay.getCompanyId());
 		List<Integer> sendCopyToTypeIds = new ArrayList<Integer>();
 		if(Validator.isNotNull(mailRelationTypeIds) && mailRelationTypeIds.size()>0){
@@ -164,6 +164,8 @@ public class GroupMailing extends MVCPortlet{
 					sendCopyToTypeIds.add(mailRelationTypeId);
 			}
 		}
+		
+		_log.debug("::::sendCopyToTypeIds "+sendCopyToTypeIds.size());
 		//Enviar email a usuarios relacionados
 		boolean sendCopyToSocialRelation = sendCopyToTypeIds.size()>0;
 		if(_log.isDebugEnabled())
