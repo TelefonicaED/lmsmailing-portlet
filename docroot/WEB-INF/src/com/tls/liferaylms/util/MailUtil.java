@@ -28,6 +28,7 @@ import com.liferay.portlet.announcements.model.AnnouncementsEntry;
 import com.liferay.portlet.announcements.model.AnnouncementsFlagConstants;
 import com.liferay.portlet.announcements.service.AnnouncementsEntryLocalServiceUtil;
 import com.liferay.portlet.announcements.service.AnnouncementsFlagLocalServiceUtil;
+import com.liferay.portlet.social.service.SocialRelationLocalServiceUtil;
 import com.tls.liferaylms.mail.service.MailRelationLocalServiceUtil;
 
 public class MailUtil {
@@ -298,12 +299,16 @@ public class MailUtil {
 		return "<p>" + LanguageUtil.get(locale, "groupmailing.messages.email-sent-to-students") +"</p>";
 	}
 	
-	public static String getExtraContentSocialRelation(List<User> listUsers, Locale locale){
+	public static String getExtraContentSocialRelation(List<User> listUsers, User user, List<Integer> typeIds){
+		Locale locale = user.getLocale();
 		String extraContent = "<p>" + LanguageUtil.get(locale, "groupmailing.messages.email-received-by") +"</p>";
 		if(Validator.isNotNull(listUsers) && listUsers.size()>0){
 			extraContent += "<p><em>";
-			for(User u:listUsers)
-				extraContent += u.getEmailAddress() + StringPool.SEMICOLON + StringPool.SPACE;
+			for(User u:listUsers){
+				//Comprobar si es subordinado
+				if(MailRelationLocalServiceUtil.countSocialRelationsBeetweenUsersBySocialRelationTypeIds(u.getUserId(), user.getUserId(), typeIds, user.getCompanyId())>0)
+					extraContent += u.getEmailAddress() + StringPool.SEMICOLON + StringPool.SPACE;
+			}
 			extraContent = extraContent.substring(0,extraContent.length()-2);
 			extraContent += "</em></p>";
 		}

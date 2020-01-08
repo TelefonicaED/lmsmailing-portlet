@@ -12,7 +12,7 @@
 				FROM user_ u 
 					INNER JOIN socialrelation rel ON rel.userId2=u.userId
 						[$WHERECOMPANYID$]
-						[$WHEREUSERID$]
+						[$WHEREUSERID1$]
 						[$WHERESOCIALRELATIONTYPEID$]
 		]]>
 	</sql>
@@ -22,8 +22,18 @@
 				FROM user_ u 
 					INNER JOIN socialrelation rel ON rel.userId2=u.userId
 						[$WHERECOMPANYID$]
-						[$WHEREUSERID$]
+						[$WHEREUSERID1$]
 						[$WHERESOCIALRELATIONTYPEID$]
+		]]>
+	</sql>
+	<sql id="com.tls.liferaylms.mail.service.persistence.MailRelationFinder.countSocialRelationsBetweenUsersBySocialRelationTypeIds">
+		<![CDATA[   
+			SELECT COUNT(1) AS COUNT_VALUE
+				FROM socialrelation rel
+					[$WHERECOMPANYID$]
+					[$WHEREUSERID1$]
+					[$WHEREUSERID2$]
+					[$WHERESOCIALRELATIONTYPEID$]
 		]]>
 	</sql>
 	<sql id="com.tls.liferaylms.mail.service.persistence.MailRelationFinder.whereCompanyId">
@@ -31,9 +41,14 @@
 			WHERE rel.companyId = ?
 		]]>
 	</sql>
-	<sql id="com.tls.liferaylms.mail.service.persistence.MailRelationFinder.whereUserId">
+	<sql id="com.tls.liferaylms.mail.service.persistence.MailRelationFinder.whereUserId1">
 		<![CDATA[   
 			AND rel.userId1 = ?
+		]]>
+	</sql>
+	<sql id="com.tls.liferaylms.mail.service.persistence.MailRelationFinder.whereUserId2">
+		<![CDATA[   
+			AND rel.userId2 = ?
 		]]>
 	</sql>
 	<sql id="com.tls.liferaylms.mail.service.persistence.MailRelationFinder.whereSocialRelationTypeId">

@@ -143,4 +143,9 @@ public class MailRelationLocalServiceImpl
 		
 		return usersRelated;
 	}
+	
+	public int countSocialRelationsBeetweenUsersBySocialRelationTypeIds(long userId1, long userId2, List<Integer> socialRelationTypeIds, long companyId){
+		return mailRelationFinder.countSocialRelationsBeetweenUsersBySocialRelationTypeIds(userId1, userId2, socialRelationTypeIds, companyId);
+	}
+	
 }

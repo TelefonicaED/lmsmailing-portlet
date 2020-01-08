@@ -1,5 +1,6 @@
 package com.tls.liferaylms.mail.service.persistence;
 
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -10,6 +11,7 @@ import com.liferay.portal.kernel.dao.orm.QueryPos;
 import com.liferay.portal.kernel.dao.orm.SQLQuery;
 import com.liferay.portal.kernel.dao.orm.Session;
 import com.liferay.portal.kernel.dao.orm.SessionFactory;
+import com.liferay.portal.kernel.dao.orm.Type;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.PortalClassLoaderUtil;
@@ -34,14 +36,20 @@ public class MailRelationFinderImpl extends BasePersistenceImpl<SocialRelation> 
 	public static final String FIND_DISTINCT_USERS_BY_COMPANYID_SOCIALRELATIONTYPE_TO_USERID =
 			MailRelationFinder.class.getName() + ".findDistinctUsersByCompanyIdSocialRelationTypeIdToUserId";
 	
+	public static final String COUNT_SOCIALRELATIONS_BETWEENUSERS_BY_RELATIONTYPEIDS =
+			MailRelationFinder.class.getName() + ".countSocialRelationsBetweenUsersBySocialRelationTypeIds";
+	
 	public static final String WHERE_COMPANYID =
 			MailRelationFinder.class.getName() + ".whereCompanyId";
 	
 	public static final String WHERE_SOCIALRELATIONTYPEID =
 			MailRelationFinder.class.getName() + ".whereSocialRelationTypeId";
 	
-	public static final String WHERE_USERID =
-			MailRelationFinder.class.getName() + ".whereUserId";
+	public static final String WHERE_USERID1 =
+			MailRelationFinder.class.getName() + ".whereUserId1";
+	
+	public static final String WHERE_USERID2 =
+			MailRelationFinder.class.getName() + ".whereUserId2";
 	
 	public List<Integer> findRelationTypesByCompanyId(long companyId){
 		
@@ -113,10 +121,10 @@ public class MailRelationFinderImpl extends BasePersistenceImpl<SocialRelation> 
 					whereCompanyId += CustomSQLUtil.get(WHERE_COMPANYID);
 				sql = StringUtil.replace(sql, "[$WHERECOMPANYID$]", whereCompanyId);
 				
-				String whereUserId = CustomSQLUtil.get(WHERE_USERID);
+				String whereUserId = CustomSQLUtil.get(WHERE_USERID1);
 				if(Validator.isNull(companyId) || companyId < 0)
 					whereUserId = StringUtil.replace(whereUserId, "AND", "WHERE");
-				sql = StringUtil.replace(sql, "[$WHEREUSERID$]", whereUserId);
+				sql = StringUtil.replace(sql, "[$WHEREUSERID1$]", whereUserId);
 				
 				String whereRelationTypeId = StringPool.BLANK;
 				if(Validator.isNotNull(socialRelationTypeId) && socialRelationTypeId>-1)
@@ -190,7 +198,7 @@ public class MailRelationFinderImpl extends BasePersistenceImpl<SocialRelation> 
 					whereCompanyId += CustomSQLUtil.get(WHERE_COMPANYID);
 				sql = StringUtil.replace(sql, "[$WHERECOMPANYID$]", whereCompanyId);
 				
-				String whereUserId = CustomSQLUtil.get(WHERE_USERID);
+				String whereUserId = CustomSQLUtil.get(WHERE_USERID1);
 				if(Validator.isNull(companyId) || companyId < 0)
 					whereUserId = StringUtil.replace(whereUserId, "AND", "WHERE");
 				if(userIds.size()>1){
@@ -199,10 +207,10 @@ public class MailRelationFinderImpl extends BasePersistenceImpl<SocialRelation> 
 					else
 						whereUserId = StringUtil.replace(whereUserId, "AND", "AND (");
 					for(int i=1;i<userIds.size();i++)
-						whereUserId += StringUtil.replace(CustomSQLUtil.get(WHERE_USERID), "AND", "OR");
+						whereUserId += StringUtil.replace(CustomSQLUtil.get(WHERE_USERID1), "AND", "OR");
 					whereUserId += ")";
 				}
-				sql = StringUtil.replace(sql, "[$WHEREUSERID$]", whereUserId);
+				sql = StringUtil.replace(sql, "[$WHEREUSERID1$]", whereUserId);
 				
 				
 				String whereRelationTypeId = StringPool.BLANK;
@@ -262,10 +270,10 @@ public class MailRelationFinderImpl extends BasePersistenceImpl<SocialRelation> 
 					whereCompanyId += CustomSQLUtil.get(WHERE_COMPANYID);
 				sql = StringUtil.replace(sql, "[$WHERECOMPANYID$]", whereCompanyId);
 				
-				String whereUserId = CustomSQLUtil.get(WHERE_USERID);
+				String whereUserId = CustomSQLUtil.get(WHERE_USERID1);
 				if(Validator.isNull(companyId) || companyId < 0)
 					whereUserId = StringUtil.replace(whereUserId, "AND", "WHERE");
-				sql = StringUtil.replace(sql, "[$WHEREUSERID$]", whereUserId);
+				sql = StringUtil.replace(sql, "[$WHEREUSERID1$]", whereUserId);
 				
 				String whereRelationTypeId = StringPool.BLANK;
 				if(Validator.isNotNull(socialRelationTypeIds) && socialRelationTypeIds.size()>0){
@@ -348,17 +356,17 @@ public class MailRelationFinderImpl extends BasePersistenceImpl<SocialRelation> 
 					whereCompanyId += CustomSQLUtil.get(WHERE_COMPANYID);
 				sql = StringUtil.replace(sql, "[$WHERECOMPANYID$]", whereCompanyId);
 				
-				String whereUserId = CustomSQLUtil.get(WHERE_USERID);
+				String whereUserId = CustomSQLUtil.get(WHERE_USERID1);
 				if(Validator.isNull(companyId) || companyId < 0)
 					whereUserId = StringUtil.replace(whereUserId, "AND", "WHERE");
 				if(userIds.size()>1){
 					whereUserId = StringUtil.replace(whereUserId, "WHERE", "WHERE (");
 					for(int i=1;i<userIds.size();i++)
-						whereUserId += CustomSQLUtil.get(WHERE_USERID);
+						whereUserId += CustomSQLUtil.get(WHERE_USERID1);
 					whereUserId = StringUtil.replace(whereUserId, "AND", "OR");
 					whereUserId += ")";
 				}
-				sql = StringUtil.replace(sql, "[$WHEREUSERID$]", whereUserId);
+				sql = StringUtil.replace(sql, "[$WHEREUSERID1$]", whereUserId);
 				
 				String whereRelationTypeId = StringPool.BLANK;
 				if(Validator.isNotNull(socialRelationTypeIds) && socialRelationTypeIds.size()>0){
@@ -427,7 +435,7 @@ public class MailRelationFinderImpl extends BasePersistenceImpl<SocialRelation> 
 					whereCompanyId += CustomSQLUtil.get(WHERE_COMPANYID);
 				sql = StringUtil.replace(sql, "[$WHERECOMPANYID$]", whereCompanyId);
 				
-				String whereUserId = CustomSQLUtil.get(WHERE_USERID);
+				String whereUserId = CustomSQLUtil.get(WHERE_USERID1);
 				if(Validator.isNull(companyId) || companyId < 0)
 					whereUserId = StringUtil.replace(whereUserId, "AND", "WHERE");
 				if(users.size()>1){
@@ -436,10 +444,10 @@ public class MailRelationFinderImpl extends BasePersistenceImpl<SocialRelation> 
 					else
 						whereUserId = StringUtil.replace(whereUserId, "AND", "AND (");
 					for(int i=1;i<users.size();i++)
-						whereUserId += StringUtil.replace(CustomSQLUtil.get(WHERE_USERID),"AND", "OR");
+						whereUserId += StringUtil.replace(CustomSQLUtil.get(WHERE_USERID1),"AND", "OR");
 					whereUserId += ")";
 				}
-				sql = StringUtil.replace(sql, "[$WHEREUSERID$]", whereUserId);
+				sql = StringUtil.replace(sql, "[$WHEREUSERID1$]", whereUserId);
 				
 				String whereRelationTypeId = StringPool.BLANK;
 				if(Validator.isNotNull(socialRelationTypeIds) && socialRelationTypeIds.size()>0){
@@ -481,6 +489,82 @@ public class MailRelationFinderImpl extends BasePersistenceImpl<SocialRelation> 
 		}
 		
 		return listUsers;
+	}
+	
+	public int countSocialRelationsBeetweenUsersBySocialRelationTypeIds(long userId1, long userId2, List<Integer> socialRelationTypeIds, long companyId){
+		
+		int numSocialRelations = 0;
+		
+		if(log.isDebugEnabled()){
+			log.debug("::countSocialRelationsBeetweenUsersBySocialRelationTypeIds::: userId1 :: " + userId1);
+			log.debug("::countSocialRelationsBeetweenUsersBySocialRelationTypeIds::: userId2 :: " + userId2);
+			log.debug("::countSocialRelationsBeetweenUsersBySocialRelationTypeIds::: socialRelationTypeId :: " + Validator.isNotNull(socialRelationTypeIds));
+			log.debug("::countSocialRelationsBeetweenUsersBySocialRelationTypeIds::: companyId :: " + companyId);
+		}
+		
+		if(Validator.isNotNull(userId1) && Validator.isNotNull(userId2) && userId1>-1 && userId2>-1 && Validator.isNotNull(socialRelationTypeIds) && socialRelationTypeIds.size()>0){
+		
+			Session session = null;
+			
+			try{
+				session = openSessionLiferay();
+				
+				String sql = CustomSQLUtil.get(COUNT_SOCIALRELATIONS_BETWEENUSERS_BY_RELATIONTYPEIDS);
+				
+				String whereCompanyId = StringPool.BLANK;
+				if(Validator.isNotNull(companyId) && companyId > -1)
+					whereCompanyId += CustomSQLUtil.get(WHERE_COMPANYID);
+				sql = StringUtil.replace(sql, "[$WHERECOMPANYID$]", whereCompanyId);
+				
+				String whereUserId1 = CustomSQLUtil.get(WHERE_USERID1);
+				if(Validator.isNull(companyId) || companyId < 0)
+					whereUserId1 = StringUtil.replace(whereUserId1, "AND", "WHERE");
+				sql = StringUtil.replace(sql, "[$WHEREUSERID1$]", whereUserId1);
+				sql = StringUtil.replace(sql, "[$WHEREUSERID2$]", CustomSQLUtil.get(WHERE_USERID2));
+				
+				String whereRelationTypeId = CustomSQLUtil.get(WHERE_SOCIALRELATIONTYPEID);
+				if(socialRelationTypeIds.size()>1){
+					whereRelationTypeId = StringUtil.replace(whereRelationTypeId, "AND", "AND (");
+					for(int i = 1; i< socialRelationTypeIds.size() ; i++)
+						whereRelationTypeId += StringUtil.replace(CustomSQLUtil.get(WHERE_SOCIALRELATIONTYPEID), "AND", "OR");
+					whereRelationTypeId += ")";
+				}
+				sql = StringUtil.replace(sql, "[$WHERESOCIALRELATIONTYPEID$]", whereRelationTypeId);
+				
+				log.debug("::countSocialRelationsBeetweenUsersBySocialRelationTypeIds::: sql :: " + sql);
+				
+				SQLQuery q = session.createSQLQuery(sql);
+				q.addScalar(COUNT_COLUMN_NAME, Type.LONG);
+				QueryPos qPos = QueryPos.getInstance(q);
+				
+				if(Validator.isNotNull(companyId) && companyId > -1 )
+					qPos.add(companyId);
+				
+				qPos.add(userId1);
+				qPos.add(userId2);
+				
+				for(int socialRelationTypeId:socialRelationTypeIds)
+					qPos.add(socialRelationTypeId);
+				
+				Object count = q.list().get(0);
+				if (Validator.isNotNull(count)) {
+					if(count instanceof Long){
+						numSocialRelations = ((Long)count).intValue();
+					}else if(count instanceof BigInteger){
+						numSocialRelations = ((BigInteger)count).intValue();
+					}else if(count instanceof Integer){
+						numSocialRelations = (Integer)count;
+					}
+				}
+				
+			} catch (Exception e){
+				e.printStackTrace();
+			} finally {
+				closeSessionLiferay(session);
+			}
+		}
+		
+		return numSocialRelations;
 	}
 	
 	private SessionFactory getPortalSessionFactory() {

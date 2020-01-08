@@ -151,7 +151,7 @@ public class GroupMailing extends MVCPortlet{
 			return;
 		}
 		
-		//Env�o de copia a usuarios relacionados
+		//Envío de copia a usuarios relacionados
 		List<Integer> mailRelationTypeIds = MailRelationLocalServiceUtil.findRelationTypeIdsByCompanyId(themeDisplay.getCompanyId());
 		List<Integer> sendCopyToTypeIds = new ArrayList<Integer>();
 		if(Validator.isNotNull(mailRelationTypeIds) && mailRelationTypeIds.size()>0){
@@ -275,6 +275,7 @@ public class GroupMailing extends MVCPortlet{
 					message.put("userId",  	themeDisplay.getUserId());
 					message.put("testing", 	testing);
 					message.put("sendToRelatedUsers", sendCopyToSocialRelation);
+					message.put("mailRelationTypeIds", mailRelationTypeIds);
 					message.put("isUserRelated", false);
 					
 					message.put("portal", 	themeDisplay.getCompany().getName());
@@ -304,6 +305,7 @@ public class GroupMailing extends MVCPortlet{
 						message.put("testing", 	testing);
 						message.put("sendToRelatedUsers", sendCopyToSocialRelation);
 						message.put("isUserRelated", true);
+						message.put("mailRelationTypeIds", mailRelationTypeIds);
 						message.put("emailSentToUsersList", teamUsers);
 						
 						message.put("portal", 	themeDisplay.getCompany().getName());
@@ -349,6 +351,7 @@ public class GroupMailing extends MVCPortlet{
 						message.put("testing", 	testing);
 						message.put("sendToRelatedUsers", sendCopyToSocialRelation);
 						message.put("isUserRelated", false);
+						message.put("mailRelationTypeIds", mailRelationTypeIds);
 
 						message.put("portal", 	themeDisplay.getCompany().getName());
 						message.put("community",themeDisplay.getScopeGroupName());
@@ -378,6 +381,7 @@ public class GroupMailing extends MVCPortlet{
 							message.put("testing", 	testing);
 							message.put("sendToRelatedUsers", sendCopyToSocialRelation);
 							message.put("isUserRelated", true);
+							message.put("mailRelationTypeIds", mailRelationTypeIds);
 							message.put("emailSentToUsersList", sentToUsersList);
 							
 							message.put("portal", 	themeDisplay.getCompany().getName());

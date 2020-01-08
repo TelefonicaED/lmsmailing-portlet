@@ -31,7 +31,6 @@ import com.liferay.portal.kernel.messaging.Message;
 import com.liferay.portal.kernel.messaging.MessageBusUtil;
 import com.liferay.portal.kernel.messaging.MessageListener;
 import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.PrefsPropsUtil;
 import com.liferay.portal.kernel.util.PropsKeys;
@@ -269,7 +268,7 @@ public class LmsMailMessageListener implements MessageListener {
 							MailUtil.getCourseStartDate(groupId, student.getLocale(), student.getTimeZone()), MailUtil.getCourseEndDate(groupId, student.getLocale(), student.getTimeZone()), userSender.getFullName());
 					String calculatedBody = StringPool.BLANK;
 					if(isUserRelated)
-						calculatedBody += MailUtil.getExtraContentSocialRelationHeader(student) + MailUtil.getExtraContentSocialRelation(emailSentToUsersList, student.getLocale());
+						calculatedBody += MailUtil.getExtraContentSocialRelationHeader(student) + MailUtil.getExtraContentSocialRelation(emailSentToUsersList, student, sendToRelationTypeIds);
 					calculatedBody += LanguageUtil.get(student.getLocale(),"mail.header");
 					calculatedBody += MailUtil.replaceMessageConstants(body, portal, community, toFullName, toScreenName,tutors,url,urlcourse, MailUtil.getCourseStartDate(groupId, student.getLocale(), student.getTimeZone()), MailUtil.getCourseEndDate(groupId, student.getLocale(), student.getTimeZone()), userSender.getFullName());
 					calculatedBody += LanguageUtil.get(student.getLocale(),"mail.footer");
@@ -320,7 +319,7 @@ public class LmsMailMessageListener implements MessageListener {
 						MailMessage mailm = new MailMessage(from, to, calculatedsubject, calculatedBody ,true);
 						if(internalMessagingActive){
 							if(isUserRelated)
-								content = MailUtil.getExtraContentSocialRelationHeader(student) + MailUtil.getExtraContentSocialRelation(emailSentToUsersList, student.getLocale()) + content;
+								content = MailUtil.getExtraContentSocialRelationHeader(student) + MailUtil.getExtraContentSocialRelation(emailSentToUsersList, student, sendToRelationTypeIds) + content;
 							MailUtil.sendInternalMessageNotification(entryId,calculatedsubject, content, groupId,userId, student.getUserId(), companyId);
 						}
 						MailEngine.send(mailm);
@@ -540,9 +539,8 @@ public class LmsMailMessageListener implements MessageListener {
 				}
 			}
 			
-			// Se env�an los correos a las relaciones sociales si corresponde
+			// Se envían los correos a las relaciones sociales si corresponde
 			if(sendCopyToSocialRelation){
-				String extraContentSocialRelation = MailUtil.getExtraContentSocialRelation(users, LocaleUtil.getDefault());
 				for (User socialRelatedUser : sendToSocialRelationUsers) {
 					if (socialRelatedUser.isActive() && Validator.isEmailAddress(socialRelatedUser.getEmailAddress())) {
 						deregisterMail = false;
@@ -581,7 +579,9 @@ public class LmsMailMessageListener implements MessageListener {
 								
 								calculatedSubject = MailUtil.replaceStudent(subjectTemplate, toFullName, toScreenName);
 								String content = MailUtil.replaceStudent(bodyTemplate, toFullName, toScreenName);
+								String extraContentSocialRelation = MailUtil.getExtraContentSocialRelation(users, socialRelatedUser, sendToRelationTypeIds);
 								calculatedBody = MailUtil.getExtraContentSocialRelationHeader(socialRelatedUser) + extraContentSocialRelation;
+								calculatedBody += MailUtil.getExtraContentSocialRelation(users, socialRelatedUser, sendToRelationTypeIds);
 								calculatedBody += LanguageUtil.get(socialRelatedUser.getLocale(),"mail.header");
 								calculatedBody += content;
 								calculatedBody += LanguageUtil.get(socialRelatedUser.getLocale(),"mail.footer");
