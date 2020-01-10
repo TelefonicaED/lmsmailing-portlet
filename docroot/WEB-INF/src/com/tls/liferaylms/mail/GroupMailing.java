@@ -236,7 +236,7 @@ public class GroupMailing extends MVCPortlet{
 				message.put("userId",  	themeDisplay.getUserId());
 				message.put("testing", 	testing);
 				message.put("sendToRelatedUsers", sendCopyToSocialRelation);
-				message.put("mailRelationTypeIds", mailRelationTypeIds);
+				message.put("mailRelationTypeIds", sendCopyToTypeIds);
 				
 				message.put("portal", 	themeDisplay.getCompany().getName());
 				message.put("community",themeDisplay.getScopeGroupName());
@@ -275,7 +275,7 @@ public class GroupMailing extends MVCPortlet{
 					message.put("userId",  	themeDisplay.getUserId());
 					message.put("testing", 	testing);
 					message.put("sendToRelatedUsers", sendCopyToSocialRelation);
-					message.put("mailRelationTypeIds", mailRelationTypeIds);
+					message.put("mailRelationTypeIds", sendCopyToTypeIds);
 					message.put("isUserRelated", false);
 					
 					message.put("portal", 	themeDisplay.getCompany().getName());
@@ -305,7 +305,7 @@ public class GroupMailing extends MVCPortlet{
 						message.put("testing", 	testing);
 						message.put("sendToRelatedUsers", sendCopyToSocialRelation);
 						message.put("isUserRelated", true);
-						message.put("mailRelationTypeIds", mailRelationTypeIds);
+						message.put("mailRelationTypeIds", sendCopyToTypeIds);
 						message.put("emailSentToUsersList", teamUsers);
 						
 						message.put("portal", 	themeDisplay.getCompany().getName());
@@ -351,7 +351,7 @@ public class GroupMailing extends MVCPortlet{
 						message.put("testing", 	testing);
 						message.put("sendToRelatedUsers", sendCopyToSocialRelation);
 						message.put("isUserRelated", false);
-						message.put("mailRelationTypeIds", mailRelationTypeIds);
+						message.put("mailRelationTypeIds", sendCopyToTypeIds);
 
 						message.put("portal", 	themeDisplay.getCompany().getName());
 						message.put("community",themeDisplay.getScopeGroupName());
@@ -381,7 +381,7 @@ public class GroupMailing extends MVCPortlet{
 						message.put("testing", 	testing);
 						message.put("sendToRelatedUsers", sendCopyToSocialRelation);
 						message.put("isUserRelated", true);
-						message.put("mailRelationTypeIds", mailRelationTypeIds);
+						message.put("mailRelationTypeIds", sendCopyToTypeIds);
 						message.put("emailSentToUsersList", sentToUsersList);
 						
 						message.put("portal", 	themeDisplay.getCompany().getName());
