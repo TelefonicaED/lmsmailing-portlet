@@ -5,6 +5,7 @@
 	<import class="com.tls.liferaylms.mail.model.AuditReceiverMail" />
 	<import class="com.tls.liferaylms.mail.model.AuditSendMails" />
 	<import class="com.tls.liferaylms.mail.model.MailJob" />
+	<import class="com.tls.liferaylms.mail.model.MailRelation" />
 	<import class="com.tls.liferaylms.mail.model.MailTemplate" />
 	<class name="com.tls.liferaylms.mail.model.impl.AuditReceiverMailImpl" table="lmsmail_AuditReceiverMail">
 		<cache usage="read-write" />

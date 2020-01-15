@@ -1,5 +1,7 @@
 package com.tls.liferaylms.util;
 
+import com.liferay.portlet.social.model.SocialRelationConstants;
+
 public class MailStringPool {
 	
 	public final static String VIEW = "view";
@@ -66,4 +68,7 @@ public class MailStringPool {
 	public final static String SEND_ALWAYS_MESSAGE_KEY = "lms.mailing.send.always.message";
 	public final static String INTERNAL_MESSAGING_KEY = "lms.mailing.internal.messaging.active";
 	public final static String DEREGISTER_MAIL_KEY = "lms.mailing.deregister.mail.expando";
+	
+	public final static String MAIL_RELATION_TYPE_SUPERVISOR = "lms.mailing.mail-relation-" + SocialRelationConstants.TYPE_UNI_SUPERVISOR;
+	
 }

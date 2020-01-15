@@ -9,6 +9,8 @@
 	<bean id="com.tls.liferaylms.mail.service.persistence.AuditSendMailsPersistence" class="com.tls.liferaylms.mail.service.persistence.AuditSendMailsPersistenceImpl" parent="basePersistence" />
 	<bean id="com.tls.liferaylms.mail.service.MailJobLocalService" class="com.tls.liferaylms.mail.service.impl.MailJobLocalServiceImpl" />
 	<bean id="com.tls.liferaylms.mail.service.persistence.MailJobPersistence" class="com.tls.liferaylms.mail.service.persistence.MailJobPersistenceImpl" parent="basePersistence" />
+	<bean id="com.tls.liferaylms.mail.service.MailRelationLocalService" class="com.tls.liferaylms.mail.service.impl.MailRelationLocalServiceImpl" />
+	<bean id="com.tls.liferaylms.mail.service.persistence.MailRelationFinder" class="com.tls.liferaylms.mail.service.persistence.MailRelationFinderImpl" parent="basePersistence" />
 	<bean id="com.tls.liferaylms.mail.service.MailTemplateLocalService" class="com.tls.liferaylms.mail.service.impl.MailTemplateLocalServiceImpl" />
 	<bean id="com.tls.liferaylms.mail.service.MailTemplateService" class="com.tls.liferaylms.mail.service.impl.MailTemplateServiceImpl" />
 	<bean id="com.tls.liferaylms.mail.service.persistence.MailTemplatePersistence" class="com.tls.liferaylms.mail.service.persistence.MailTemplatePersistenceImpl" parent="basePersistence" />

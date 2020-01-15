@@ -1,6 +1,8 @@
 package com.tls.liferaylms.mail.portlet;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.List;
 
 import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
@@ -18,13 +20,18 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.servlet.SessionMessages;
 import com.liferay.portal.kernel.util.ParamUtil;
+import com.liferay.portal.kernel.util.StringPool;
+import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portal.service.PortalPreferencesLocalServiceUtil;
 import com.liferay.util.bridges.mvc.MVCPortlet;
+
 import javax.portlet.PortletPreferences;
+
 import com.liferay.portal.kernel.util.PrefsPropsUtil;
 import com.liferay.portal.kernel.util.PropsUtil;
+import com.tls.liferaylms.mail.service.MailRelationLocalServiceUtil;
 import com.tls.liferaylms.util.MailStringPool;
 
 
@@ -94,6 +101,22 @@ public class LmsMailingPreferencesManagement extends MVCPortlet {
 		renderRequest.setAttribute("sendAlwaysMessage",sendAlwaysMessage);
 		renderRequest.setAttribute("deregisterMailExpando", deregisterMailExpando);
 		
+		//Envio de copia de email a relación social
+		try {
+			List<Integer> mailRelationTypeIds = MailRelationLocalServiceUtil.findRelationTypeIdsByCompanyId(themeDisplay.getCompanyId());
+			HashMap<Integer, Boolean> mailRelationTypeActiveHash = new HashMap<Integer, Boolean>();
+			if(Validator.isNotNull(mailRelationTypeIds) && mailRelationTypeIds.size()>0){
+				String mailRelationTypePref = StringPool.BLANK;
+				for(int mailRelationTypeId:mailRelationTypeIds){
+					mailRelationTypePref = "mailType_"+mailRelationTypeId;
+					mailRelationTypeActiveHash.put(mailRelationTypeId, PrefsPropsUtil.getBoolean(themeDisplay.getCompanyId(), mailRelationTypePref));
+				}
+			}
+			renderRequest.setAttribute("mailRelationTypeHash", mailRelationTypeActiveHash);
+		} catch (SystemException e) {
+			e.printStackTrace();
+		}
+		
 		PortletURL updateURL = renderResponse.createActionURL();
 		updateURL.setParameter("javax.portlet.action", "updatePrefs");
 		renderRequest.setAttribute("updateURL", updateURL.toString());
@@ -111,7 +134,16 @@ public class LmsMailingPreferencesManagement extends MVCPortlet {
 			boolean errorDeregisterExpando = savePreference(MailStringPool.DEREGISTER_MAIL_KEY,deregisterMailExpando , themeDisplay.getCompanyId());
 			boolean errorInternalMessaging = savePreference(MailStringPool.INTERNAL_MESSAGING_KEY ,String.valueOf(internalMessagingActive) , themeDisplay.getCompanyId());
 			boolean errorSendAlwaysMessage = savePreference(MailStringPool.SEND_ALWAYS_MESSAGE_KEY ,String.valueOf(sendAlwaysMessage) , themeDisplay.getCompanyId());
-			if(errorDeregisterExpando || errorInternalMessaging || errorSendAlwaysMessage){
+			boolean errorActiveMailRelations = false;
+			List<Integer> mailRelationTypeIds = MailRelationLocalServiceUtil.findRelationTypeIdsByCompanyId(themeDisplay.getCompanyId());
+			if(Validator.isNotNull(mailRelationTypeIds) && mailRelationTypeIds.size()>0){
+				String mailRelationTypePref = StringPool.BLANK;
+				for(int mailRelationTypeId:mailRelationTypeIds){
+					mailRelationTypePref = "mailType_"+mailRelationTypeId;
+					errorActiveMailRelations = errorActiveMailRelations || savePreference(mailRelationTypePref, String.valueOf(ParamUtil.getBoolean(actionRequest, mailRelationTypePref)), themeDisplay.getCompanyId());
+				}
+			}
+			if(errorDeregisterExpando || errorInternalMessaging || errorSendAlwaysMessage || errorActiveMailRelations){
 				SessionErrors.add(actionRequest, "update-ko");
 			}else{
 				SessionMessages.add(actionRequest, "update-ok");
@@ -120,6 +152,7 @@ public class LmsMailingPreferencesManagement extends MVCPortlet {
 			e.printStackTrace();
 			SessionErrors.add(actionRequest, "update-ko");
 		}
+		
 	}
 
 	private boolean savePreference(String key,String value, long companyId) throws SystemException {

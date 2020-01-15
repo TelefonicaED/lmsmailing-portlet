@@ -1,6 +1,7 @@
 <%@page import="com.liferay.portal.service.PortalPreferencesLocalServiceUtil"%>
 <%@page import="com.tls.liferaylms.mail.service.MailTemplateLocalServiceUtil"%>
 <%@page import="com.tls.liferaylms.mail.model.MailTemplate"%>
+<%@page import="com.tls.liferaylms.mail.service.MailRelationLocalServiceUtil"%>
 <%@page import="com.liferay.portlet.PortletPreferencesFactoryUtil"%>
 <%@page import="javax.portlet.PortletPreferences"%>
 <%@page import="com.liferay.portal.service.TeamLocalServiceUtil"%>
@@ -20,6 +21,7 @@
 <%@page import="com.liferay.portal.kernel.workflow.WorkflowConstants"%>
 <%@page import="com.liferay.portal.util.comparator.UserFirstNameComparator"%>
 <%@page import="com.liferay.portal.kernel.util.OrderByComparator"%>
+<%@page import="com.liferay.portal.kernel.util.PrefsPropsUtil"%>
 <%@ include file="/init.jsp" %>
 
 <%
@@ -453,8 +455,6 @@ else
 	
 </div>
 
-
-
 <div class="newmail">
 
 	<liferay-portlet:actionURL name="sendNewMail" var="sendNewMailURL" >
@@ -468,6 +468,26 @@ else
 	
 		<aui:input type="hidden" name="to"  value="<%=to%>"/>
 		<aui:input type="hidden" name="toNames" value="<%=toNames%>"/>
+		
+		
+<%
+	List<Integer> mailRelationTypeIds = MailRelationLocalServiceUtil.findRelationTypeIdsByCompanyId(themeDisplay.getCompanyId());
+	if(Validator.isNotNull(mailRelationTypeIds) && mailRelationTypeIds.size()>0){
+		String mailRelationTypePref = StringPool.BLANK;
+		String sendMailToRelationType = StringPool.BLANK;
+		String labelSendMailToType = StringPool.BLANK;
+		for(int mailRelationTypeId:mailRelationTypeIds){
+			mailRelationTypePref = "mailType_"+mailRelationTypeId;
+			if(PrefsPropsUtil.getBoolean(themeDisplay.getCompanyId(), mailRelationTypePref)){
+				sendMailToRelationType = "sendMailToType_"+mailRelationTypeId;
+				labelSendMailToType = "groupmailing.messages.send-copy-to-"+mailRelationTypeId;
+%>
+				<aui:input type="checkbox" label="<%=labelSendMailToType %>" name="<%=sendMailToRelationType %>"/>
+<%				
+			}
+		}
+	}
+%>
 			
 		<div class="mail_subject" >
 			<aui:input name="subject" title="groupmailing.messages.subject" size="120" value="<%=emailSubject %>">
