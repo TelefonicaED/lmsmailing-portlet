@@ -88,4 +88,7 @@
 			<finder-column name="companyId" />
 		</finder>
     </entity>   
+    
+    <entity local-service="true" remote-service="false" name="MailRelation" json-enabled="false"/>
+    
 </service-builder>

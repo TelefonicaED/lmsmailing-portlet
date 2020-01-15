@@ -8,3 +8,7 @@ El formato estÃ¡ basado en [SemVer](https://semver.org/spec/v2.0.0.html).
 ### UPDATED 
 
 #164514: Sanitizado el asunto y el body del GroupMailing
+
+## ADDED
+
+#164221: Opción de enviar copia de email a supervisores de alumnos

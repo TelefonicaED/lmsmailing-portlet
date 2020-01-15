@@ -1,6 +1,7 @@
 package com.tls.liferaylms.util;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -13,9 +14,12 @@ import com.liferay.counter.service.CounterLocalServiceUtil;
 import com.liferay.lms.model.Course;
 import com.liferay.lms.service.CourseLocalServiceUtil;
 import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.StringPool;
+import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.Company;
 import com.liferay.portal.model.Group;
 import com.liferay.portal.model.User;
@@ -24,6 +28,8 @@ import com.liferay.portlet.announcements.model.AnnouncementsEntry;
 import com.liferay.portlet.announcements.model.AnnouncementsFlagConstants;
 import com.liferay.portlet.announcements.service.AnnouncementsEntryLocalServiceUtil;
 import com.liferay.portlet.announcements.service.AnnouncementsFlagLocalServiceUtil;
+import com.liferay.portlet.social.service.SocialRelationLocalServiceUtil;
+import com.tls.liferaylms.mail.service.MailRelationLocalServiceUtil;
 
 public class MailUtil {
 
@@ -267,5 +273,47 @@ public class MailUtil {
 		}catch(Exception e){}
 		
 		return tutors;
+	}
+	
+	public static List<User> getSocialRelationUsers(User user, List<Integer> socialRelationTypeIds, List<User> socialRelationUsers, long companyId){
+		List<User> socialRelationUsersTmp = new ArrayList<User>();
+		log.debug("Social Relation Users ");
+		for(int relationTypeId:socialRelationTypeIds){
+			socialRelationUsersTmp = MailRelationLocalServiceUtil.findUsersByCompanyIdSocialRelationTypeIdToUserId(user.getUserId(), relationTypeId, companyId);
+			log.debug("::socialRelationUsersTmp OK::: " + Validator.isNotNull(socialRelationUsersTmp));
+			if(Validator.isNotNull(socialRelationUsersTmp) && socialRelationUsersTmp.size()>0){
+				log.debug("::socialRelationUsersTmp.size()::: " + socialRelationUsersTmp.size());
+				for(User userRelated:socialRelationUsersTmp){
+					if(!socialRelationUsers.contains(userRelated))
+						socialRelationUsers.add(userRelated);
+				}
+			}
+		}
+		return socialRelationUsers;
+	}
+	
+	public static String getExtraContentSocialRelationHeader(User user){
+		Locale locale = LocaleUtil.getDefault();
+		if(Validator.isNotNull(user))
+			locale = user.getLocale();
+		return "<p>" + LanguageUtil.get(locale, "groupmailing.messages.email-sent-to-students") +"</p>";
+	}
+	
+	public static String getExtraContentSocialRelation(List<User> listUsers, User user, List<Integer> typeIds){
+		Locale locale = user.getLocale();
+		String extraContent = "<p>" + LanguageUtil.get(locale, "groupmailing.messages.email-received-by") +"</p>";
+		if(Validator.isNotNull(listUsers) && listUsers.size()>0){
+			extraContent += "<p><em>";
+			for(User u:listUsers){
+				//Comprobar si es subordinado
+				if(MailRelationLocalServiceUtil.countSocialRelationsBeetweenUsersBySocialRelationTypeIds(u.getUserId(), user.getUserId(), typeIds, user.getCompanyId())>0)
+					extraContent += u.getEmailAddress() + StringPool.SEMICOLON + StringPool.SPACE;
+			}
+			extraContent = extraContent.substring(0,extraContent.length()-2);
+			extraContent += "</em></p>";
+		}
+		extraContent += "<p>" + LanguageUtil.get(locale, "groupmailing.messages.email-sent") + "</p>";
+		extraContent += "<p>" + StringPool.UNDERLINE + StringPool.UNDERLINE + StringPool.UNDERLINE + StringPool.UNDERLINE + StringPool.UNDERLINE + StringPool.UNDERLINE + "</p>";
+		return extraContent;
 	}
 }
