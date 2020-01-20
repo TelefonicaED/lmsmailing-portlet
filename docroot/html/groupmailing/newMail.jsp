@@ -525,6 +525,7 @@ else
     		<li>[$TITLE_COURSE$] - <%=LanguageUtil.get(pageContext,"groupmailing.messages.course")%></li>
     		<li>[$USER_FULLNAME$] - <%=LanguageUtil.get(pageContext,"groupmailing.messages.student")%></li>
     		<li>[$USER_SCREENNAME$] - <%=LanguageUtil.get(pageContext,"the-user-screen-name")%></li>
+    		<li>[$USER_FIRSTNAME$] - <%=LanguageUtil.get(pageContext,"groupmailing.messages.student.first-name")%></li>
     		<li>[$TEACHER$] - <%=LanguageUtil.get(pageContext,"groupmailing.messages.teacher")%></li>
     		<li>[$USER_SENDER$] - <%=LanguageUtil.get(pageContext,"groupmailing.messages.user-sender")%></li>
     		<li>[$PAGE_URL$] - <%=LanguageUtil.get(pageContext,"groupmailing.messages.urlcourse")%></li>
@@ -542,8 +543,7 @@ else
 				}
 			}
 
-			boolean showExpandosCourse = PrefsPropsUtil.getBoolean(themeDisplay.getCompanyId(), MailConstants.COURSE_EXPANDOS_TO_SHOW, Boolean.FALSE);
-			if(showExpandosCourse){
+			if(PrefsPropsUtil.getBoolean(themeDisplay.getCompanyId(), MailConstants.COURSE_EXPANDOS_TO_SHOW, Boolean.FALSE)){
 				List<ExpandoColumn> listCourseExpandos = ExpandoColumnLocalServiceUtil.getColumns(themeDisplay.getCompanyId(), Course.class.getName(), ExpandoTableConstants.DEFAULT_TABLE_NAME);
 				for(ExpandoColumn expandoCourseColumn: listCourseExpandos){
 					if(PrefsPropsUtil.getBoolean(themeDisplay.getCompanyId(), MailConstants.COURSE_EXPANDO_TO_SHOW+String.valueOf(expandoCourseColumn.getColumnId()), false)){

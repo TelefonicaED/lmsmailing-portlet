@@ -155,7 +155,7 @@ public class MailUtil {
 		return url;
 	}
 	
-	public static String replaceMessageConstants(String text, String portal, String community, String student, String studentScreenName, String teacher, String url,
+	public static String replaceMessageConstants(String text, String portal, String community, String student, String studentScreenName, String studentName, String teacher, String url,
 			String urlcourse, String startDate, String endDate, String userSender) {
 
 		String res = "";
@@ -178,7 +178,7 @@ public class MailUtil {
 		res = res.replace ("[$START_DATE$]", startDate);
 		res = res.replace ("[$END_DATE$]", endDate);
 		
-		res = replaceStudent(res, student, studentScreenName);
+		res = replaceStudent(res, student, studentScreenName, studentName);
 		//Se cambiala URL des.
 		res = MailUtil.changeToURL(res, url);
 		
@@ -279,7 +279,7 @@ public class MailUtil {
 	/*
 	 * Método que cambia cambia el nombre del usuario de la plantilla.
 	 */
-	public static String replaceStudent(String text, String student, String studentScreenName) {
+	public static String replaceStudent(String text, String student, String studentScreenName, String studentName) {
 		if(text != null) {
 			if(student!=null){
 				text = text.replace ("[@student]", 	student);
@@ -291,6 +291,9 @@ public class MailUtil {
 			if(studentScreenName!=null){
 				text = text.replace("[$USER_SCREENNAME$]", studentScreenName);
 			}
+			
+			if(Validator.isNotNull(studentName))
+				text = text.replace("[$USER_FIRSTNAME$]", studentName);
 			
 			return text;
 		}
