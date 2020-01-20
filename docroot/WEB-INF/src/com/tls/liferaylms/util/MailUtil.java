@@ -18,6 +18,7 @@ import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
+import com.liferay.portal.kernel.util.PrefsPropsUtil;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.Company;
@@ -28,7 +29,9 @@ import com.liferay.portlet.announcements.model.AnnouncementsEntry;
 import com.liferay.portlet.announcements.model.AnnouncementsFlagConstants;
 import com.liferay.portlet.announcements.service.AnnouncementsEntryLocalServiceUtil;
 import com.liferay.portlet.announcements.service.AnnouncementsFlagLocalServiceUtil;
-import com.liferay.portlet.social.service.SocialRelationLocalServiceUtil;
+import com.liferay.portlet.expando.model.ExpandoColumn;
+import com.liferay.portlet.expando.model.ExpandoTableConstants;
+import com.liferay.portlet.expando.service.ExpandoColumnLocalServiceUtil;
 import com.tls.liferaylms.mail.service.MailRelationLocalServiceUtil;
 
 public class MailUtil {
@@ -152,7 +155,9 @@ public class MailUtil {
 		return url;
 	}
 	
-	public static String replaceMessageConstants(String text, String portal, String community, String student, String studentScreenName, String teacher, String url, String urlcourse, String startDate, String endDate, String userSender){
+	public static String replaceMessageConstants(String text, String portal, String community, String student, String studentScreenName, String teacher, String url,
+			String urlcourse, String startDate, String endDate, String userSender) {
+
 		String res = "";
 		
 		res = text.replace("[@portal]", 	portal);
@@ -177,6 +182,66 @@ public class MailUtil {
 		//Se cambiala URL des.
 		res = MailUtil.changeToURL(res, url);
 		
+		return res;
+	}
+	
+	/**
+	 * Sustituye los expandos del usuario y en el caso de que el usuario sea null sustituye un texto genérico
+	 * @param text
+	 * @param companyId
+	 * @param user
+	 * @param locale
+	 * @return
+	 */
+	public static String replaceExpandosUser(String text, long companyId, User user, Locale locale){
+		String res = text;
+		try {
+			List<ExpandoColumn> listUserExpandos = ExpandoColumnLocalServiceUtil.getColumns(companyId, User.class.getName(), ExpandoTableConstants.DEFAULT_TABLE_NAME);
+			if(Validator.isNotNull(listUserExpandos)){
+				String replaceString = StringPool.BLANK;
+				for(ExpandoColumn expandoUserColumn: listUserExpandos){
+					if(PrefsPropsUtil.getBoolean(companyId, MailConstants.USER_EXPANDO_TO_SHOW+String.valueOf(expandoUserColumn.getColumnId()), Boolean.FALSE)){
+						replaceString = "[$"+expandoUserColumn.getName().toUpperCase()+"$]";
+						if(Validator.isNotNull(user))
+							res = res.replace(replaceString, String.valueOf(user.getExpandoBridge().getAttribute(expandoUserColumn.getName(), Boolean.FALSE)));
+						else
+							res.replace(replaceString, "<b>" + StringPool.DOUBLE_APOSTROPHE + expandoUserColumn.getDisplayName(locale) + StringPool.DOUBLE_APOSTROPHE + "</b>");
+					}
+				}
+			}
+		} catch (SystemException e) {
+			log.error(e.getLocalizedMessage());
+		}
+		return res;
+	}
+	
+	/**
+	 * Sustituye los expandos del curso y en caso de que el curso sea null sustituye un texto genérico
+	 * @param text
+	 * @param companyId
+	 * @param groupId
+	 * @return
+	 */
+	public static String replaceExpandosCourse(String text, long companyId, long groupId, Locale locale){
+		String res = text;
+		try {
+			List<ExpandoColumn> listCourseExpandos = ExpandoColumnLocalServiceUtil.getColumns(companyId, Course.class.getName(), ExpandoTableConstants.DEFAULT_TABLE_NAME);
+			Course course = CourseLocalServiceUtil.fetchByGroupCreatedId(groupId);
+			if(Validator.isNotNull(listCourseExpandos)){
+				String replaceString = StringPool.BLANK;
+				for(ExpandoColumn expandoCourseColumn: listCourseExpandos){
+					if(PrefsPropsUtil.getBoolean(companyId, MailConstants.COURSE_EXPANDO_TO_SHOW+String.valueOf(expandoCourseColumn.getColumnId()), Boolean.FALSE)){
+						replaceString = "[$"+expandoCourseColumn.getName().toUpperCase()+"$]";
+						if(Validator.isNotNull(course))
+							res = res.replace(replaceString, String.valueOf(course.getExpandoBridge().getAttribute(expandoCourseColumn.getName(), Boolean.FALSE)));
+						else
+							res.replace(replaceString, "<b>" + StringPool.DOUBLE_APOSTROPHE + expandoCourseColumn.getDisplayName(locale) + StringPool.DOUBLE_APOSTROPHE + "</b>");
+					}
+				}
+			}
+		} catch (SystemException e) {
+			log.error(e.getLocalizedMessage());
+		}
 		return res;
 	}
 

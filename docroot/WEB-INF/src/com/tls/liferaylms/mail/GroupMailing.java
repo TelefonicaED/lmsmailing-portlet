@@ -34,6 +34,7 @@ import com.liferay.util.bridges.mvc.MVCPortlet;
 import com.tls.liferaylms.mail.model.MailTemplate;
 import com.tls.liferaylms.mail.service.MailRelationLocalServiceUtil;
 import com.tls.liferaylms.mail.service.MailTemplateLocalServiceUtil;
+import com.tls.liferaylms.util.MailConstants;
 import com.tls.liferaylms.util.MailStringPool;
 import com.tls.liferaylms.util.MailUtil;
 
@@ -69,14 +70,25 @@ public class GroupMailing extends MVCPortlet{
 			
 			long entryId = -1;
 			boolean internalMessagingActive = PrefsPropsUtil.getBoolean(themeDisplay.getCompanyId(), MailStringPool.INTERNAL_MESSAGING_KEY);
-			
+
 			if(internalMessagingActive){
 				_log.debug("Sending internal message ");
 				String content =  MailUtil.replaceMessageConstants(changeToURL(template.getBody(), themeDisplay.getURLPortal()), themeDisplay.getCompany().getName(), 
 						themeDisplay.getScopeGroupName(), themeDisplay.getUser().getFullName(), themeDisplay.getUser().getScreenName(),  tutors, 
 						MailUtil.getURLPortal(themeDisplay.getCompany(),actionRequest), MailUtil.getURLPortal(themeDisplay.getCompany(),actionRequest)+themeDisplay.getPathFriendlyURLPublic()+themeDisplay.getScopeGroup().getFriendlyURL(),
-						MailUtil.getCourseStartDate(themeDisplay.getScopeGroupId(), themeDisplay.getLocale(), themeDisplay.getTimeZone()), MailUtil.getCourseEndDate(themeDisplay.getScopeGroupId(), themeDisplay.getLocale(), themeDisplay.getTimeZone()),themeDisplay.getUser().getFullName());
-			
+						MailUtil.getCourseStartDate(themeDisplay.getScopeGroupId(), themeDisplay.getLocale(), themeDisplay.getTimeZone()), MailUtil.getCourseEndDate(themeDisplay.getScopeGroupId(), themeDisplay.getLocale(),
+						themeDisplay.getTimeZone()),themeDisplay.getUser().getFullName());
+				
+				//Sustituir expandos
+				boolean showExpandosUser = PrefsPropsUtil.getBoolean(themeDisplay.getCompanyId(), MailConstants.USER_EXPANDOS_TO_SHOW, Boolean.FALSE);
+				if(showExpandosUser){
+					content = MailUtil.replaceExpandosUser(content, themeDisplay.getCompanyId(), themeDisplay.getUser(), themeDisplay.getLocale());
+				}
+				boolean showExpandosCourse = PrefsPropsUtil.getBoolean(themeDisplay.getCompanyId(), MailConstants.COURSE_EXPANDOS_TO_SHOW, Boolean.FALSE);
+				if(showExpandosCourse){
+					content = MailUtil.replaceExpandosCourse(content, themeDisplay.getCompanyId(), themeDisplay.getScopeGroupId(), themeDisplay.getLocale());
+				}
+				
 				AnnouncementsEntry entry = MailUtil.createInternalMessageNotification(template.getSubject(),content, themeDisplay.getScopeGroupId(), themeDisplay.getUserId(), themeDisplay.getCompanyId());
 				if(entry!=null){
 					entryId = entry.getEntryId();
@@ -178,6 +190,16 @@ public class GroupMailing extends MVCPortlet{
 					themeDisplay.getScopeGroupName(), themeDisplay.getUser().getFullName(), themeDisplay.getUser().getScreenName(),  tutors, 
 					MailUtil.getURLPortal(themeDisplay.getCompany(),actionRequest), MailUtil.getURLPortal(themeDisplay.getCompany(),actionRequest)+themeDisplay.getPathFriendlyURLPublic()+themeDisplay.getScopeGroup().getFriendlyURL(), 
 					MailUtil.getCourseStartDate(themeDisplay.getScopeGroupId(), themeDisplay.getLocale(), themeDisplay.getTimeZone()), MailUtil.getCourseEndDate(themeDisplay.getScopeGroupId(), themeDisplay.getLocale(), themeDisplay.getTimeZone()),themeDisplay.getUser().getFullName());
+			
+			//Sustituir expandos
+			boolean showExpandosUser = PrefsPropsUtil.getBoolean(themeDisplay.getCompanyId(), MailConstants.USER_EXPANDOS_TO_SHOW, Boolean.FALSE);
+			if(showExpandosUser){
+				content = MailUtil.replaceExpandosUser(content, themeDisplay.getCompanyId(), themeDisplay.getUser(), themeDisplay.getLocale());
+			}
+			boolean showExpandosCourse = PrefsPropsUtil.getBoolean(themeDisplay.getCompanyId(), MailConstants.COURSE_EXPANDOS_TO_SHOW, Boolean.FALSE);
+			if(showExpandosCourse){
+				content = MailUtil.replaceExpandosCourse(content, themeDisplay.getCompanyId(), themeDisplay.getScopeGroupId(), themeDisplay.getLocale());
+			}
 			
 			AnnouncementsEntry entry = MailUtil.createInternalMessageNotification(subject, content, themeDisplay.getScopeGroupId(), themeDisplay.getUserId(), themeDisplay.getCompanyId());
 			if(entry!=null){
