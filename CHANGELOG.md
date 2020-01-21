@@ -7,7 +7,8 @@ El formato está basado en [SemVer](https://semver.org/spec/v2.0.0.html).
 
 ### Added
 
-- #164221 Se añade a las preferencias del mailing la opción de activar el envío de email a supervisor, jefe, etc
+- #164221 Se añade a las preferencias del mailing la opción de activar el envío de email a supervisor, jefe
+
 
 ## [4.0.0](https://github.com/TelefonicaED/lmsmailing-portlet/releases/tag/v4.0.0)
 

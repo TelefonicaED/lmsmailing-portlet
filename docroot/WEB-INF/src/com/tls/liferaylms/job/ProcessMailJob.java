@@ -1,6 +1,5 @@
 package com.tls.liferaylms.job;
 
-import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
@@ -8,8 +7,6 @@ import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
 
 import com.liferay.counter.service.CounterLocalServiceUtil;
-import com.liferay.lms.model.Course;
-import com.liferay.lms.service.CourseLocalServiceUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.log.Log;
@@ -30,7 +27,6 @@ import com.liferay.portlet.announcements.model.AnnouncementsEntry;
 import com.liferay.util.bridges.mvc.MVCPortlet;
 import com.tls.liferaylms.job.condition.Condition;
 import com.tls.liferaylms.job.condition.ConditionUtil;
-import com.tls.liferaylms.mail.message.LmsMailMessageListener;
 import com.tls.liferaylms.mail.model.AuditSendMails;
 import com.tls.liferaylms.mail.model.MailJob;
 import com.tls.liferaylms.mail.model.MailTemplate;
@@ -64,11 +60,6 @@ public class ProcessMailJob extends MVCPortlet implements MessageListener{
 		List<MailJob> mailJobs = MailJobLocalServiceUtil.getNotProcessedMailJobs();
 		
 		for(MailJob mailJob : mailJobs){
-			
-			
-			
-			
-			
 			if(log.isDebugEnabled())log.debug(mailJob.getConditionClassName());
 			Condition condition = null;
 			try {
