@@ -22,6 +22,10 @@
 <%@page import="com.liferay.portal.util.comparator.UserFirstNameComparator"%>
 <%@page import="com.liferay.portal.kernel.util.OrderByComparator"%>
 <%@page import="com.liferay.portal.kernel.util.PrefsPropsUtil"%>
+<%@page import="com.tls.liferaylms.util.MailConstants"%>
+<%@page import="com.liferay.portlet.expando.service.ExpandoColumnLocalServiceUtil"%>
+<%@page import="com.liferay.portlet.expando.model.ExpandoColumn"%>
+<%@page import="com.liferay.portlet.expando.model.ExpandoTableConstants"%>
 <%@ include file="/init.jsp" %>
 
 <%
@@ -521,12 +525,36 @@ else
     		<li>[$TITLE_COURSE$] - <%=LanguageUtil.get(pageContext,"groupmailing.messages.course")%></li>
     		<li>[$USER_FULLNAME$] - <%=LanguageUtil.get(pageContext,"groupmailing.messages.student")%></li>
     		<li>[$USER_SCREENNAME$] - <%=LanguageUtil.get(pageContext,"the-user-screen-name")%></li>
+    		<li>[$USER_FIRSTNAME$] - <%=LanguageUtil.get(pageContext,"groupmailing.messages.student.first-name")%></li>
     		<li>[$TEACHER$] - <%=LanguageUtil.get(pageContext,"groupmailing.messages.teacher")%></li>
     		<li>[$USER_SENDER$] - <%=LanguageUtil.get(pageContext,"groupmailing.messages.user-sender")%></li>
     		<li>[$PAGE_URL$] - <%=LanguageUtil.get(pageContext,"groupmailing.messages.urlcourse")%></li>
     		<li>[$URL$] - <%=LanguageUtil.get(pageContext,"groupmailing.messages.url")%></li>
     		<li>[$START_DATE$] - <%=LanguageUtil.get(pageContext,"start-execution-date")%></li>
 		    <li>[$END_DATE$] - <%=LanguageUtil.get(pageContext,"end-execution-date")%></li>
+		    
+<%			if(PrefsPropsUtil.getBoolean(themeDisplay.getCompanyId(), MailConstants.USER_EXPANDOS_TO_SHOW, Boolean.FALSE)){
+				List<ExpandoColumn> listUserExpandos = ExpandoColumnLocalServiceUtil.getColumns(themeDisplay.getCompanyId(), User.class.getName(), ExpandoTableConstants.DEFAULT_TABLE_NAME);
+				for(ExpandoColumn expandoUserColumn: listUserExpandos){
+					if(PrefsPropsUtil.getBoolean(themeDisplay.getCompanyId(), MailConstants.USER_EXPANDO_TO_SHOW+String.valueOf(expandoUserColumn.getColumnId()), false)){
+%>
+						<li>[$<%=expandoUserColumn.getName().toUpperCase() %>$] - <%= expandoUserColumn.getDisplayName(themeDisplay.getLocale()) %></li>
+<%					}	
+				}
+			}
+
+			if(PrefsPropsUtil.getBoolean(themeDisplay.getCompanyId(), MailConstants.COURSE_EXPANDOS_TO_SHOW, Boolean.FALSE)){
+				List<ExpandoColumn> listCourseExpandos = ExpandoColumnLocalServiceUtil.getColumns(themeDisplay.getCompanyId(), Course.class.getName(), ExpandoTableConstants.DEFAULT_TABLE_NAME);
+				for(ExpandoColumn expandoCourseColumn: listCourseExpandos){
+					if(PrefsPropsUtil.getBoolean(themeDisplay.getCompanyId(), MailConstants.COURSE_EXPANDO_TO_SHOW+String.valueOf(expandoCourseColumn.getColumnId()), false)){
+%>
+						<li>[$<%=expandoCourseColumn.getName().toUpperCase() %>$] - <%= expandoCourseColumn.getDisplayName(themeDisplay.getLocale()) %></li>
+<%					}	
+				}
+			}
+%>
+		    
+		    
     	</ul>
 
 		<aui:button-row>
