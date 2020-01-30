@@ -124,7 +124,7 @@ public class GroupMailing extends MVCPortlet{
 		
 		_log.debug("SUBJECT "+subject);
 		
-		subject = SanitizerUtil.sanitize(themeDisplay.getCompanyId(), themeDisplay.getScopeGroupId(), themeDisplay.getUserId(), StringPool.BLANK, 0, ContentTypes.TEXT_HTML, subject);
+		subject = SanitizerUtil.sanitize(themeDisplay.getCompanyId(), themeDisplay.getScopeGroupId(), themeDisplay.getUserId(), StringPool.BLANK, 0, ContentTypes.TEXT_PLAIN, subject);
 	    _log.debug("SUBJECT AFTER SANITIZE "+subject);
 		
 		
