@@ -581,7 +581,6 @@ public class LmsMailMessageListener implements MessageListener {
 								String content = MailUtil.replaceStudent(bodyTemplate, toFullName, toScreenName);
 								String extraContentSocialRelation = MailUtil.getExtraContentSocialRelation(users, socialRelatedUser, sendToRelationTypeIds);
 								calculatedBody = MailUtil.getExtraContentSocialRelationHeader(socialRelatedUser) + extraContentSocialRelation;
-								calculatedBody += MailUtil.getExtraContentSocialRelation(users, socialRelatedUser, sendToRelationTypeIds);
 								calculatedBody += LanguageUtil.get(socialRelatedUser.getLocale(),"mail.header");
 								calculatedBody += content;
 								calculatedBody += LanguageUtil.get(socialRelatedUser.getLocale(),"mail.footer");
