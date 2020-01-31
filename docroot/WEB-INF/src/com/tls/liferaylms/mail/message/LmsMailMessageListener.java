@@ -178,6 +178,13 @@ public class LmsMailMessageListener implements MessageListener {
 			millis = Long.valueOf(milliseconds);
 		}
 		
+		boolean showExpandosUser = PrefsPropsUtil.getBoolean(companyId, MailConstants.USER_EXPANDOS_TO_SHOW, Boolean.FALSE);
+		boolean showExpandosCourse = PrefsPropsUtil.getBoolean(companyId, MailConstants.COURSE_EXPANDOS_TO_SHOW, Boolean.FALSE);
+		if(log.isDebugEnabled()){
+			log.debug("::::showExpandosUser:::: " + showExpandosUser);
+			log.debug("::::showExpandosCourse:::: " + showExpandosCourse);
+		}
+			
 		InternetAddress from = new InternetAddress(fromAddress, fromName);
 		User userSender = UserLocalServiceUtil.getUserById(userId);
 		if ("true".equals(testing)) {
@@ -199,14 +206,29 @@ public class LmsMailMessageListener implements MessageListener {
 			log.debug("--- EXPANDO 1: "+userSender.getExpandoBridge().getAttribute(deregisterMailExpando,false));
 			
 			if(!deregisterMail){
-				body = MailUtil.replaceMessageConstants(body, portal, community, userSender.getFullName(), userSender.getScreenName(), tutors, url, urlcourse,
+				
+				body = MailUtil.replaceMessageConstants(body, portal, community, userSender.getFullName(), userSender.getScreenName(), userSender.getFirstName(), tutors, url, urlcourse,
 						MailUtil.getCourseStartDate(groupId, userSender.getLocale(), userSender.getTimeZone()), MailUtil.getCourseEndDate(groupId, userSender.getLocale(), userSender.getTimeZone()), userSender.getFullName());
+				
+				//Sustituir expandos
+				if(showExpandosUser)
+					body = MailUtil.replaceExpandosUser(body, companyId, userSender, userSender.getLocale());
+				if(showExpandosCourse)
+					body = MailUtil.replaceExpandosCourse(body, companyId, groupId, userSender.getLocale());
+				
 				String calculatedBody = LanguageUtil.get(Locale.getDefault(),"mail.header");
 				calculatedBody += body;
 				calculatedBody += LanguageUtil.get(Locale.getDefault(),"mail.footer");
 				
-				subject = MailUtil.replaceMessageConstants(subject, portal, community, userSender.getFullName(), userSender.getScreenName(), tutors, url, urlcourse,
+				subject = MailUtil.replaceMessageConstants(subject, portal, community, userSender.getFullName(), userSender.getScreenName(), userSender.getFirstName(), tutors, url, urlcourse,
 						MailUtil.getCourseStartDate(groupId, userSender.getLocale(), userSender.getTimeZone()), MailUtil.getCourseEndDate(groupId, userSender.getLocale(), userSender.getTimeZone()), userSender.getFullName());
+				//Sustituir expandos
+				if(showExpandosUser)
+					subject = MailUtil.replaceExpandosUser(subject, companyId, userSender, userSender.getLocale());
+				if(showExpandosCourse)
+					subject = MailUtil.replaceExpandosCourse(subject, companyId, groupId, userSender.getLocale());
+				
+				
 				//Guardar una auditoria del envio de emails.
 				auditSendMails = AuditSendMailsLocalServiceUtil.createAuditSendMails(CounterLocalServiceUtil.increment(AuditSendMails.class.getName()));
 				auditSendMails.setUserId(userId);
@@ -262,18 +284,38 @@ public class LmsMailMessageListener implements MessageListener {
 					
 					String toFullName = (isUserRelated) ? LanguageUtil.get(student.getLocale(),"groupmailing.messages.student-full-name") : student.getFullName();
 					String toScreenName = (isUserRelated) ? LanguageUtil.get(student.getLocale(),"groupmailing.messages.student-screen-name") : student.getScreenName();
+					String toFirstName = (isUserRelated) ? LanguageUtil.get(student.getLocale(),"groupmailing.messages.student-name") : student.getFirstName();
 					
 					InternetAddress to = new InternetAddress(toMail, student.getFullName());
-					String content = MailUtil.replaceMessageConstants(body, portal, community, toFullName, toScreenName, tutors,url,urlcourse,
+					String content = MailUtil.replaceMessageConstants(body, portal, community, toFullName, toScreenName, toFirstName, tutors,url,urlcourse,
 							MailUtil.getCourseStartDate(groupId, student.getLocale(), student.getTimeZone()), MailUtil.getCourseEndDate(groupId, student.getLocale(), student.getTimeZone()), userSender.getFullName());
+					
+					//Sustituir expandos
+					if(showExpandosUser)
+						content = MailUtil.replaceExpandosUser(content, companyId, isUserRelated?null:student, student.getLocale());
+					if(showExpandosCourse)
+						content = MailUtil.replaceExpandosCourse(content, companyId, groupId, student.getLocale());
+					
 					String calculatedBody = StringPool.BLANK;
 					if(isUserRelated)
 						calculatedBody += MailUtil.getExtraContentSocialRelationHeader(student) + MailUtil.getExtraContentSocialRelation(emailSentToUsersList, student, sendToRelationTypeIds);
 					calculatedBody += LanguageUtil.get(student.getLocale(),"mail.header");
-					calculatedBody += MailUtil.replaceMessageConstants(body, portal, community, toFullName, toScreenName,tutors,url,urlcourse, MailUtil.getCourseStartDate(groupId, student.getLocale(), student.getTimeZone()), MailUtil.getCourseEndDate(groupId, student.getLocale(), student.getTimeZone()), userSender.getFullName());
+					calculatedBody += MailUtil.replaceMessageConstants(body, portal, community, toFullName, toScreenName, toFirstName, tutors,url,urlcourse, MailUtil.getCourseStartDate(groupId, student.getLocale(), student.getTimeZone()), MailUtil.getCourseEndDate(groupId, student.getLocale(), student.getTimeZone()), userSender.getFullName());
+					
+					//Sustituir expandos
+					if(showExpandosUser)
+						calculatedBody = MailUtil.replaceExpandosUser(calculatedBody, companyId, isUserRelated?null:student, student.getLocale());
+					if(showExpandosCourse)
+						calculatedBody = MailUtil.replaceExpandosCourse(calculatedBody, companyId, groupId, student.getLocale());
+					
 					calculatedBody += LanguageUtil.get(student.getLocale(),"mail.footer");
 					
-					String calculatedsubject = MailUtil.replaceMessageConstants(subject, portal, community, toFullName, toScreenName, tutors, url, urlcourse, MailUtil.getCourseStartDate(groupId, student.getLocale(), student.getTimeZone()), MailUtil.getCourseEndDate(groupId, student.getLocale(), student.getTimeZone()), userSender.getFullName());
+					String calculatedsubject = MailUtil.replaceMessageConstants(subject, portal, community, toFullName, toScreenName, toFirstName, tutors, url, urlcourse, MailUtil.getCourseStartDate(groupId, student.getLocale(), student.getTimeZone()), MailUtil.getCourseEndDate(groupId, student.getLocale(), student.getTimeZone()), userSender.getFullName());
+					//Sustituir expandos
+					if(showExpandosUser)
+						calculatedsubject = MailUtil.replaceExpandosUser(calculatedsubject, companyId, isUserRelated?null:student, student.getLocale());
+					if(showExpandosCourse)
+						calculatedsubject = MailUtil.replaceExpandosCourse(calculatedsubject, companyId, groupId, student.getLocale());
 					
 					if(log.isDebugEnabled()) {
 						log.debug("Se envia el siguiente correo...");
@@ -412,10 +454,20 @@ public class LmsMailMessageListener implements MessageListener {
 			}
 			
 
-			String bodyTemplate = MailUtil.replaceMessageConstants(body, portal, community, null, null, tutors, url, urlcourse,
+			String bodyTemplate = MailUtil.replaceMessageConstants(body, portal, community, null, null, null, tutors, url, urlcourse,
 					MailUtil.getCourseStartDate(groupId, userSender.getLocale(), userSender.getTimeZone()), MailUtil.getCourseEndDate(groupId, userSender.getLocale(), userSender.getTimeZone()), userSender.getFullName());
-			String subjectTemplate = MailUtil.replaceMessageConstants(subject, portal, community, null, null, tutors, url, urlcourse,
+			
+			//Sustituir expandos
+			if(showExpandosCourse)
+				bodyTemplate = MailUtil.replaceExpandosCourse(bodyTemplate, companyId, groupId, userSender.getLocale());
+			
+			String subjectTemplate = MailUtil.replaceMessageConstants(subject, portal, community, null, null, null, tutors, url, urlcourse,
 					MailUtil.getCourseStartDate(groupId, userSender.getLocale(), userSender.getTimeZone()), MailUtil.getCourseEndDate(groupId, userSender.getLocale(), userSender.getTimeZone()), userSender.getFullName());
+			
+			//Sustituir expandos
+			if(showExpandosCourse)
+				subjectTemplate = MailUtil.replaceExpandosCourse(subjectTemplate, companyId, groupId, userSender.getLocale());
+			
 			String calculatedBody, calculatedSubject;
 			
 			if(_log.isDebugEnabled()) {
@@ -490,8 +542,14 @@ public class LmsMailMessageListener implements MessageListener {
 								_log.debug("Se envia un correo electronico al siguiente usuario: " + student.getEmailAddress());
 							}
 							
-							calculatedSubject = MailUtil.replaceStudent(subjectTemplate, student.getFullName(), student.getScreenName());
-							String content = MailUtil.replaceStudent(bodyTemplate, student.getFullName(), student.getScreenName());
+							calculatedSubject = MailUtil.replaceStudent(subjectTemplate, student.getFullName(), student.getScreenName(), student.getFirstName());
+							//Sustituir expandos de usuario
+							if(showExpandosUser)
+								calculatedSubject = MailUtil.replaceExpandosUser(calculatedSubject, companyId, student, student.getLocale());
+							String content = MailUtil.replaceStudent(bodyTemplate, student.getFullName(), student.getScreenName(), student.getFirstName());
+							//Sustituir expandos de usuario
+							if(showExpandosUser)
+								content = MailUtil.replaceExpandosUser(content, companyId, student, student.getLocale());
 							calculatedBody = LanguageUtil.get(student.getLocale(),"mail.header");
 							calculatedBody += content;
 							calculatedBody += LanguageUtil.get(student.getLocale(),"mail.footer");
@@ -576,9 +634,17 @@ public class LmsMailMessageListener implements MessageListener {
 								}
 								String toFullName = LanguageUtil.get(socialRelatedUser.getLocale(),"groupmailing.messages.student-full-name");
 								String toScreenName = LanguageUtil.get(socialRelatedUser.getLocale(),"groupmailing.messages.student-screen-name");
+								String toFirstName = LanguageUtil.get(socialRelatedUser.getLocale(),"groupmailing.messages.student-name");
 								
-								calculatedSubject = MailUtil.replaceStudent(subjectTemplate, toFullName, toScreenName);
-								String content = MailUtil.replaceStudent(bodyTemplate, toFullName, toScreenName);
+								calculatedSubject = MailUtil.replaceStudent(subjectTemplate, toFullName, toScreenName, toFirstName);
+								//Sustituir expandos
+								if(showExpandosUser)
+									calculatedSubject = MailUtil.replaceExpandosUser(calculatedSubject, companyId, null, socialRelatedUser.getLocale());
+								String content = MailUtil.replaceStudent(bodyTemplate, toFullName, toScreenName, toFirstName);
+								//Sustituir expandos
+								if(showExpandosUser)
+									content = MailUtil.replaceExpandosUser(content, companyId, null, socialRelatedUser.getLocale());
+								
 								String extraContentSocialRelation = MailUtil.getExtraContentSocialRelation(users, socialRelatedUser, sendToRelationTypeIds);
 								calculatedBody = MailUtil.getExtraContentSocialRelationHeader(socialRelatedUser) + extraContentSocialRelation;
 								calculatedBody += LanguageUtil.get(socialRelatedUser.getLocale(),"mail.header");

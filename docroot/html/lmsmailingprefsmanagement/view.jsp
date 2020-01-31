@@ -1,3 +1,10 @@
+<%@page import="com.liferay.portal.kernel.util.PrefsPropsUtil"%>
+<%@page import="com.liferay.portlet.expando.service.ExpandoColumnLocalServiceUtil"%>
+<%@page import="com.liferay.portlet.expando.model.ExpandoColumn"%>
+<%@page import="com.liferay.portlet.expando.model.ExpandoTableConstants"%>
+<%@page import="com.tls.liferaylms.util.MailConstants"%>
+<%@page import="com.liferay.lms.model.Course"%>
+<%@page import="com.liferay.portal.model.User"%>
 <%@include file="/init.jsp" %>
 
 <liferay-ui:success key="update-ok" message="mail.preferences.ok"/>
@@ -22,7 +29,59 @@
 			</c:forEach>
 		</aui:fieldset>
 	</c:if>
+	
+	<aui:fieldset label="mail.preferences.show-user-expandos">
+		<aui:input type="checkbox" name="showExpandosUser" label="mail.preferences.show-user-expando-fields" value="${showExpandosUser }" checked="${showExpandosUser }" 
+			onchange="javascript:${renderResponse.getNamespace()}changeUserCustomAttributesToShow()"/>
+		
+		<div class="lfr-panel lfr-collapsible lfr-panel-basic ${showExpandosUser ? '' : 'aui-helper-hidden'}" id="${renderResponse.getNamespace()}selectUserCustomAttributesToShow">
+			<%List<ExpandoColumn> listUserExpandos = ExpandoColumnLocalServiceUtil.getColumns(themeDisplay.getCompanyId(), User.class.getName(), ExpandoTableConstants.DEFAULT_TABLE_NAME);
+			String nameExpandoUser = "";
+			boolean expandoUserChecked = false;
+			for(ExpandoColumn expandoUserColumn: listUserExpandos){
+				expandoUserChecked = PrefsPropsUtil.getBoolean(themeDisplay.getCompanyId(), MailConstants.USER_EXPANDO_TO_SHOW+String.valueOf(expandoUserColumn.getColumnId()), false);
+				nameExpandoUser = "showExpandosUser" + expandoUserColumn.getColumnId();%>
+				<aui:input type="checkbox" name="<%=nameExpandoUser%>" label="<%=expandoUserColumn.getName() %>" value="<%=expandoUserChecked %>" checked="<%=expandoUserChecked %>" />
+			<%} %>
+		</div>
+	</aui:fieldset>
+	
+	<aui:fieldset label="mail.preferences.show-course-expandos">
+		<aui:input type="checkbox" name="showExpandosCourse" label="mail.preferences.show-course-expando-fields" value="${showExpandosCourse }" checked="${showExpandosCourse }" 
+			onchange="javascript:${renderResponse.getNamespace()}changeCourseCustomAttributesToShow()"/>
+		
+		<div class="lfr-panel lfr-collapsible lfr-panel-basic ${showExpandosCourse ? '' : 'aui-helper-hidden'}" id="${renderResponse.getNamespace()}selectCourseCustomAttributesToShow">
+			<%List<ExpandoColumn> listCourseExpandos = ExpandoColumnLocalServiceUtil.getColumns(themeDisplay.getCompanyId(), Course.class.getName(), ExpandoTableConstants.DEFAULT_TABLE_NAME);
+			String nameExpandoCourse = "";
+			boolean expandoCourseChecked = false;
+			for(ExpandoColumn expandoCourseColumn: listCourseExpandos){
+				expandoCourseChecked = PrefsPropsUtil.getBoolean(themeDisplay.getCompanyId(), MailConstants.COURSE_EXPANDO_TO_SHOW+String.valueOf(expandoCourseColumn.getColumnId()), false);
+				nameExpandoCourse = "showExpandosCourse" + expandoCourseColumn.getColumnId();%>
+				<aui:input type="checkbox" name="<%=nameExpandoCourse%>" label="<%=expandoCourseColumn.getName() %>" value="<%=expandoCourseChecked %>" checked="<%=expandoCourseChecked %>" />
+			<%} %>
+		</div>
+	</aui:fieldset>
+	
 	<aui:button-row>
 		<aui:button type="submit" value="save" />
 	</aui:button-row>
 </aui:form>
+
+<script>
+	function <portlet:namespace />changeUserCustomAttributesToShow(){
+		var checked = document.getElementById('<portlet:namespace />showExpandosUser').value;
+		if(checked == 'true'){
+			document.getElementById('<portlet:namespace />selectUserCustomAttributesToShow').className = "lfr-panel lfr-collapsible lfr-panel-basic";
+		}else{
+			document.getElementById('<portlet:namespace />selectUserCustomAttributesToShow').className = "lfr-panel lfr-collapsible lfr-panel-basic aui-helper-hidden";
+		}
+	}
+	function <portlet:namespace />changeCourseCustomAttributesToShow(){
+		var checked = document.getElementById('<portlet:namespace />showExpandosCourse').value;
+		if(checked == 'true'){
+			document.getElementById('<portlet:namespace />selectCourseCustomAttributesToShow').className = "lfr-panel lfr-collapsible lfr-panel-basic";
+		}else{
+			document.getElementById('<portlet:namespace />selectCourseCustomAttributesToShow').className = "lfr-panel lfr-collapsible lfr-panel-basic aui-helper-hidden";
+		}
+	}
+</script>
