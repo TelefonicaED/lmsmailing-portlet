@@ -1,3 +1,4 @@
+<%@page import="java.util.Locale"%>
 <%@page import="com.liferay.portal.kernel.util.PrefsPropsUtil"%>
 <%@page import="com.liferay.portlet.expando.service.ExpandoColumnLocalServiceUtil"%>
 <%@page import="com.liferay.portlet.expando.model.ExpandoColumn"%>
@@ -5,7 +6,13 @@
 <%@page import="com.tls.liferaylms.util.MailConstants"%>
 <%@page import="com.liferay.lms.model.Course"%>
 <%@page import="com.liferay.portal.model.User"%>
+<%@page import=" com.tls.liferaylms.util.JavaScriptUtil"%>
 <%@include file="/init.jsp" %>
+
+<%
+String header = PrefsPropsUtil.getString(themeDisplay.getCompanyId(), MailConstants.HEADER_PREFS, LanguageUtil.get(Locale.getDefault(),"mail.header"));
+String footer = PrefsPropsUtil.getString(themeDisplay.getCompanyId(), MailConstants.FOOTER_PREFS, LanguageUtil.get(Locale.getDefault(),"mail.footer"));
+%>
 
 <liferay-ui:success key="update-ok" message="mail.preferences.ok"/>
 <liferay-ui:error key="update-ko" message="mail.preferences.error"/>
@@ -61,7 +68,26 @@
 			<%} %>
 		</div>
 	</aui:fieldset>
-	
+	<aui:fieldset label="mail.preferences.header-footer">
+		<aui:field-wrapper label="header">
+			<liferay-ui:input-editor name="header" initMethod="initEditorHeader"/>
+		</aui:field-wrapper>
+		<aui:field-wrapper label="footer">
+			<liferay-ui:input-editor name="footer" initMethod="initEditorFooter"/>
+		</aui:field-wrapper>
+		<script type="text/javascript">
+	    <!--
+		    function <portlet:namespace />initEditorHeader()
+		    {
+		    	return "<%=JavaScriptUtil.markupToStringLiteral(header)%>";
+		    }
+		    function <portlet:namespace />initEditorFooter()
+		    {
+		    	return "<%=JavaScriptUtil.markupToStringLiteral(footer)%>";
+		    }
+	        //-->
+	    </script>
+	</aui:fieldset>
 	<aui:button-row>
 		<aui:button type="submit" value="save" />
 	</aui:button-row>

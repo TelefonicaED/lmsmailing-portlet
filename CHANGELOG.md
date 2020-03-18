@@ -8,8 +8,8 @@ El formato está basado en [SemVer](https://semver.org/spec/v2.0.0.html).
 ### Added 
 
 - #171812 Se añade la opción de usar el nombre del alumno como variable en el envío del email
-
 - #169695 Se añade a las preferencias del mailing la opción de activar los expandos de curso y de usuario como variables en el envío de emails
+- #138540 Se pueden configurar desde el panel de control la cabecera y pie de los correos
 
 ## [4.1.0](https://github.com/TelefonicaED/lmsmailing-portlet/releases/tag/v4.1.0)
 
