@@ -1,4 +1,6 @@
 
+<%@page import="com.tls.liferaylms.mail.service.MailTemplateLocalServiceUtil"%>
+<%@page import="com.tls.liferaylms.mail.model.MailTemplate"%>
 <%@page import="com.tls.liferaylms.job.condition.Condition"%>
 <%@page import="com.tls.liferaylms.job.condition.ConditionUtil"%>
 <%@ include file="/init.jsp"%>
@@ -55,11 +57,15 @@ $(document).ready(function(){
 			<%
 				Condition condition = ConditionUtil.instance(mailJob.getConditionClassName(), mailJob);
 				Condition reference = ConditionUtil.instance(mailJob.getDateClassName(), mailJob);
+				MailTemplate template = MailTemplateLocalServiceUtil.fetchMailTemplate(mailJob.getIdTemplate());
 			%>
 				
 			<portlet:actionURL var="viewURL" name="viewMailJob">
         		<portlet:param name="mailjob" value="<%=String.valueOf(mailJob.getPrimaryKey()) %>" />
 			</portlet:actionURL>
+			<liferay-ui:search-container-column-text name="template">
+				<%=template != null ? template.getSubject() : "" %>
+			</liferay-ui:search-container-column-text>
 			<liferay-ui:search-container-column-text name="condition">
 				<%if(condition!=null){ %>
 				<c:choose>
@@ -94,7 +100,7 @@ $(document).ready(function(){
 					</c:otherwise>
 				</c:choose>
 			</liferay-ui:search-container-column-text>		
-			<liferay-ui:search-container-column-text name="release-date">
+			<liferay-ui:search-container-column-text name="groupmailing.release-date">
 			<%if(reference!=null){ %>
 			<%= reference.getFormatDate() %>
 			<%} %>
@@ -137,11 +143,15 @@ nonProcessedURL.setParameter("tab","non-processed-plural");
 			<%
 				Condition condition = ConditionUtil.instance(mailJob.getConditionClassName(), mailJob);
 				Condition reference = ConditionUtil.instance(mailJob.getDateClassName(), mailJob);
+				MailTemplate template = MailTemplateLocalServiceUtil.fetchMailTemplate(mailJob.getIdTemplate());
 			%>
 				
 			<portlet:actionURL var="viewURL" name="viewMailJob">
         		<portlet:param name="mailjob" value="<%=String.valueOf(mailJob.getPrimaryKey()) %>" />
 			</portlet:actionURL>
+			<liferay-ui:search-container-column-text name="template">
+				<%=template != null ? template.getSubject() : "" %>
+			</liferay-ui:search-container-column-text>
 			<liferay-ui:search-container-column-text name="condition">
 				<%if(condition!=null){ %>
 				<c:choose>
@@ -176,7 +186,7 @@ nonProcessedURL.setParameter("tab","non-processed-plural");
 					</c:otherwise>
 				</c:choose>
 			</liferay-ui:search-container-column-text>		
-			<liferay-ui:search-container-column-text name="release-date">
+			<liferay-ui:search-container-column-text name="groupmailing.release-date">
 			<%if(reference!=null){ %>
 				<%= reference.getFormatDate() %>
 			<%} %>
