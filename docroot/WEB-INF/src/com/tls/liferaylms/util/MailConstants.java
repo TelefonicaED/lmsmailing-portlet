@@ -14,4 +14,7 @@ public class MailConstants {
 	public static final String USER_EXPANDO_TO_SHOW = "mail-preferences.show-user-expando.";
 	public static final String COURSE_EXPANDOS_TO_SHOW = "mail-preferences.show-course-expandos";
 	public static final String COURSE_EXPANDO_TO_SHOW = "mail-preferences.show-course-expando.";
+	
+	public static final String FOOTER_PREFS = "mail-preferences.footer";
+	public static final String HEADER_PREFS = "mail-preferences.header";
 }

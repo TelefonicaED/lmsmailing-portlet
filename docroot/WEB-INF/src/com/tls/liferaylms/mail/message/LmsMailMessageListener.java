@@ -216,9 +216,9 @@ public class LmsMailMessageListener implements MessageListener {
 				if(showExpandosCourse)
 					body = MailUtil.replaceExpandosCourse(body, companyId, groupId, userSender.getLocale());
 				
-				String calculatedBody = LanguageUtil.get(Locale.getDefault(),"mail.header");
+				String calculatedBody = PrefsPropsUtil.getString(companyId, MailConstants.HEADER_PREFS, LanguageUtil.get(Locale.getDefault(),"mail.header"));
 				calculatedBody += body;
-				calculatedBody += LanguageUtil.get(Locale.getDefault(),"mail.footer");
+				calculatedBody += PrefsPropsUtil.getString(companyId, MailConstants.FOOTER_PREFS, LanguageUtil.get(Locale.getDefault(),"mail.footer"));
 				
 				subject = MailUtil.replaceMessageConstants(subject, portal, community, userSender.getFullName(), userSender.getScreenName(), userSender.getFirstName(), tutors, url, urlcourse,
 						MailUtil.getCourseStartDate(groupId, userSender.getLocale(), userSender.getTimeZone()), MailUtil.getCourseEndDate(groupId, userSender.getLocale(), userSender.getTimeZone()), userSender.getFullName());
@@ -240,6 +240,8 @@ public class LmsMailMessageListener implements MessageListener {
 				}
 				auditSendMails.setCompanyId(companyId);
 				AuditSendMailsLocalServiceUtil.addAuditSendMails(auditSendMails);
+				
+				log.debug("calculatedBody: " + calculatedBody);
 				
 				try{
 					MailMessage mailm = new MailMessage(from, to, subject, calculatedBody, true);
@@ -299,16 +301,16 @@ public class LmsMailMessageListener implements MessageListener {
 					String calculatedBody = StringPool.BLANK;
 					if(isUserRelated)
 						calculatedBody += MailUtil.getExtraContentSocialRelationHeader(student) + MailUtil.getExtraContentSocialRelation(emailSentToUsersList, student, sendToRelationTypeIds);
-					calculatedBody += LanguageUtil.get(student.getLocale(),"mail.header");
+					calculatedBody += PrefsPropsUtil.getString(companyId, MailConstants.HEADER_PREFS, LanguageUtil.get(student.getLocale(),"mail.header"));
 					calculatedBody += MailUtil.replaceMessageConstants(body, portal, community, toFullName, toScreenName, toFirstName, tutors,url,urlcourse, MailUtil.getCourseStartDate(groupId, student.getLocale(), student.getTimeZone()), MailUtil.getCourseEndDate(groupId, student.getLocale(), student.getTimeZone()), userSender.getFullName());
-					
+
 					//Sustituir expandos
 					if(showExpandosUser)
 						calculatedBody = MailUtil.replaceExpandosUser(calculatedBody, companyId, isUserRelated?null:student, student.getLocale());
 					if(showExpandosCourse)
 						calculatedBody = MailUtil.replaceExpandosCourse(calculatedBody, companyId, groupId, student.getLocale());
 					
-					calculatedBody += LanguageUtil.get(student.getLocale(),"mail.footer");
+					calculatedBody += PrefsPropsUtil.getString(companyId, MailConstants.FOOTER_PREFS, LanguageUtil.get(student.getLocale(),"mail.footer"));
 					
 					String calculatedsubject = MailUtil.replaceMessageConstants(subject, portal, community, toFullName, toScreenName, toFirstName, tutors, url, urlcourse, MailUtil.getCourseStartDate(groupId, student.getLocale(), student.getTimeZone()), MailUtil.getCourseEndDate(groupId, student.getLocale(), student.getTimeZone()), userSender.getFullName());
 					//Sustituir expandos
@@ -550,9 +552,9 @@ public class LmsMailMessageListener implements MessageListener {
 							//Sustituir expandos de usuario
 							if(showExpandosUser)
 								content = MailUtil.replaceExpandosUser(content, companyId, student, student.getLocale());
-							calculatedBody = LanguageUtil.get(student.getLocale(),"mail.header");
+							calculatedBody = PrefsPropsUtil.getString(companyId, MailConstants.HEADER_PREFS, LanguageUtil.get(student.getLocale(),"mail.header"));
 							calculatedBody += content;
-							calculatedBody += LanguageUtil.get(student.getLocale(),"mail.footer");
+							calculatedBody += PrefsPropsUtil.getString(companyId, MailConstants.FOOTER_PREFS, LanguageUtil.get(student.getLocale(),"mail.footer"));
 							
 							if(log.isDebugEnabled()) {
 								log.debug("Se envia el siguiente correo...");
@@ -647,9 +649,10 @@ public class LmsMailMessageListener implements MessageListener {
 								
 								String extraContentSocialRelation = MailUtil.getExtraContentSocialRelation(users, socialRelatedUser, sendToRelationTypeIds);
 								calculatedBody = MailUtil.getExtraContentSocialRelationHeader(socialRelatedUser) + extraContentSocialRelation;
-								calculatedBody += LanguageUtil.get(socialRelatedUser.getLocale(),"mail.header");
+								calculatedBody += MailUtil.getExtraContentSocialRelation(users, socialRelatedUser, sendToRelationTypeIds);
+								calculatedBody += PrefsPropsUtil.getString(companyId, MailConstants.HEADER_PREFS, LanguageUtil.get(socialRelatedUser.getLocale(),"mail.header"));
 								calculatedBody += content;
-								calculatedBody += LanguageUtil.get(socialRelatedUser.getLocale(),"mail.footer");
+								calculatedBody += PrefsPropsUtil.getString(companyId, MailConstants.FOOTER_PREFS, LanguageUtil.get(socialRelatedUser.getLocale(),"mail.footer"));
 								
 								if(log.isDebugEnabled()) {
 									log.debug("Se envia el siguiente correo...");

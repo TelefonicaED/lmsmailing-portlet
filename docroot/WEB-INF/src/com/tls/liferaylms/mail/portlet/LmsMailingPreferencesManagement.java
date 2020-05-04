@@ -3,6 +3,7 @@ package com.tls.liferaylms.mail.portlet;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 
 import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
@@ -15,7 +16,9 @@ import javax.portlet.RenderResponse;
 import javax.portlet.ValidatorException;
 
 import com.liferay.lms.model.Course;
+import com.liferay.lms.service.CourseLocalServiceUtil;
 import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.servlet.SessionErrors;
@@ -84,6 +87,7 @@ public class LmsMailingPreferencesManagement extends MVCPortlet {
 		boolean internalMessagingActive = false;
 		boolean sendAlwaysMessage = false;
 		String deregisterMailExpando = "deregister-mail";
+		
 		try {
 			internalMessagingActive = PrefsPropsUtil.getBoolean(themeDisplay.getCompanyId(), MailStringPool.INTERNAL_MESSAGING_KEY);
 			sendAlwaysMessage = PrefsPropsUtil.getBoolean(themeDisplay.getCompanyId(), MailStringPool.SEND_ALWAYS_MESSAGE_KEY);
@@ -150,9 +154,13 @@ public class LmsMailingPreferencesManagement extends MVCPortlet {
 			boolean internalMessagingActive = ParamUtil.getBoolean(actionRequest,"internalMessagingActive");
 			boolean sendAlwaysMessage = ParamUtil.getBoolean(actionRequest,"sendAlwaysMessage");
 			String deregisterMailExpando = ParamUtil.getString(actionRequest,"deregisterMailExpando");
+			String header = ParamUtil.getString(actionRequest, "header", LanguageUtil.get(Locale.getDefault(),"mail.header"));
+			String footer = ParamUtil.getString(actionRequest, "footer", LanguageUtil.get(Locale.getDefault(),"mail.footer"));
 			boolean errorDeregisterExpando = savePreference(MailStringPool.DEREGISTER_MAIL_KEY,deregisterMailExpando , companyId);
 			boolean errorInternalMessaging = savePreference(MailStringPool.INTERNAL_MESSAGING_KEY ,String.valueOf(internalMessagingActive) , companyId);
 			boolean errorSendAlwaysMessage = savePreference(MailStringPool.SEND_ALWAYS_MESSAGE_KEY ,String.valueOf(sendAlwaysMessage) , companyId);
+			boolean errorHeader = savePreference(MailConstants.HEADER_PREFS, header, companyId);
+			boolean errorFooter = savePreference(MailConstants.FOOTER_PREFS, footer, companyId);
 			boolean errorActiveMailRelations = false;
 			List<Integer> mailRelationTypeIds = MailRelationLocalServiceUtil.findRelationTypeIdsByCompanyId(companyId);
 			if(Validator.isNotNull(mailRelationTypeIds) && mailRelationTypeIds.size()>0){
@@ -191,7 +199,8 @@ public class LmsMailingPreferencesManagement extends MVCPortlet {
 				} 
 			}
 			
-			if(errorDeregisterExpando || errorInternalMessaging || errorSendAlwaysMessage || errorActiveMailRelations || errorShowExpandosUser || errorShowExpandosCourse){
+			if(errorDeregisterExpando || errorInternalMessaging || errorSendAlwaysMessage || errorActiveMailRelations || errorShowExpandosUser 
+					|| errorShowExpandosCourse || errorHeader || errorFooter){
 				SessionErrors.add(actionRequest, "update-ko");
 			}else{
 				SessionMessages.add(actionRequest, "update-ok");

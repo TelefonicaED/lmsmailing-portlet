@@ -19,7 +19,6 @@ import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.model.User;
-import com.liferay.portal.security.permission.PermissionCheckerFactoryUtil;
 import com.liferay.portal.service.UserLocalServiceUtil;
 import com.tls.liferaylms.util.MailStringPool;
 
@@ -44,17 +43,8 @@ public class ActivityCondition extends MainCondition{
 		
 
 		for(User user : groupUsers){
+			if(log.isDebugEnabled())log.debug("-----userId---------- "+user.getUserId());
 			LearningActivityResult lar = null;
-			
-			//Excluye los usuarios que son algo más que estudiantes
-			/*try {
-				if((PermissionCheckerFactoryUtil.create(user)).hasPermission(getMailJob().getGroupId(), "com.liferay.lms.model", getMailJob().getGroupId(), "VIEW_RESULTS")){
-					continue;
-				}
-			} catch (Exception e) {
-				if(log.isDebugEnabled())e.printStackTrace();
-				if(log.isErrorEnabled())log.error(e.getMessage());
-			}*/
 			
 			try {
 				lar = LearningActivityResultLocalServiceUtil.getByActIdAndUserId(getMailJob().getConditionClassPK(), user.getUserId());
@@ -64,8 +54,7 @@ public class ActivityCondition extends MainCondition{
 			}
 			String[] ids = new String[0];
 			if(getMailJob().getConditionStatus().length()!=0) ids=  getMailJob().getConditionStatus().split(StringPool.COMMA);
-			if(log.isDebugEnabled())log.debug("----------------------------- "+getMailJob().getConditionStatus().length());
-
+			if(log.isDebugEnabled())log.debug("----------------------------- "+ids.length);
 			
 			for(String sid : ids){
 				if(log.isDebugEnabled())log.debug("----------------------------- "+sid);
@@ -77,30 +66,36 @@ public class ActivityCondition extends MainCondition{
 					if(log.isDebugEnabled())nfe.printStackTrace();
 					if(log.isErrorEnabled())log.error(nfe.getMessage());
 				}
+				
+				if(log.isDebugEnabled())log.debug("--------------------id--------- "+id);
 			
 				switch (id) {
 					//not started
 					case 0:
 						if(lar==null){
 							users.add(user);
+							log.debug("usuario añadido 0");
 						}
 					break;
 					//started
 					case 1:
 						if(lar!=null&&lar.getEndDate()==null){
 							users.add(user);
+							log.debug("usuario añadido 1");
 						}
 					break;
 					//not passed
 					case 2:
 						if(lar!=null&&!lar.getPassed()&&lar.getEndDate()!=null){
 							users.add(user);
+							log.debug("usuario añadido 2");
 						}
 					break;
 					//passed
 					case 3:
 						if(lar!=null&&lar.getPassed()){
 							users.add(user);
+							log.debug("usuario añadido 3");
 						}
 					break;
 				}
