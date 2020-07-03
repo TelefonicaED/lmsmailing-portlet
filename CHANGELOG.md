@@ -3,6 +3,7 @@ Todos los cambios de este proyecto estarán documentados en este archivo.
 
 El formato está basado en [SemVer](https://semver.org/spec/v2.0.0.html).
 
+
 ## [4.2.0](https://github.com/TelefonicaED/lmsmailing-portlet/releases/tag/v4.2.0)
 
 ### Added 
@@ -11,6 +12,10 @@ El formato está basado en [SemVer](https://semver.org/spec/v2.0.0.html).
 - #169695 Se añade a las preferencias del mailing la opción de activar los expandos de curso y de usuario como variables en el envío de emails
 - #138540 Se pueden configurar desde el panel de control la cabecera y pie de los correos
 - #177049 Nueva columna para plantilla en correos programados
+
+### Fixed
+
+ #179432 - Configuración de correos programados no funciona correctamente con la plataforma en catalán. Cambio comilla simple por comilla doble
 
 ## [4.1.0](https://github.com/TelefonicaED/lmsmailing-portlet/releases/tag/v4.1.0)
 

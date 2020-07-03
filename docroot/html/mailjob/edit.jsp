@@ -12,7 +12,7 @@
 	<c:forEach items="${modules}" var="module" >
 		hash['${module.moduleId}']= [
 		<c:forEach items="${activities[module.moduleId]}" var="activity" varStatus="loop">
-			{id : '${activity.actId}', title : '${activity.getTitle(themeDisplay.locale)}'} ${!loop.last ? ',' : ''}
+			{id : "${activity.actId}", title : "${activity.getTitle(themeDisplay.locale)}"} ${!loop.last ? ',' : ''}
 		</c:forEach>
 		];
 	</c:forEach>
