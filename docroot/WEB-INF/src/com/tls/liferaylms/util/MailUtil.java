@@ -1,5 +1,6 @@
 package com.tls.liferaylms.util;
 
+import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -17,8 +18,10 @@ import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.PrefsPropsUtil;
+import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.Company;
@@ -43,48 +46,54 @@ public class MailUtil {
 			long userId, long companyId) {
 		long classNameId = PortalUtil.getClassNameId(Group.class.getName());
 		try {
-			String type = "announcements.type.general";
-			log.debug("-- Sending Interal Messaging Notification");
-			log.debug("-- Content "+content);
-			Date now = new Date();
-			log.debug("NOW " + now);
-			Calendar displayDate = Calendar.getInstance();
-			Calendar expirationDate = Calendar.getInstance();
-			displayDate.setTime(now);
-			expirationDate.setTime(now);
+			AnnouncementsEntry ae = null;
+			if (entryId != null && entryId > 0) {
+				ae = AnnouncementsEntryLocalServiceUtil.fetchAnnouncementsEntry(entryId);
+			}
+			
+			if(ae==null){
+				String type = "announcements.type.general";
+				log.debug("-- Sending Interal Messaging Notification");
+				log.debug("-- Content "+content);
+				Date now = new Date();
+				log.debug("NOW " + now);
+				Calendar displayDate = Calendar.getInstance();
+				Calendar expirationDate = Calendar.getInstance();
+				displayDate.setTime(now);
+				expirationDate.setTime(now);
 
-			expirationDate.add(Calendar.MONTH, 1);
+				expirationDate.add(Calendar.MONTH, 1);
 
-			AnnouncementsEntry ae = AnnouncementsEntryLocalServiceUtil
-					.createAnnouncementsEntry(CounterLocalServiceUtil
-							.increment());
+				ae = AnnouncementsEntryLocalServiceUtil
+						.createAnnouncementsEntry(CounterLocalServiceUtil
+								.increment());
 
-			ae.setCompanyId(companyId);
-			ae.setUserId(senderUserId);
-			ae.setUserName(StringPool.BLANK);
-			ae.setCreateDate(now);
-			ae.setModifiedDate(now);
-			ae.setClassNameId(classNameId);
-			ae.setClassPK(groupId);
-			ae.setTitle(title);
-			ae.setContent(content);
-			ae.setUrl(StringPool.BLANK);
-			ae.setType(type);
-			ae.setDisplayDate(displayDate.getTime());
-			ae.setExpirationDate(expirationDate.getTime());
-			ae.setPriority(0);
-			ae.setAlert(true);
+				ae.setCompanyId(companyId);
+				ae.setUserId(senderUserId);
+				ae.setUserName(StringPool.BLANK);
+				ae.setCreateDate(now);
+				ae.setModifiedDate(now);
+				ae.setClassNameId(classNameId);
+				ae.setClassPK(groupId);
+				ae.setTitle(title);
+				ae.setContent(content);
+				ae.setUrl(StringPool.BLANK);
+				ae.setType(type);
+				ae.setDisplayDate(displayDate.getTime());
+				ae.setExpirationDate(expirationDate.getTime());
+				ae.setPriority(0);
+				ae.setAlert(true);
 
-			ae = AnnouncementsEntryLocalServiceUtil
-					.updateAnnouncementsEntry(ae);
+				ae = AnnouncementsEntryLocalServiceUtil
+						.updateAnnouncementsEntry(ae);
+			}
+			
+			
+			
 			AnnouncementsFlagLocalServiceUtil.addFlag(userId, ae.getEntryId(),
 					AnnouncementsFlagConstants.UNREAD);
 
-			if (entryId != null && entryId > 0) {
-				AnnouncementsFlagLocalServiceUtil.addFlag(userId, entryId,
-						MailConstants.ANNOUNCEMENT_FLAG_DELETED);
-			}
-
+		
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -93,7 +102,7 @@ public class MailUtil {
 
 	public static AnnouncementsEntry createInternalMessageNotification(
 			String title, String content, long groupId, long senderUserId,
-			long companyId) {
+			long companyId, File[] attachments, String[] attachmentNames) {
 		long classNameId = PortalUtil.getClassNameId(Group.class.getName());
 		AnnouncementsEntry ae = null;
 		try {
@@ -132,6 +141,32 @@ public class MailUtil {
 					.updateAnnouncementsEntry(ae);
 			AnnouncementsFlagLocalServiceUtil.addFlag(senderUserId,
 					ae.getEntryId(), AnnouncementsFlagConstants.NOT_HIDDEN);
+			
+			long entryId = ae.getEntryId();
+			
+			log.debug("Attachments "+attachments);
+			String filePaths = null;
+			File attachment = null;
+			String path = null;
+			if(attachments!=null && attachments.length>0){
+				if(attachments!=null && attachments.length>0){
+					for(int i=0; i<attachments.length; i++){
+						if(attachments[i]!=null){
+							if(Validator.isNull(filePaths)){
+								filePaths = getAttachmentPath(ae.getEntryId());
+								log.debug("Path de los adjuntos "+filePaths);
+							}
+							path=filePaths+File.separator+attachmentNames[i];
+							attachment  = new File(existsFile(path, 1));
+							log.debug("ATTACHMENT NAME "+attachmentNames[i]);
+							log.debug("ATTACHMENT "+attachments[i].length());
+							FileUtil.copyFile(attachments[i], attachment);
+						}
+						
+					}
+				}
+			}
+			
 
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -139,6 +174,54 @@ public class MailUtil {
 		return ae;
 	}
 	
+	
+	public static String getAttachmentPath(long entryId){
+		
+
+		log.debug("::Attachment for: "+entryId);
+		StringBuffer sb = new StringBuffer(PropsUtil.get("liferay.home"));
+
+		sb.append(File.separator);
+		sb.append("data");
+		sb.append(File.separator);
+		sb.append(MailConstants.INTERNAL_MESSAGING_FILE_PATH_FOLDER);
+
+		File dir = new File(sb.toString());
+		if(!dir.exists()){
+			dir.mkdir();
+		}
+
+		sb.append(File.separator);
+		sb.append(MailConstants.ATTACHMENTS_FILE_PATH_FOLDER);
+		dir = new File(sb.toString());
+		if(!dir.exists()){
+			dir.mkdir();
+		}
+
+		sb.append(File.separator);
+		sb.append(entryId);
+
+		dir = new File(sb.toString());
+		if(!dir.exists()){
+			dir.mkdir();
+		}
+
+	
+		return sb.toString();
+	
+	}
+	
+	public static String existsFile(String path, int version){
+		if(FileUtil.exists(path)){
+			path = path+version;
+			String[] pathSections = path.split(".");
+			String newPath = pathSections[0]+version+"."+pathSections[1];
+			return existsFile(newPath, version++);
+		}else{
+			return path;
+		}
+		
+	}
 	
 	public static String getURLPortal(Company company, ActionRequest request){
 		String url = "";

@@ -155,7 +155,7 @@ public class ProcessMailJob extends MVCPortlet implements MessageListener{
 							
 							if(internalMessagingActive){
 								log.debug("Sending internal message ");
-								AnnouncementsEntry entry = MailUtil.createInternalMessageNotification(mailTemplate.getSubject(), mailTemplate.getBody(), mailJob.getGroupId(), mailJob.getUserId(), mailJob.getCompanyId());
+								AnnouncementsEntry entry = MailUtil.createInternalMessageNotification(mailTemplate.getSubject(), mailTemplate.getBody(), mailJob.getGroupId(), mailJob.getUserId(), mailJob.getCompanyId(), null, null);
 								if(entry!=null){
 									entryId = entry.getEntryId();
 								}
