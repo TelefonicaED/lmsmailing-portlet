@@ -1,5 +1,6 @@
 package com.tls.liferaylms.mail.message;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedHashMap;
@@ -152,8 +153,18 @@ public class LmsMailMessageListener implements MessageListener {
 		Long entryId = message.getLong("entryId");
 		boolean deregisterMail;
 		String type_ = message.getString("type");
+		File[] attachments = (File[]) message.get("attachments");
+		String[] attachmentNames = (String[]) message.get("attachmentNames");
 		
 		if (_log.isDebugEnabled())
+				_log.debug("Attachments: "+attachments);
+			_log.debug("Attachment Names: "+attachmentNames);
+			
+			if(attachments!= null && attachmentNames!= null){
+				_log.debug("Attachments length: "+attachments.length);
+				_log.debug("Attachment Names length: "+attachmentNames.length);
+			}
+		
 			_log.debug("type_::"+type_);
 
 		
@@ -245,6 +256,11 @@ public class LmsMailMessageListener implements MessageListener {
 				
 				try{
 					MailMessage mailm = new MailMessage(from, to, subject, calculatedBody, true);
+					if(attachments!=null && attachments.length>0 && attachmentNames!=null && attachmentNames.length>0 && attachments.length == attachmentNames.length){
+						for(int i = 0; i<attachments.length ; i++){
+							mailm.addFileAttachment(attachments[i], attachmentNames[i]);
+						}
+					}
 					if(internalMessagingActive){
 						MailUtil.sendInternalMessageNotification(entryId,subject, body, groupId, userId, userSender.getUserId(), companyId);
 					}
@@ -361,6 +377,12 @@ public class LmsMailMessageListener implements MessageListener {
 					
 					try{
 						MailMessage mailm = new MailMessage(from, to, calculatedsubject, calculatedBody ,true);
+						if(attachments!=null && attachments.length>0 && attachmentNames!=null && attachmentNames.length>0 && attachments.length == attachmentNames.length){
+							for(int i = 0; i<attachments.length ; i++){
+								mailm.addFileAttachment(attachments[i], attachmentNames[i]);
+							}
+						}
+						
 						if(internalMessagingActive){
 							if(isUserRelated)
 								content = MailUtil.getExtraContentSocialRelationHeader(student) + MailUtil.getExtraContentSocialRelation(emailSentToUsersList, student, sendToRelationTypeIds) + content;
@@ -567,7 +589,11 @@ public class LmsMailMessageListener implements MessageListener {
 							
 							MailMessage mailm = new MailMessage(from, to, calculatedSubject, calculatedBody ,true);
 							//MailEngine.send(mailm);
-							
+							if(attachments!=null && attachments.length>0 && attachmentNames!=null && attachmentNames.length>0 && attachments.length == attachmentNames.length){
+								for(int i = 0; i<attachments.length ; i++){
+									mailm.addFileAttachment(attachments[i], attachmentNames[i]);
+								}
+							}
 							try{
 								if(internalMessagingActive){
 									MailUtil.sendInternalMessageNotification(entryId,calculatedSubject,content, groupId, userId, student.getUserId(), companyId);
@@ -665,6 +691,11 @@ public class LmsMailMessageListener implements MessageListener {
 								
 								MailMessage mailm = new MailMessage(from, to, calculatedSubject, calculatedBody ,true);
 								//MailEngine.send(mailm);
+								if(attachments!=null && attachments.length>0 && attachmentNames!=null && attachmentNames.length>0 && attachments.length == attachmentNames.length){
+									for(int i = 0; i<attachments.length ; i++){
+										mailm.addFileAttachment(attachments[i], attachmentNames[i]);
+									}
+								}
 								
 								try{
 									if(internalMessagingActive){

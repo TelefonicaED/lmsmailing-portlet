@@ -1,4 +1,6 @@
-<%@page import="com.liferay.portal.service.PortalPreferencesLocalServiceUtil"%>
+<%@page import="com.liferay.portal.kernel.exception.SystemException"%>
+<%@page import="com.liferay.portal.service.permission.PortalPermissionUtil"%>
+<%@page import="com.tls.liferaylms.util.MailPrefsPropsValues"%><%@page import="com.liferay.portal.service.PortalPreferencesLocalServiceUtil"%>
 <%@page import="com.tls.liferaylms.mail.service.MailTemplateLocalServiceUtil"%>
 <%@page import="com.tls.liferaylms.mail.model.MailTemplate"%>
 <%@page import="com.tls.liferaylms.mail.service.MailRelationLocalServiceUtil"%>
@@ -33,6 +35,9 @@
 
 	String criteria = request.getParameter("criteria");
 	
+	boolean userExtendedData = !MailPrefsPropsValues.getUsersExtendedData(themeDisplay.getCompanyId()) || PortalPermissionUtil.contains(
+			themeDisplay.getPermissionChecker(), MailConstants.ACTION_VIEW_USER_EXTENDED);
+	
 	boolean backToEdit = ParamUtil.getBoolean(request, "backToEdit");
 	String redirectOfEdit = ParamUtil.getString(request, "redirectOfEdit");
 	String firstName = ParamUtil.getString(request,"firstName");
@@ -50,7 +55,7 @@
 			for(int i =0; i<toElements.length; i++){
 				currentUser = UserLocalServiceUtil.fetchUser(Long.parseLong(toElements[i]));
 				if(currentUser!=null){
-					toNames += currentUser.getFullName() + ";";
+					toNames += (userExtendedData ? currentUser.getFullName(): currentUser.getScreenName()) + ";";
 				}
 			}
 			
@@ -116,6 +121,8 @@ if (ownTeam && !permissionChecker.isOmniadmin())
 	userTeams=TeamLocalServiceUtil.getUserTeams(themeDisplay.getUserId(), themeDisplay.getScopeGroupId());
 else
 	userTeams=TeamLocalServiceUtil.getGroupTeams(themeDisplay.getScopeGroupId());
+
+
 %>
 <script type="text/javascript">
 
@@ -238,7 +245,7 @@ else
 			);
 		});
 
-		A.one('#<%=renderResponse.getNamespace() %>form_mail').on('submit', function(evt) {			
+		A.one('#<%=renderResponse.getNamespace() %>fm').on('submit', function(evt) {			
 	         if((A.one('input:radio[name=<portlet:namespace />radio_to]:checked').get('value')=='student')&& 
 	    	    (window.<portlet:namespace />selectedUsers.isEmpty ())) {
 	             evt.preventDefault();
@@ -271,7 +278,9 @@ else
 
 <div id="<portlet:namespace />student_search" class="aui-helper-hidden" >
 
-	<jsp:include page="/html/groupmailing/search_form.jsp" />
+	<jsp:include page="/html/groupmailing/search_form.jsp" >
+		<jsp:param value="<%=String.valueOf(userExtendedData) %>" name="userExtendedData"/>
+	</jsp:include>
 	
 	<liferay-ui:search-container iteratorURL="<%=portletURL%>" emptyResultsMessage="there-are-no-results" delta="5" deltaConfigurable="true" >
 
@@ -349,9 +358,11 @@ else
 		</liferay-ui:search-container-results>
 		
 		<liferay-ui:search-container-row className="com.liferay.portal.model.User" keyProperty="userId" modelVar="userMessage">
-			<liferay-ui:search-container-column-text name="studentsearch.user.firstName" title="studentsearch.user.firstName"><%=userMessage.getFullName() %></liferay-ui:search-container-column-text>
+			<liferay-ui:search-container-column-text name="user" title="user">
+				<%=userExtendedData ? userMessage.getFullName() : userMessage.getScreenName()%>
+			</liferay-ui:search-container-column-text>
 			<liferay-ui:search-container-column-text>
-				<a id="<portlet:namespace />addUser_<%=userMessage.getUserId() %>" onClick="<portlet:namespace />addUser(<%=userMessage.getUserId() %>, '<%=userMessage.getFullName() %>')" style="Cursor:pointer;" >
+				<a id="<portlet:namespace />addUser_<%=userMessage.getUserId() %>" onClick="<portlet:namespace />addUser(<%=userMessage.getUserId() %>, '<%=userExtendedData ? userMessage.getFullName() : userMessage.getScreenName()%>')" style="Cursor:pointer;" >
 				<liferay-ui:message key="select" /></a>
 				<a id="<portlet:namespace />deleteUser_<%=userMessage.getUserId() %>" class="aui-helper-hidden" onClick="<portlet:namespace />deleteUser(<%=userMessage.getUserId() %>)" style="Cursor:pointer;" >
 				<liferay-ui:message key="groupmailing.deselect" /></a>			
@@ -468,7 +479,7 @@ else
 		<liferay-portlet:param name="jspPage" value="/html/groupmailing/view.jsp"></liferay-portlet:param>
 	</liferay-portlet:renderURL>
 		
-	<aui:form action="<%=sendNewMailURL %>" method="POST" name="form_mail">
+	<aui:form action="<%=sendNewMailURL %>" method="post" name="fm"  role="form" enctype="multipart/form-data">
 	
 		<aui:input type="hidden" name="to"  value="<%=to%>"/>
 		<aui:input type="hidden" name="toNames" value="<%=toNames%>"/>
@@ -500,6 +511,35 @@ else
 			</aui:input>
 		</div>
 		
+		
+		
+		<!-- UPLOAD ATTACHMENTS -->
+		<% 
+		int maxSize = MailConstants.ATTACHMENTS_DEFAULT_MAX_SIZE;
+		try {
+			maxSize = PrefsPropsUtil.getInteger(themeDisplay.getCompanyId(), MailConstants.ATTACHMENTS_MAX_SIZE_KEY, MailConstants.ATTACHMENTS_DEFAULT_MAX_SIZE);
+		} catch (SystemException e1) {
+			e1.printStackTrace();
+		}
+		
+		String acceptFiles = MailConstants.ATTACHMENTS_DEFAULT_ACCEPTED_FILES;
+		try {
+			acceptFiles = PrefsPropsUtil.getString(themeDisplay.getCompanyId(), MailConstants.ATTACHMENTS_ACCEPTED_FILES_KEY, MailConstants.ATTACHMENTS_DEFAULT_ACCEPTED_FILES);
+		} catch (SystemException e1) {
+			e1.printStackTrace();
+		}
+		
+		%>
+	<script src="/lmsmailing-portlet/js/jquery.MultiFile.js"></script>
+ 	<div class="col-md-4 file-wrap">
+ 		<input name="maxFile" id="maxFile" type="hidden" value="<%= maxSize%>"/>
+       <input type="file" multiple="multiple" class="multi" name="MultipleFile1"  accept="<%= acceptFiles%>" maxsize="<%= maxSize%>" />
+     </div>
+     
+	<!-- END UPLOAD ATTACHMENTS -->
+	
+	
+	
 		<div class="mail_content" >
 			<aui:field-wrapper label="body">
 				<liferay-ui:input-editor name="body" initMethod="initBodyEditor"/>

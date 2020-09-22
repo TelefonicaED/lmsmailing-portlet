@@ -3,6 +3,11 @@ Todos los cambios de este proyecto estarán documentados en este archivo.
 
 El formato está basado en [SemVer](https://semver.org/spec/v2.0.0.html).
 
+## [4.3.0](https://github.com/TelefonicaED/lmsmailing-portlet/releases/tag/v4.3.0)
+
+### Added 
+
+- #151401 Añadir la posibilidad de adjuntos en los correos dentro del curso.
 
 ## [4.2.0](https://github.com/TelefonicaED/lmsmailing-portlet/releases/tag/v4.2.0)
 
