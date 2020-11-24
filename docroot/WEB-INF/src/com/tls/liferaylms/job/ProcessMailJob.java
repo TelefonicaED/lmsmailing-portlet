@@ -7,6 +7,8 @@ import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
 
 import com.liferay.counter.service.CounterLocalServiceUtil;
+import com.liferay.lms.model.Course;
+import com.liferay.lms.service.CourseLocalServiceUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.log.Log;
@@ -182,7 +184,14 @@ public class ProcessMailJob extends MVCPortlet implements MessageListener{
 								message.put("testing", 	StringPool.FALSE);
 
 								message.put("portal", 	companyName);
-								message.put("community",group.getName());
+								
+								Course course = CourseLocalServiceUtil.fetchByGroupCreatedId(group.getGroupId());
+								if(course!=null){
+									message.put("community",course.getTitle(user.getLocale()));
+								}else{
+									message.put("community",group.getName());
+								}
+								
 
 								String portalUrl = PortalUtil.getPortalURL(company.getVirtualHostname(), 80, false);
 						    	//QUITANDO PUERTOS

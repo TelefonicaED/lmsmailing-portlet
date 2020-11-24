@@ -3,6 +3,13 @@ Todos los cambios de este proyecto estarán documentados en este archivo.
 
 El formato está basado en [SemVer](https://semver.org/spec/v2.0.0.html).
 
+
+## [4.4.0](https://github.com/TelefonicaED/lmsmailing-portlet/releases/tag/v4.4.0)
+
+### Fixed
+
+- #191633: Se sustituye la variable por la del curso cuando no es nulo.
+
 ## [4.3.0](https://github.com/TelefonicaED/lmsmailing-portlet/releases/tag/v4.3.0)
 
 ### Added 

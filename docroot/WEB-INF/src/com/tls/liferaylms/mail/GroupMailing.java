@@ -11,6 +11,8 @@ import javax.portlet.PortletPreferences;
 import javax.portlet.PortletSession;
 import javax.portlet.ProcessAction;
 
+import com.liferay.lms.model.Course;
+import com.liferay.lms.service.CourseLocalServiceUtil;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.log.Log;
@@ -121,7 +123,14 @@ public class GroupMailing extends MVCPortlet{
 				message.put("testing", 	testing);
 				
 				message.put("portal", 	themeDisplay.getCompany().getName());
-				message.put("community",themeDisplay.getScopeGroupName());
+				
+				Course course = CourseLocalServiceUtil.fetchByGroupCreatedId(themeDisplay.getScopeGroupId());
+				if(course!=null){
+					message.put("community",course.getTitle(themeDisplay.getLocale()));	
+				}else{
+					message.put("community",themeDisplay.getScopeGroupName());
+				}
+				
 				
 				message.put("url", 	MailUtil.getURLPortal(themeDisplay.getCompany(),actionRequest));
 				message.put("urlcourse",MailUtil.getURLPortal(themeDisplay.getCompany(),actionRequest)+themeDisplay.getPathFriendlyURLPublic()+themeDisplay.getScopeGroup().getFriendlyURL());
@@ -152,7 +161,11 @@ public class GroupMailing extends MVCPortlet{
 			File[] attachments = uploadRequest.getFiles("MultipleFile1");
 			String[] attachmentNames = uploadRequest.getFileNames("MultipleFile1");
 			String attachmentVerification = checkAttachments(attachmentNames, attachments, themeDisplay.getCompanyId());
-			
+			Course course = CourseLocalServiceUtil.fetchByGroupCreatedId(themeDisplay.getScopeGroupId());
+			String community = themeDisplay.getScopeGroupName();
+			if(course!=null){
+				community = course.getTitle(themeDisplay.getLocale());
+			}
 			boolean error = false;
 			if(!attachmentVerification.equals("OK")){
 				error = true;
@@ -291,7 +304,8 @@ public class GroupMailing extends MVCPortlet{
 						message.put("attachments", attachments);
 						message.put("attachmentNames", attachmentNames);
 						message.put("portal", 	themeDisplay.getCompany().getName());
-						message.put("community",themeDisplay.getScopeGroupName());
+						message.put("community",community);
+						
 						
 						message.put("url", 		MailUtil.getURLPortal(themeDisplay.getCompany(),actionRequest));
 						message.put("urlcourse",MailUtil.getURLPortal(themeDisplay.getCompany(),actionRequest)+themeDisplay.getPathFriendlyURLPublic()+themeDisplay.getScopeGroup().getFriendlyURL());
@@ -332,7 +346,7 @@ public class GroupMailing extends MVCPortlet{
 							message.put("attachments", attachments);
 							message.put("attachmentNames", attachmentNames);
 							message.put("portal", 	themeDisplay.getCompany().getName());
-							message.put("community",themeDisplay.getScopeGroupName());
+							message.put("community",community);
 							
 							message.put("url", 		MailUtil.getURLPortal(themeDisplay.getCompany(),actionRequest));
 							message.put("urlcourse",MailUtil.getURLPortal(themeDisplay.getCompany(),actionRequest)+themeDisplay.getPathFriendlyURLPublic()+themeDisplay.getScopeGroup().getFriendlyURL());
@@ -363,7 +377,7 @@ public class GroupMailing extends MVCPortlet{
 								message.put("attachments", attachments);
 								message.put("attachmentNames", attachmentNames);
 								message.put("portal", 	themeDisplay.getCompany().getName());
-								message.put("community",themeDisplay.getScopeGroupName());
+								message.put("community",community);
 								
 								message.put("url", 		MailUtil.getURLPortal(themeDisplay.getCompany(),actionRequest));
 								message.put("urlcourse",MailUtil.getURLPortal(themeDisplay.getCompany(),actionRequest)+themeDisplay.getPathFriendlyURLPublic()+themeDisplay.getScopeGroup().getFriendlyURL());
@@ -409,7 +423,7 @@ public class GroupMailing extends MVCPortlet{
 								message.put("attachments", attachments);
 								message.put("attachmentNames", attachmentNames);
 								message.put("portal", 	themeDisplay.getCompany().getName());
-								message.put("community",themeDisplay.getScopeGroupName());
+								message.put("community",community);
 								
 								message.put("url", 	MailUtil.getURLPortal(themeDisplay.getCompany(), actionRequest));
 								message.put("urlcourse", MailUtil.getURLPortal(themeDisplay.getCompany(),actionRequest)+themeDisplay.getPathFriendlyURLPublic()+themeDisplay.getScopeGroup().getFriendlyURL());
@@ -441,7 +455,7 @@ public class GroupMailing extends MVCPortlet{
 								message.put("attachments", attachments);
 								message.put("attachmentNames", attachmentNames);
 								message.put("portal", 	themeDisplay.getCompany().getName());
-								message.put("community",themeDisplay.getScopeGroupName());
+								message.put("community",community);
 								
 								message.put("url", 		MailUtil.getURLPortal(themeDisplay.getCompany(),actionRequest));
 								message.put("urlcourse",MailUtil.getURLPortal(themeDisplay.getCompany(),actionRequest)+themeDisplay.getPathFriendlyURLPublic()+themeDisplay.getScopeGroup().getFriendlyURL());
