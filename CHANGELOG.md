@@ -10,6 +10,9 @@ El formato está basado en [SemVer](https://semver.org/spec/v2.0.0.html).
 
 - #191633: Se sustituye la variable por la del curso cuando no es nulo.
 
+- #189936: No debe de haber ningun job sin conditionStatus, para ello se ha establecido una validación para que no se puedan introducir valores nulos. 
+		   Además se han corregido otros problemas con el componente y se ha refactorizado el código.
+
 ## [4.3.0](https://github.com/TelefonicaED/lmsmailing-portlet/releases/tag/v4.3.0)
 
 ### Added 

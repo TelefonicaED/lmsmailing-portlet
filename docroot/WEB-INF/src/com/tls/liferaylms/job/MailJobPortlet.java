@@ -230,6 +230,7 @@ public class MailJobPortlet extends MVCPortlet {
 
 	@ProcessAction(name = "update")
 	public void update(ActionRequest request, ActionResponse response) {
+		
 		String conditionClassName = ParamUtil.getString(request, MailStringPool.CONDITION_CLASSNAME, StringPool.BLANK);
 		Long conditionModule = ParamUtil.getLong(request, MailStringPool.CONDITION_MODULE, 0);
 		Long conditionActivity = ParamUtil.getLong(request, MailStringPool.CONDITION_ACTIVITY, 0);
@@ -255,6 +256,7 @@ public class MailJobPortlet extends MVCPortlet {
 		
 		
 		if(log.isDebugEnabled()){
+			log.debug("UPDATE");
 			log.debug(template);
 			log.debug(conditionClassName);
 			log.debug(conditionModule);
@@ -331,7 +333,7 @@ public class MailJobPortlet extends MVCPortlet {
 	}
 
 	@ProcessAction(name = "save")
-	public void save(ActionRequest request, ActionResponse response) {		
+	public void save(ActionRequest request, ActionResponse response) {	
 		String conditionClassName = ParamUtil.getString(request, MailStringPool.CONDITION_CLASSNAME, StringPool.BLANK);
 		Long conditionModule = ParamUtil.getLong(request, MailStringPool.CONDITION_MODULE, 0);
 		Long conditionActivity = ParamUtil.getLong(request, MailStringPool.CONDITION_ACTIVITY, 0);
@@ -354,8 +356,8 @@ public class MailJobPortlet extends MVCPortlet {
 		Long dateShift = ParamUtil.getLong(request, MailStringPool.DATE_SHIFT, 0);
 		Long template = ParamUtil.getLong(request, MailStringPool.ID_TEMPLATE, 0);
 		
-		
 		if(log.isDebugEnabled()){
+			log.debug("SAVE");
 			log.debug(template);
 			log.debug(conditionClassName);
 			log.debug(conditionModule);
