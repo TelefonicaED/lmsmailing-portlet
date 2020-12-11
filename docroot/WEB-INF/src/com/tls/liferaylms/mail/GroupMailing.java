@@ -184,7 +184,7 @@ public class GroupMailing extends MVCPortlet{
 				String body 	= ParamUtil.getString(uploadRequest, "body", "");
 				body = SanitizerUtil.sanitize(themeDisplay.getCompanyId(), themeDisplay.getScopeGroupId(), themeDisplay.getUserId(), StringPool.BLANK, 0, ContentTypes.TEXT_HTML, body);
 				 _log.debug("BODY AFTER SANITIZE "+body);	
-				String testing 	= ParamUtil.getString(actionRequest, "testing", "false");
+				String testing 	= ParamUtil.getString(uploadRequest, "testing", "false");
 				boolean testMessage = testing.equals(StringPool.TRUE);
 				
 				String to 		= ParamUtil.getString(uploadRequest, "to", "");

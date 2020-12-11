@@ -8,6 +8,8 @@ El formato está basado en [SemVer](https://semver.org/spec/v2.0.0.html).
 
 ### Fixed
 
+- #193892: No funcionaba el check de "Enviar correo de prueba" y enviaba el correo a todos los alumnos del curso
+
 - #191633: Se sustituye la variable por la del curso cuando no es nulo.
 
 - #189936: No debe de haber ningun job sin conditionStatus, para ello se ha establecido una validación para que no se puedan introducir valores nulos. 
