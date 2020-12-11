@@ -3,6 +3,12 @@ Todos los cambios de este proyecto estarán documentados en este archivo.
 
 El formato está basado en [SemVer](https://semver.org/spec/v2.0.0.html).
 
+## [4.3.1](https://github.com/TelefonicaED/lmsmailing-portlet/releases/tag/v4.3.1)
+
+### Fixed
+
+- #193892: No funcionaba el check de "Enviar correo de prueba" y enviaba el correo a todos los alumnos del curso
+
 ## [4.3.0](https://github.com/TelefonicaED/lmsmailing-portlet/releases/tag/v4.3.0)
 
 ### Added 
