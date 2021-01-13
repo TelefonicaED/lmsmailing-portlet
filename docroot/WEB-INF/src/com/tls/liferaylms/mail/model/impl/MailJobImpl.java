@@ -14,6 +14,10 @@
 
 package com.tls.liferaylms.mail.model.impl;
 
+import com.liferay.portal.kernel.json.JSONException;
+import com.liferay.portal.kernel.json.JSONFactoryUtil;
+import com.liferay.portal.kernel.json.JSONObject;
+
 /**
  * The extended model implementation for the MailJob service. Represents a row in the &quot;lmsmail_MailJob&quot; database table, with each column mapped to a property of this class.
  *
@@ -29,6 +33,32 @@ public class MailJobImpl extends MailJobBaseImpl {
 	 *
 	 * Never reference this class directly. All methods that expect a mail job model instance should use the {@link com.tls.liferaylms.mail.model.MailJob} interface instead.
 	 */
+	private JSONObject extraDataJSON = null;
+	
 	public MailJobImpl() {
+	}
+	
+	
+	@Override
+	public JSONObject getExtraDataJSON() {
+		if(extraDataJSON == null) {
+			try {
+				extraDataJSON = JSONFactoryUtil.createJSONObject(getExtraData());
+			} catch (JSONException e) {
+				extraDataJSON = JSONFactoryUtil.createJSONObject();
+			}
+		}
+		return extraDataJSON;
+	}
+	
+	@Override
+	public void setExtraData(String extraData) {
+		try {
+			extraDataJSON = JSONFactoryUtil.createJSONObject(extraData);
+		} catch (JSONException e) {
+			extraDataJSON = JSONFactoryUtil.createJSONObject();
+		}
+		
+		super.setExtraData(extraData);
 	}
 }

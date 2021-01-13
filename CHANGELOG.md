@@ -15,6 +15,13 @@ El formato está basado en [SemVer](https://semver.org/spec/v2.0.0.html).
 - #189936: No debe de haber ningun job sin conditionStatus, para ello se ha establecido una validación para que no se puedan introducir valores nulos. 
 		   Además se han corregido otros problemas con el componente y se ha refactorizado el código.
 
+		   
+### Added
+
+- #194918: Para los mailjobs se da funcionalidad a la fecha de inscripción, se basa en la fecha de inscripción del usuario en el curso y esos mensajes programados se ejecutan todos los dias.
+
+- #190466: Añadido envio de copia a relaciones sociales en los correos programados.
+
 ## [4.3.0](https://github.com/TelefonicaED/lmsmailing-portlet/releases/tag/v4.3.0)
 
 ### Added 

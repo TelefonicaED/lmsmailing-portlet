@@ -32,7 +32,7 @@ import java.io.Serializable;
 public class MailJobCacheModel implements CacheModel<MailJob>, Serializable {
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(31);
+		StringBundler sb = new StringBundler(33);
 
 		sb.append("{uuid=");
 		sb.append(uuid);
@@ -64,6 +64,8 @@ public class MailJobCacheModel implements CacheModel<MailJob>, Serializable {
 		sb.append(teamId);
 		sb.append(", processed=");
 		sb.append(processed);
+		sb.append(", extraData=");
+		sb.append(extraData);
 		sb.append("}");
 
 		return sb.toString();
@@ -114,6 +116,13 @@ public class MailJobCacheModel implements CacheModel<MailJob>, Serializable {
 		mailJobImpl.setTeamId(teamId);
 		mailJobImpl.setProcessed(processed);
 
+		if (extraData == null) {
+			mailJobImpl.setExtraData(StringPool.BLANK);
+		}
+		else {
+			mailJobImpl.setExtraData(extraData);
+		}
+
 		mailJobImpl.resetOriginalValues();
 
 		return mailJobImpl;
@@ -134,4 +143,5 @@ public class MailJobCacheModel implements CacheModel<MailJob>, Serializable {
 	public long dateShift;
 	public long teamId;
 	public boolean processed;
+	public String extraData;
 }

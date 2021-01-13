@@ -28,4 +28,8 @@ public class MailConstants {
 	public static final String ATTACHMENTS_FILE_PATH_FOLDER = "attachments";
 	public final static String PREFS_USERS_EXTENDED_DATA = "users.view.extended.data";
 	public final static boolean PREFS_USERS_EXTENDED_DATA_DEFAULT = false;
-	public final static String ACTION_VIEW_USER_EXTENDED = "VIEW_USER_EXTENDED";}
+	public final static String ACTION_VIEW_USER_EXTENDED = "VIEW_USER_EXTENDED";
+	
+	public final static String EXTRA_DATA_SEND_COPY = "sendToRelatedUsers";
+	public final static String EXTRA_DATA_RELATION_ARRAY = "mailRelationTypeIds";
+}

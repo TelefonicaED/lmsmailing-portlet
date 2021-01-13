@@ -1,4 +1,11 @@
 
+<%@page import="com.liferay.portal.kernel.json.JSONArray"%>
+<%@page import="com.tls.liferaylms.util.MailConstants"%>
+<%@page import="com.tls.liferaylms.mail.service.MailJobLocalServiceUtil"%>
+<%@page import="com.tls.liferaylms.util.MailStringPool"%>
+<%@page import="com.tls.liferaylms.mail.model.MailJob"%>
+<%@page import="com.liferay.portal.kernel.util.PrefsPropsUtil"%>
+<%@page import="com.tls.liferaylms.mail.service.MailRelationLocalServiceUtil"%>
 <%@ include file="/init.jsp"%>
 
 
@@ -174,6 +181,41 @@
 				<option <c:if test="${time eq 1}"> selected="selected"</c:if> value="1"><liferay-ui:message key="after" /></option>
 			</select>
 		</span>
+		
+		<%
+	List<Integer> mailRelationTypeIds = MailRelationLocalServiceUtil.findRelationTypeIdsByCompanyId(themeDisplay.getCompanyId());
+	Long id = ParamUtil.getLong(renderRequest, MailStringPool.MAIL_JOB, 0);
+	MailJob mailJob = MailJobLocalServiceUtil.fetchMailJob(id);
+	
+	List<Integer> selectedMailRelations = new ArrayList<Integer>();
+	if(mailJob!=null){
+		JSONArray selectedRelations = mailJob.getExtraDataJSON().getJSONArray(MailConstants.EXTRA_DATA_RELATION_ARRAY);
+		if(selectedRelations!=null && selectedRelations.length()>0){
+			for(int i = 0;i<selectedRelations.length(); i++){
+				selectedMailRelations.add(selectedRelations.getInt(i));
+				System.out.println("ADDING RELATION "+selectedRelations.getInt(i));
+			}
+		}
+	}
+	
+	if(Validator.isNotNull(mailRelationTypeIds) && mailRelationTypeIds.size()>0){
+		String mailRelationTypePref = StringPool.BLANK;
+		String sendMailToRelationType = StringPool.BLANK;
+		String labelSendMailToType = StringPool.BLANK;
+		for(int mailRelationTypeId:mailRelationTypeIds){
+			mailRelationTypePref = "mailType_"+mailRelationTypeId;
+			if(PrefsPropsUtil.getBoolean(themeDisplay.getCompanyId(), mailRelationTypePref)){
+				sendMailToRelationType = "sendMailToType_"+mailRelationTypeId;
+				labelSendMailToType = "groupmailing.messages.send-copy-to-"+mailRelationTypeId;
+				System.out.println("RELATION SELECTED " + selectedMailRelations.contains(mailRelationTypeId));
+%>
+				<aui:input type="checkbox" label="<%=labelSendMailToType %>" name="<%=sendMailToRelationType %>" checked="<%=selectedMailRelations.contains(mailRelationTypeId) %>"/>
+<%				
+			}
+		}
+	}
+%>
+		
 	</div>
 </div>
 <aui:button-row>
