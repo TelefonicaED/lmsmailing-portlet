@@ -19,7 +19,8 @@ El formato está basado en [SemVer](https://semver.org/spec/v2.0.0.html).
 ### Added
 
 - #194918: Para los mailjobs se da funcionalidad a la fecha de inscripción, se basa en la fecha de inscripción del usuario en el curso y esos mensajes programados se ejecutan todos los dias.
-
+		   Se calcula la fecha fin del curso teniendo en cuenta el allowFinishDate del courseResult.
+		   
 - #190466: Añadido envio de copia a relaciones sociales en los correos programados.
 
 ## [4.3.0](https://github.com/TelefonicaED/lmsmailing-portlet/releases/tag/v4.3.0)
