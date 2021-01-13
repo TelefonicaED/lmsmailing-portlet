@@ -219,7 +219,7 @@ public class LmsMailMessageListener implements MessageListener {
 			if(!deregisterMail){
 				
 				body = MailUtil.replaceMessageConstants(body, portal, community, userSender.getFullName(), userSender.getScreenName(), userSender.getFirstName(), tutors, url, urlcourse,
-						MailUtil.getCourseStartDate(groupId, userSender.getLocale(), userSender.getTimeZone()), MailUtil.getCourseEndDate(groupId, userSender.getLocale(), userSender.getTimeZone()), userSender.getFullName());
+						MailUtil.getCourseStartDate(groupId, userSender.getLocale(), userSender.getTimeZone()), MailUtil.getCourseEndDate(groupId, userSender.getLocale(), userSender.getTimeZone(),userSender), userSender.getFullName());
 				
 				//Sustituir expandos
 				if(showExpandosUser)
@@ -232,7 +232,7 @@ public class LmsMailMessageListener implements MessageListener {
 				calculatedBody += PrefsPropsUtil.getString(companyId, MailConstants.FOOTER_PREFS, LanguageUtil.get(Locale.getDefault(),"mail.footer"));
 				
 				subject = MailUtil.replaceMessageConstants(subject, portal, community, userSender.getFullName(), userSender.getScreenName(), userSender.getFirstName(), tutors, url, urlcourse,
-						MailUtil.getCourseStartDate(groupId, userSender.getLocale(), userSender.getTimeZone()), MailUtil.getCourseEndDate(groupId, userSender.getLocale(), userSender.getTimeZone()), userSender.getFullName());
+						MailUtil.getCourseStartDate(groupId, userSender.getLocale(), userSender.getTimeZone()), MailUtil.getCourseEndDate(groupId, userSender.getLocale(), userSender.getTimeZone(),userSender), userSender.getFullName());
 				//Sustituir expandos
 				if(showExpandosUser)
 					subject = MailUtil.replaceExpandosUser(subject, companyId, userSender, userSender.getLocale());
@@ -306,7 +306,7 @@ public class LmsMailMessageListener implements MessageListener {
 					
 					InternetAddress to = new InternetAddress(toMail, student.getFullName());
 					String content = MailUtil.replaceMessageConstants(body, portal, community, toFullName, toScreenName, toFirstName, tutors,url,urlcourse,
-							MailUtil.getCourseStartDate(groupId, student.getLocale(), student.getTimeZone()), MailUtil.getCourseEndDate(groupId, student.getLocale(), student.getTimeZone()), userSender.getFullName());
+							MailUtil.getCourseStartDate(groupId, student.getLocale(), student.getTimeZone()), MailUtil.getCourseEndDate(groupId, student.getLocale(), student.getTimeZone(),student), userSender.getFullName());
 					
 					//Sustituir expandos
 					if(showExpandosUser)
@@ -318,7 +318,7 @@ public class LmsMailMessageListener implements MessageListener {
 					if(isUserRelated)
 						calculatedBody += MailUtil.getExtraContentSocialRelationHeader(student) + MailUtil.getExtraContentSocialRelation(emailSentToUsersList, student, sendToRelationTypeIds);
 					calculatedBody += PrefsPropsUtil.getString(companyId, MailConstants.HEADER_PREFS, LanguageUtil.get(student.getLocale(),"mail.header"));
-					calculatedBody += MailUtil.replaceMessageConstants(body, portal, community, toFullName, toScreenName, toFirstName, tutors,url,urlcourse, MailUtil.getCourseStartDate(groupId, student.getLocale(), student.getTimeZone()), MailUtil.getCourseEndDate(groupId, student.getLocale(), student.getTimeZone()), userSender.getFullName());
+					calculatedBody += MailUtil.replaceMessageConstants(body, portal, community, toFullName, toScreenName, toFirstName, tutors,url,urlcourse, MailUtil.getCourseStartDate(groupId, student.getLocale(), student.getTimeZone()), MailUtil.getCourseEndDate(groupId, student.getLocale(), student.getTimeZone(), student), userSender.getFullName());
 
 					//Sustituir expandos
 					if(showExpandosUser)
@@ -328,7 +328,7 @@ public class LmsMailMessageListener implements MessageListener {
 					
 					calculatedBody += PrefsPropsUtil.getString(companyId, MailConstants.FOOTER_PREFS, LanguageUtil.get(student.getLocale(),"mail.footer"));
 					
-					String calculatedsubject = MailUtil.replaceMessageConstants(subject, portal, community, toFullName, toScreenName, toFirstName, tutors, url, urlcourse, MailUtil.getCourseStartDate(groupId, student.getLocale(), student.getTimeZone()), MailUtil.getCourseEndDate(groupId, student.getLocale(), student.getTimeZone()), userSender.getFullName());
+					String calculatedsubject = MailUtil.replaceMessageConstants(subject, portal, community, toFullName, toScreenName, toFirstName, tutors, url, urlcourse, MailUtil.getCourseStartDate(groupId, student.getLocale(), student.getTimeZone()), MailUtil.getCourseEndDate(groupId, student.getLocale(), student.getTimeZone(),student), userSender.getFullName());
 					//Sustituir expandos
 					if(showExpandosUser)
 						calculatedsubject = MailUtil.replaceExpandosUser(calculatedsubject, companyId, isUserRelated?null:student, student.getLocale());
@@ -479,14 +479,14 @@ public class LmsMailMessageListener implements MessageListener {
 			
 
 			String bodyTemplate = MailUtil.replaceMessageConstants(body, portal, community, null, null, null, tutors, url, urlcourse,
-					MailUtil.getCourseStartDate(groupId, userSender.getLocale(), userSender.getTimeZone()), MailUtil.getCourseEndDate(groupId, userSender.getLocale(), userSender.getTimeZone()), userSender.getFullName());
+					MailUtil.getCourseStartDate(groupId, userSender.getLocale(), userSender.getTimeZone()), MailUtil.getCourseEndDate(groupId, userSender.getLocale(), userSender.getTimeZone(),userSender), userSender.getFullName());
 			
 			//Sustituir expandos
 			if(showExpandosCourse)
 				bodyTemplate = MailUtil.replaceExpandosCourse(bodyTemplate, companyId, groupId, userSender.getLocale());
 			
 			String subjectTemplate = MailUtil.replaceMessageConstants(subject, portal, community, null, null, null, tutors, url, urlcourse,
-					MailUtil.getCourseStartDate(groupId, userSender.getLocale(), userSender.getTimeZone()), MailUtil.getCourseEndDate(groupId, userSender.getLocale(), userSender.getTimeZone()), userSender.getFullName());
+					MailUtil.getCourseStartDate(groupId, userSender.getLocale(), userSender.getTimeZone()), MailUtil.getCourseEndDate(groupId, userSender.getLocale(), userSender.getTimeZone(),userSender), userSender.getFullName());
 			
 			//Sustituir expandos
 			if(showExpandosCourse)

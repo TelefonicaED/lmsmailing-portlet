@@ -88,7 +88,7 @@ public class GroupMailing extends MVCPortlet{
 							themeDisplay.getScopeGroupName(), themeDisplay.getUser().getFullName(), themeDisplay.getUser().getScreenName(), themeDisplay.getUser().getFirstName(), tutors, 
 							MailUtil.getURLPortal(themeDisplay.getCompany(),actionRequest), MailUtil.getURLPortal(themeDisplay.getCompany(),actionRequest)+themeDisplay.getPathFriendlyURLPublic()+themeDisplay.getScopeGroup().getFriendlyURL(),
 							MailUtil.getCourseStartDate(themeDisplay.getScopeGroupId(), themeDisplay.getLocale(), themeDisplay.getTimeZone()), MailUtil.getCourseEndDate(themeDisplay.getScopeGroupId(), themeDisplay.getLocale(),
-							themeDisplay.getTimeZone()),themeDisplay.getUser().getFullName());
+							themeDisplay.getTimeZone(), themeDisplay.getUser()),themeDisplay.getUser().getFullName());
 					
 					//Sustituir expandos
 					boolean showExpandosUser = PrefsPropsUtil.getBoolean(themeDisplay.getCompanyId(), MailConstants.USER_EXPANDOS_TO_SHOW, Boolean.FALSE);
@@ -230,7 +230,7 @@ public class GroupMailing extends MVCPortlet{
 					String content =  MailUtil.replaceMessageConstants(changeToURL(body, themeDisplay.getURLPortal()), themeDisplay.getCompany().getName(), 
 							themeDisplay.getScopeGroupName(), themeDisplay.getUser().getFullName(), themeDisplay.getUser().getScreenName(), themeDisplay.getUser().getFirstName(), tutors, 
 							MailUtil.getURLPortal(themeDisplay.getCompany(),actionRequest), MailUtil.getURLPortal(themeDisplay.getCompany(),actionRequest)+themeDisplay.getPathFriendlyURLPublic()+themeDisplay.getScopeGroup().getFriendlyURL(), 
-							MailUtil.getCourseStartDate(themeDisplay.getScopeGroupId(), themeDisplay.getLocale(), themeDisplay.getTimeZone()), MailUtil.getCourseEndDate(themeDisplay.getScopeGroupId(), themeDisplay.getLocale(), themeDisplay.getTimeZone()),themeDisplay.getUser().getFullName());
+							MailUtil.getCourseStartDate(themeDisplay.getScopeGroupId(), themeDisplay.getLocale(), themeDisplay.getTimeZone()), MailUtil.getCourseEndDate(themeDisplay.getScopeGroupId(), themeDisplay.getLocale(), themeDisplay.getTimeZone(), themeDisplay.getUser()),themeDisplay.getUser().getFullName());
 					
 					//Sustituir expandos
 					boolean showExpandosUser = PrefsPropsUtil.getBoolean(themeDisplay.getCompanyId(), MailConstants.USER_EXPANDOS_TO_SHOW, Boolean.FALSE);
