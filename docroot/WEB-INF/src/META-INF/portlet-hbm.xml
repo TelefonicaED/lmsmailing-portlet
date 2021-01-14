@@ -52,6 +52,7 @@
 		<property name="dateShift" type="com.liferay.portal.dao.orm.hibernate.LongType" />
 		<property name="teamId" type="com.liferay.portal.dao.orm.hibernate.LongType" />
 		<property name="processed" type="com.liferay.portal.dao.orm.hibernate.BooleanType" />
+		<property name="extraData" type="com.liferay.portal.dao.orm.hibernate.StringType" />
 	</class>
 	<class name="com.tls.liferaylms.mail.model.impl.MailTemplateImpl" table="lmsmail_MailTemplate">
 		<cache usage="read-write" />

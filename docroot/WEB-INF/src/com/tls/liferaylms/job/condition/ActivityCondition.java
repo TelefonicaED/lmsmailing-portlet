@@ -9,8 +9,12 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 
+import com.liferay.lms.model.Course;
+import com.liferay.lms.model.CourseResult;
 import com.liferay.lms.model.LearningActivity;
 import com.liferay.lms.model.LearningActivityResult;
+import com.liferay.lms.service.CourseLocalServiceUtil;
+import com.liferay.lms.service.CourseResultLocalServiceUtil;
 import com.liferay.lms.service.LearningActivityLocalServiceUtil;
 import com.liferay.lms.service.LearningActivityResultLocalServiceUtil;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -43,63 +47,109 @@ public class ActivityCondition extends MainCondition{
 		
 
 		for(User user : groupUsers){
-			if(log.isDebugEnabled())log.debug("-----userId---------- "+user.getUserId());
-			LearningActivityResult lar = null;
-			
-			try {
-				lar = LearningActivityResultLocalServiceUtil.getByActIdAndUserId(getMailJob().getConditionClassPK(), user.getUserId());
-			} catch (SystemException e) {
-				if(log.isDebugEnabled())e.printStackTrace();
-				if(log.isErrorEnabled())log.error(e.getMessage());
-			}
-			String[] ids = new String[0];
-			if(getMailJob().getConditionStatus().length()!=0) ids=  getMailJob().getConditionStatus().split(StringPool.COMMA);
-			if(log.isDebugEnabled())log.debug("----------------------------- "+ids.length);
-			
-			for(String sid : ids){
-				if(log.isDebugEnabled())log.debug("----------------------------- "+sid);
-				int id = -1;
-				try{
-						id = (int)Integer.valueOf(sid);
-				
-				}catch(NumberFormatException nfe){
-					if(log.isDebugEnabled())nfe.printStackTrace();
-					if(log.isErrorEnabled())log.error(nfe.getMessage());
+			int referenceDate = (int)getMailJob().getDateReferenceDate();
+			boolean addUserSend= true;
+			if(referenceDate == 2){
+				addUserSend= false;
+				try {
+					GregorianCalendar dateSend = new GregorianCalendar();
+					Course course = CourseLocalServiceUtil.fetchByGroupCreatedId(getMailJob().getGroupId());
+					if(course!=null){
+						CourseResult cr = CourseResultLocalServiceUtil.getCourseResultByCourseAndUser(course.getCourseId(), user.getUserId());
+					    if(cr!=null && cr.getRegistrationDate()!=null){
+					    	dateSend.setTime(cr.getRegistrationDate());
+							dateSend.set(Calendar.HOUR_OF_DAY, 0);
+							dateSend.set(Calendar.MINUTE, 0);
+							dateSend.set(Calendar.SECOND, 0);
+							dateSend.set(Calendar.MILLISECOND, 0);
+							dateSend.add(Calendar.DAY_OF_MONTH, (int)getMailJob().getDateShift());
+							
+							GregorianCalendar today = new GregorianCalendar();
+							today.set(Calendar.HOUR_OF_DAY, 0);
+							today.set(Calendar.MINUTE, 0);
+							today.set(Calendar.SECOND, 0);
+							today.set(Calendar.MILLISECOND, 0);
+							
+							if(log.isDebugEnabled()){
+								
+								log.debug("USUARIO "+user.getFullName()+"  "+dateSend.getTime().getTime());
+								log.debug("USUARIO "+user.getFullName()+"  "+today.getTime().getTime());
+								log.debug("USUARIO "+user.getFullName()+"  "+dateSend.getTime());
+								log.debug("USUARIO "+user.getFullName()+"  "+today.getTime());
+							}
+							if(dateSend.getTime().getTime()==today.getTime().getTime()){
+								addUserSend=true;
+							}
+					    }
+					}
+				} catch (SystemException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
 				}
-				
-				if(log.isDebugEnabled())log.debug("--------------------id--------- "+id);
+			}	
 			
-				switch (id) {
-					//not started
-					case 0:
-						if(lar==null){
-							users.add(user);
-							log.debug("usuario añadido 0");
-						}
-					break;
-					//started
-					case 1:
-						if(lar!=null&&lar.getEndDate()==null){
-							users.add(user);
-							log.debug("usuario añadido 1");
-						}
-					break;
-					//not passed
-					case 2:
-						if(lar!=null&&!lar.getPassed()&&lar.getEndDate()!=null){
-							users.add(user);
-							log.debug("usuario añadido 2");
-						}
-					break;
-					//passed
-					case 3:
-						if(lar!=null&&lar.getPassed()){
-							users.add(user);
-							log.debug("usuario añadido 3");
-						}
-					break;
+			if(addUserSend){
+				if(log.isDebugEnabled())log.debug("-----userId---------- "+user.getUserId());
+				LearningActivityResult lar = null;
+				
+				try {
+					lar = LearningActivityResultLocalServiceUtil.getByActIdAndUserId(getMailJob().getConditionClassPK(), user.getUserId());
+				} catch (SystemException e) {
+					if(log.isDebugEnabled())e.printStackTrace();
+					if(log.isErrorEnabled())log.error(e.getMessage());
+				}
+				String[] ids = new String[0];
+				if(getMailJob().getConditionStatus().length()!=0) ids=  getMailJob().getConditionStatus().split(StringPool.COMMA);
+				if(log.isDebugEnabled())log.debug("----------------------------- "+ids.length);
+				
+				for(String sid : ids){
+					if(log.isDebugEnabled())log.debug("----------------------------- "+sid);
+					int id = -1;
+					try{
+							id = (int)Integer.valueOf(sid);
+					
+					}catch(NumberFormatException nfe){
+						if(log.isDebugEnabled())nfe.printStackTrace();
+						if(log.isErrorEnabled())log.error(nfe.getMessage());
+					}
+					
+					if(log.isDebugEnabled())log.debug("--------------------id--------- "+id);
+				
+					switch (id) {
+						//not started
+						case 0:
+							if(lar==null){
+								users.add(user);
+								log.debug("usuario añadido 0");
+							}
+						break;
+						//started
+						case 1:
+							if(lar!=null&&lar.getEndDate()==null){
+								users.add(user);
+								log.debug("usuario añadido 1");
+							}
+						break;
+						//not passed
+						case 2:
+							if(lar!=null&&!lar.getPassed()&&lar.getEndDate()!=null){
+								users.add(user);
+								log.debug("usuario añadido 2");
+							}
+						break;
+						//passed
+						case 3:
+							if(lar!=null&&lar.getPassed()){
+								users.add(user);
+								log.debug("usuario añadido 3");
+							}
+						break;
+					}
+				
 				}
 			}
+			
+			
 		}
 
 		return users;
@@ -111,7 +161,7 @@ public class ActivityCondition extends MainCondition{
 	public boolean shouldBeProcessed() {
 		
 		LearningActivity la = null;
-		
+		boolean process = false;
 		try {
 			la = LearningActivityLocalServiceUtil.getLearningActivity(getMailJob().getDateClassPK());
 		} catch (PortalException e) {
@@ -136,7 +186,7 @@ public class ActivityCondition extends MainCondition{
 					break;
 				//inscription date
 				case 2:
-					dateSend.setTime(la.getStartdate());
+					process=true;
 					break;
 			}
 			
@@ -156,6 +206,9 @@ public class ActivityCondition extends MainCondition{
 				log.debug(la.getStartdate());
 				log.debug(dateSend.getTime());
 				log.debug(today.getTime());
+			}
+			if(process){
+				return true;
 			}
 			
 			if(dateSend.getTime().getTime()<=today.getTime().getTime()){

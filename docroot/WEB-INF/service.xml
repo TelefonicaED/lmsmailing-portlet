@@ -73,7 +73,7 @@
       	<column name="dateShift" type="long"></column> <!-- Dias antes o despues de la fecha -->
       	<column name="teamId" type="long"></column>
       	<column name="processed" type="boolean"></column> <!--  Si ha sido enviado -->
-      	
+      	<column name="extraData" type="String"></column>
 		<finder name="u" return-type="Collection">
 			<finder-column name="userId" />
 		</finder>

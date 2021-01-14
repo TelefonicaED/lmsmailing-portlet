@@ -74,9 +74,10 @@ public class MailJobModelImpl extends BaseModelImpl<MailJob>
 			{ "dateReferenceDate", Types.BIGINT },
 			{ "dateShift", Types.BIGINT },
 			{ "teamId", Types.BIGINT },
-			{ "processed", Types.BOOLEAN }
+			{ "processed", Types.BOOLEAN },
+			{ "extraData", Types.VARCHAR }
 		};
-	public static final String TABLE_SQL_CREATE = "create table lmsmail_MailJob (uuid_ VARCHAR(75) null,idJob LONG not null primary key,companyId LONG,groupId LONG,userId LONG,idTemplate LONG,conditionClassName VARCHAR(75) null,conditionClassPK LONG,conditionStatus VARCHAR(75) null,dateClassName VARCHAR(75) null,dateClassPK LONG,dateReferenceDate LONG,dateShift LONG,teamId LONG,processed BOOLEAN)";
+	public static final String TABLE_SQL_CREATE = "create table lmsmail_MailJob (uuid_ VARCHAR(75) null,idJob LONG not null primary key,companyId LONG,groupId LONG,userId LONG,idTemplate LONG,conditionClassName VARCHAR(75) null,conditionClassPK LONG,conditionStatus VARCHAR(75) null,dateClassName VARCHAR(75) null,dateClassPK LONG,dateReferenceDate LONG,dateShift LONG,teamId LONG,processed BOOLEAN,extraData VARCHAR(75) null)";
 	public static final String TABLE_SQL_DROP = "drop table lmsmail_MailJob";
 	public static final String DATA_SOURCE = "liferayDataSource";
 	public static final String SESSION_FACTORY = "liferaySessionFactory";
@@ -144,6 +145,7 @@ public class MailJobModelImpl extends BaseModelImpl<MailJob>
 		attributes.put("dateShift", getDateShift());
 		attributes.put("teamId", getTeamId());
 		attributes.put("processed", getProcessed());
+		attributes.put("extraData", getExtraData());
 
 		return attributes;
 	}
@@ -238,6 +240,12 @@ public class MailJobModelImpl extends BaseModelImpl<MailJob>
 
 		if (processed != null) {
 			setProcessed(processed);
+		}
+
+		String extraData = (String)attributes.get("extraData");
+
+		if (extraData != null) {
+			setExtraData(extraData);
 		}
 	}
 
@@ -449,6 +457,19 @@ public class MailJobModelImpl extends BaseModelImpl<MailJob>
 		return _originalProcessed;
 	}
 
+	public String getExtraData() {
+		if (_extraData == null) {
+			return StringPool.BLANK;
+		}
+		else {
+			return _extraData;
+		}
+	}
+
+	public void setExtraData(String extraData) {
+		_extraData = extraData;
+	}
+
 	public long getColumnBitmask() {
 		return _columnBitmask;
 	}
@@ -496,6 +517,7 @@ public class MailJobModelImpl extends BaseModelImpl<MailJob>
 		mailJobImpl.setDateShift(getDateShift());
 		mailJobImpl.setTeamId(getTeamId());
 		mailJobImpl.setProcessed(getProcessed());
+		mailJobImpl.setExtraData(getExtraData());
 
 		mailJobImpl.resetOriginalValues();
 
@@ -629,12 +651,20 @@ public class MailJobModelImpl extends BaseModelImpl<MailJob>
 
 		mailJobCacheModel.processed = getProcessed();
 
+		mailJobCacheModel.extraData = getExtraData();
+
+		String extraData = mailJobCacheModel.extraData;
+
+		if ((extraData != null) && (extraData.length() == 0)) {
+			mailJobCacheModel.extraData = null;
+		}
+
 		return mailJobCacheModel;
 	}
 
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(31);
+		StringBundler sb = new StringBundler(33);
 
 		sb.append("{uuid=");
 		sb.append(getUuid());
@@ -666,13 +696,15 @@ public class MailJobModelImpl extends BaseModelImpl<MailJob>
 		sb.append(getTeamId());
 		sb.append(", processed=");
 		sb.append(getProcessed());
+		sb.append(", extraData=");
+		sb.append(getExtraData());
 		sb.append("}");
 
 		return sb.toString();
 	}
 
 	public String toXmlString() {
-		StringBundler sb = new StringBundler(49);
+		StringBundler sb = new StringBundler(52);
 
 		sb.append("<model><model-name>");
 		sb.append("com.tls.liferaylms.mail.model.MailJob");
@@ -738,6 +770,10 @@ public class MailJobModelImpl extends BaseModelImpl<MailJob>
 			"<column><column-name>processed</column-name><column-value><![CDATA[");
 		sb.append(getProcessed());
 		sb.append("]]></column-value></column>");
+		sb.append(
+			"<column><column-name>extraData</column-name><column-value><![CDATA[");
+		sb.append(getExtraData());
+		sb.append("]]></column-value></column>");
 
 		sb.append("</model>");
 
@@ -773,6 +809,7 @@ public class MailJobModelImpl extends BaseModelImpl<MailJob>
 	private boolean _processed;
 	private boolean _originalProcessed;
 	private boolean _setOriginalProcessed;
+	private String _extraData;
 	private long _columnBitmask;
 	private MailJob _escapedModelProxy;
 }

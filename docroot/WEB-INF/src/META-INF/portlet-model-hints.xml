@@ -41,6 +41,7 @@
 		<field name="dateShift" type="long" />
 		<field name="teamId" type="long" />
 		<field name="processed" type="boolean" />
+		<field name="extraData" type="String" />
 	</model>
 	<model name="com.tls.liferaylms.mail.model.MailTemplate">
 		<field name="uuid" type="String" />

@@ -13,7 +13,9 @@ import javax.portlet.ActionRequest;
 
 import com.liferay.counter.service.CounterLocalServiceUtil;
 import com.liferay.lms.model.Course;
+import com.liferay.lms.model.CourseResult;
 import com.liferay.lms.service.CourseLocalServiceUtil;
+import com.liferay.lms.service.CourseResultLocalServiceUtil;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
@@ -345,14 +347,21 @@ public class MailUtil {
 		return startDate;
 	}
 	
-	public static String getCourseEndDate(long groupId, Locale locale ,TimeZone timeZone){
+	public static String getCourseEndDate(long groupId, Locale locale ,TimeZone timeZone, User student){
 		
 		String endDate = "";
 		try {
 			Course course = CourseLocalServiceUtil.fetchByGroupCreatedId(groupId);
 			if(course!=null){
+				Date endCourseDate = course.getExecutionEndDate();
+				CourseResult cr = CourseResultLocalServiceUtil.getCourseResultByCourseAndUser(course.getCourseId(), student.getUserId());
+				if(cr!=null&& cr.getAllowFinishDate()!=null){
+					if(cr.getAllowFinishDate().before(endCourseDate)){
+						endCourseDate = cr.getAllowFinishDate();
+					}
+				}
 				SimpleDateFormat dateFormatDate = new SimpleDateFormat("dd/MM/yyyy");
-				endDate  = dateFormatDate.format(course.getExecutionEndDate());
+				endDate  = dateFormatDate.format(endCourseDate);
 			}
 		} catch (SystemException e) {
 			e.printStackTrace();

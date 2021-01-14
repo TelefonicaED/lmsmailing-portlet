@@ -1,6 +1,7 @@
 package com.tls.liferaylms.job;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
@@ -22,6 +23,9 @@ import com.liferay.lms.service.ModuleLocalServiceUtil;
 import com.liferay.portal.kernel.dao.orm.Session;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.json.JSONArray;
+import com.liferay.portal.kernel.json.JSONFactoryUtil;
+import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.messaging.MessageListenerException;
@@ -29,6 +33,7 @@ import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.servlet.SessionMessages;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.StringPool;
+import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.service.ServiceContextFactory;
@@ -39,7 +44,9 @@ import com.tls.liferaylms.job.condition.ConditionUtil;
 import com.tls.liferaylms.mail.model.MailJob;
 import com.tls.liferaylms.mail.model.MailTemplate;
 import com.tls.liferaylms.mail.service.MailJobLocalServiceUtil;
+import com.tls.liferaylms.mail.service.MailRelationLocalServiceUtil;
 import com.tls.liferaylms.mail.service.MailTemplateLocalServiceUtil;
+import com.tls.liferaylms.util.MailConstants;
 import com.tls.liferaylms.util.MailStringPool;
 
 /**
@@ -230,6 +237,8 @@ public class MailJobPortlet extends MVCPortlet {
 
 	@ProcessAction(name = "update")
 	public void update(ActionRequest request, ActionResponse response) {
+		ThemeDisplay themeDisplay = (ThemeDisplay) request.getAttribute(WebKeys.THEME_DISPLAY);
+		
 		String conditionClassName = ParamUtil.getString(request, MailStringPool.CONDITION_CLASSNAME, StringPool.BLANK);
 		Long conditionModule = ParamUtil.getLong(request, MailStringPool.CONDITION_MODULE, 0);
 		Long conditionActivity = ParamUtil.getLong(request, MailStringPool.CONDITION_ACTIVITY, 0);
@@ -254,7 +263,25 @@ public class MailJobPortlet extends MVCPortlet {
 		Long template = ParamUtil.getLong(request, MailStringPool.ID_TEMPLATE, 0);
 		
 		
+		//Envío de copia a usuarios relacionados
+		List<Integer> mailRelationTypeIds = MailRelationLocalServiceUtil.findRelationTypeIdsByCompanyId(themeDisplay.getCompanyId());
+		JSONArray sendCopyToTypeIds = JSONFactoryUtil.createJSONArray();
+		if(Validator.isNotNull(mailRelationTypeIds) && mailRelationTypeIds.size()>0){
+			String sendMailToRelationType = StringPool.BLANK;
+			boolean isActiveSendMailToRelationType = Boolean.FALSE;
+			for(int mailRelationTypeId:mailRelationTypeIds){
+				sendMailToRelationType = "sendMailToType_"+mailRelationTypeId;
+				isActiveSendMailToRelationType = ParamUtil.getBoolean(request, sendMailToRelationType, Boolean.FALSE);
+				if(isActiveSendMailToRelationType){
+					sendCopyToTypeIds.put(mailRelationTypeId);
+				}
+			}
+		}
+		//Enviar email a usuarios relacionados
+		boolean sendCopyToSocialRelation = sendCopyToTypeIds.length()>0;
+		
 		if(log.isDebugEnabled()){
+			log.debug("UPDATE");
 			log.debug(template);
 			log.debug(conditionClassName);
 			log.debug(conditionModule);
@@ -267,6 +294,8 @@ public class MailJobPortlet extends MVCPortlet {
 			log.debug(dateShift);
 			log.debug(days);
 			log.debug(days*dateShift);
+			log.debug("::::sendCopyToTypeIds "+sendCopyToTypeIds.length());
+			log.debug(":::sendCopyToSocialRelation:: " + sendCopyToSocialRelation); 
 		}	
 		
 		try {
@@ -296,6 +325,12 @@ public class MailJobPortlet extends MVCPortlet {
 				mailJob.setDateClassPK(referenceActivity);
 				mailJob.setDateShift(days*dateShift);
 				mailJob.setDateReferenceDate(referenceState);
+				
+				JSONObject extraData = JSONFactoryUtil.createJSONObject();
+				extraData.put(MailConstants.EXTRA_DATA_SEND_COPY, sendCopyToSocialRelation);
+				extraData.put(MailConstants.EXTRA_DATA_RELATION_ARRAY, sendCopyToTypeIds);
+				mailJob.setExtraData(extraData.toString());
+				
 				
 				MailJobLocalServiceUtil.updateMailJob(mailJob);
 			}
@@ -331,7 +366,8 @@ public class MailJobPortlet extends MVCPortlet {
 	}
 
 	@ProcessAction(name = "save")
-	public void save(ActionRequest request, ActionResponse response) {		
+	public void save(ActionRequest request, ActionResponse response) {	
+		ThemeDisplay themeDisplay = (ThemeDisplay) request.getAttribute(WebKeys.THEME_DISPLAY);
 		String conditionClassName = ParamUtil.getString(request, MailStringPool.CONDITION_CLASSNAME, StringPool.BLANK);
 		Long conditionModule = ParamUtil.getLong(request, MailStringPool.CONDITION_MODULE, 0);
 		Long conditionActivity = ParamUtil.getLong(request, MailStringPool.CONDITION_ACTIVITY, 0);
@@ -355,7 +391,32 @@ public class MailJobPortlet extends MVCPortlet {
 		Long template = ParamUtil.getLong(request, MailStringPool.ID_TEMPLATE, 0);
 		
 		
+		
+		
+		//Envío de copia a usuarios relacionados
+		List<Integer> mailRelationTypeIds = MailRelationLocalServiceUtil.findRelationTypeIdsByCompanyId(themeDisplay.getCompanyId());
+		JSONArray sendCopyToTypeIds = JSONFactoryUtil.createJSONArray();
+		if(Validator.isNotNull(mailRelationTypeIds) && mailRelationTypeIds.size()>0){
+			String sendMailToRelationType = StringPool.BLANK;
+			boolean isActiveSendMailToRelationType = Boolean.FALSE;
+			for(int mailRelationTypeId:mailRelationTypeIds){
+				sendMailToRelationType = "sendMailToType_"+mailRelationTypeId;
+				isActiveSendMailToRelationType = ParamUtil.getBoolean(request, sendMailToRelationType, Boolean.FALSE);
+				if(isActiveSendMailToRelationType){
+					sendCopyToTypeIds.put(mailRelationTypeId);
+				}
+			}
+		}
+		
+		
+		
+		//Enviar email a usuarios relacionados
+		boolean sendCopyToSocialRelation = sendCopyToTypeIds.length()>0;
+		
+			
+		
 		if(log.isDebugEnabled()){
+			log.debug("SAVE");
 			log.debug(template);
 			log.debug(conditionClassName);
 			log.debug(conditionModule);
@@ -368,6 +429,8 @@ public class MailJobPortlet extends MVCPortlet {
 			log.debug(dateShift);
 			log.debug(days);
 			log.debug(days*dateShift);
+			log.debug("::::sendCopyToTypeIds "+sendCopyToTypeIds.length());
+			log.debug(":::sendCopyToSocialRelation:: " + sendCopyToSocialRelation); 
 		}
 		
 		ServiceContext serviceContext = null;
@@ -382,7 +445,13 @@ public class MailJobPortlet extends MVCPortlet {
 		}
 		
 		try {
-			MailJobLocalServiceUtil.addMailJob(template, conditionClassName, conditionActivity, conditionState.toString(), referenceClassName, referenceActivity, days*dateShift, referenceState, serviceContext);
+			MailJob mailJob =  MailJobLocalServiceUtil.addMailJob(template, conditionClassName, conditionActivity, conditionState.toString(), referenceClassName, referenceActivity, days*dateShift, referenceState, serviceContext);
+			JSONObject extraData = JSONFactoryUtil.createJSONObject();
+			extraData.put(MailConstants.EXTRA_DATA_SEND_COPY, sendCopyToSocialRelation);
+			extraData.put(MailConstants.EXTRA_DATA_RELATION_ARRAY, sendCopyToTypeIds);
+			mailJob.setExtraData(extraData.toString());
+			MailJobLocalServiceUtil.updateMailJob(mailJob);
+		
 		} catch (PortalException e) {
 			if(log.isDebugEnabled())e.printStackTrace();
 			if(log.isErrorEnabled())log.error(e.getMessage());

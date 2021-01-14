@@ -65,6 +65,7 @@
 			<basic name="dateShift" />
 			<basic name="teamId" />
 			<basic name="processed" />
+			<basic name="extraData" />
 			<transient name="modelAttributes" />
 			<transient name="primaryKey" />
 			<transient name="primaryKeyObj" />
