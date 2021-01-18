@@ -262,7 +262,7 @@ public class LmsMailMessageListener implements MessageListener {
 						}
 					}
 					if(internalMessagingActive){
-						MailUtil.sendInternalMessageNotification(entryId,subject, body, groupId, userId, userSender.getUserId(), companyId);
+						MailUtil.sendInternalMessageNotification(entryId,subject, body, groupId, userId, userSender.getUserId(), companyId, attachments, attachmentNames);
 					}
 					MailServiceUtil.sendEmail(mailm);
 					addAuditReceiverMail(auditSendMails.getAuditSendMailsId(), userSender.getEmailAddress(), MailConstants.STATUS_OK, false);
@@ -386,7 +386,7 @@ public class LmsMailMessageListener implements MessageListener {
 						if(internalMessagingActive){
 							if(isUserRelated)
 								content = MailUtil.getExtraContentSocialRelationHeader(student) + MailUtil.getExtraContentSocialRelation(emailSentToUsersList, student, sendToRelationTypeIds) + content;
-							MailUtil.sendInternalMessageNotification(entryId,calculatedsubject, content, groupId,userId, student.getUserId(), companyId);
+							MailUtil.sendInternalMessageNotification(entryId,calculatedsubject, content, groupId,userId, student.getUserId(), companyId, attachments, attachmentNames);
 						}
 						MailEngine.send(mailm);
 						addAuditReceiverMail(auditSendMails.getAuditSendMailsId(), toMail, MailConstants.STATUS_OK, hasDate);
@@ -596,7 +596,7 @@ public class LmsMailMessageListener implements MessageListener {
 							}
 							try{
 								if(internalMessagingActive){
-									MailUtil.sendInternalMessageNotification(entryId,calculatedSubject,content, groupId, userId, student.getUserId(), companyId);
+									MailUtil.sendInternalMessageNotification(entryId,calculatedSubject,content, groupId, userId, student.getUserId(), companyId, attachments, attachmentNames);
 								}
 								sendMail(mailm,transport,session);
 								addAuditReceiverMail(auditSendMails.getAuditSendMailsId(), student.getEmailAddress(), MailConstants.STATUS_OK, false);
@@ -700,7 +700,7 @@ public class LmsMailMessageListener implements MessageListener {
 								try{
 									if(internalMessagingActive){
 										content = MailUtil.getExtraContentSocialRelationHeader(socialRelatedUser) + extraContentSocialRelation + content;
-										MailUtil.sendInternalMessageNotification(entryId,calculatedSubject,content, groupId, userId, socialRelatedUser.getUserId(), companyId);
+										MailUtil.sendInternalMessageNotification(entryId,calculatedSubject,content, groupId, userId, socialRelatedUser.getUserId(), companyId, attachments, attachmentNames);
 									}
 									sendMail(mailm,transport,session);
 									addAuditReceiverMail(auditSendMails.getAuditSendMailsId(), socialRelatedUser.getEmailAddress(), MailConstants.STATUS_OK, false);
