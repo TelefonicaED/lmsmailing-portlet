@@ -45,7 +45,7 @@ public class MailUtil {
 
 	public static void sendInternalMessageNotification(Long entryId,
 			String title, String content, long groupId, long senderUserId,
-			long userId, long companyId) {
+			long userId, long companyId,File[] attachments, String[] attachmentNames) {
 		long classNameId = PortalUtil.getClassNameId(Group.class.getName());
 		try {
 			AnnouncementsEntry ae = null;
@@ -88,6 +88,31 @@ public class MailUtil {
 
 				ae = AnnouncementsEntryLocalServiceUtil
 						.updateAnnouncementsEntry(ae);
+				
+				
+
+				log.debug("Attachments "+attachments);
+				String filePaths = null;
+				File attachment = null;
+				String path = null;
+				if(attachments!=null && attachments.length>0){
+					if(attachments!=null && attachments.length>0){
+						for(int i=0; i<attachments.length; i++){
+							if(attachments[i]!=null){
+								if(Validator.isNull(filePaths)){
+									filePaths = getAttachmentPath(ae.getEntryId());
+									log.debug("Path de los adjuntos "+filePaths);
+								}
+								path=filePaths+File.separator+attachmentNames[i];
+								attachment  = new File(existsFile(path, 1));
+								log.debug("ATTACHMENT NAME "+attachmentNames[i]);
+								log.debug("ATTACHMENT "+attachments[i].length());
+								FileUtil.copyFile(attachments[i], attachment);
+							}
+							
+						}
+					}
+				}
 			}
 			
 			
@@ -144,7 +169,7 @@ public class MailUtil {
 			AnnouncementsFlagLocalServiceUtil.addFlag(senderUserId,
 					ae.getEntryId(), AnnouncementsFlagConstants.NOT_HIDDEN);
 			
-			long entryId = ae.getEntryId();
+			
 			
 			log.debug("Attachments "+attachments);
 			String filePaths = null;
