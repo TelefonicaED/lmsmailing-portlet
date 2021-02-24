@@ -448,7 +448,16 @@ public class LmsMailMessageListener implements MessageListener {
 				users  = UserLocalServiceUtil.search(companyId, null, 0, userParams, QueryUtil.ALL_POS, QueryUtil.ALL_POS, obc);
 				
 			}else {
-				users = UserLocalServiceUtil.getGroupUsers(groupId);
+				Course course = CourseLocalServiceUtil.fetchByGroupCreatedId(groupId);
+				boolean sendToTutors = PrefsPropsUtil.getBoolean(companyId, MailStringPool.SEND_TO_TUTORS_KEY, true);
+				log.debug("Send to tutos "+sendToTutors);
+				if(!sendToTutors && course!=null){
+					users =  CourseLocalServiceUtil.getStudentsFromCourse(course);
+				}else{
+					users = UserLocalServiceUtil.getGroupUsers(groupId);
+				}
+				
+				   
 			}
 			
 			//Env�o de correos a usuarios relacionados

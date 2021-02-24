@@ -3,6 +3,13 @@ Todos los cambios de este proyecto estarán documentados en este archivo.
 
 El formato está basado en [SemVer](https://semver.org/spec/v2.0.0.html).
 
+## [4.5.0](https://github.com/TelefonicaED/lmsmailing-portlet/releases/tag/v4.4.0)
+
+### Added
+
+- #196909: Se establece por configuración si el mensaje a todos y los programados se envian a los tutores o no. Por defecto está el funcionamiento anterior, así que estarán incluidos los tutores.
+
+
 ## [4.4.0](https://github.com/TelefonicaED/lmsmailing-portlet/releases/tag/v4.4.0)
 
 ### Fixed

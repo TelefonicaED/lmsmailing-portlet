@@ -21,6 +21,7 @@ import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.util.PrefsPropsUtil;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.model.User;
 import com.liferay.portal.service.UserLocalServiceUtil;
@@ -38,8 +39,17 @@ public class ActivityCondition extends MainCondition{
 		List<User> groupUsers = null;
 		if(log.isDebugEnabled())log.debug(getMailJob().getGroupId());
 		try {
-			groupUsers = UserLocalServiceUtil.getGroupUsers(getMailJob().getGroupId());
-		} catch (SystemException e) {
+			Course course = CourseLocalServiceUtil.fetchByGroupCreatedId(getMailJob().getGroupId());
+			boolean sendToTutors = PrefsPropsUtil.getBoolean(getMailJob().getCompanyId(), MailStringPool.SEND_TO_TUTORS_KEY, true);
+			log.debug("Send to tutos "+sendToTutors);
+			if(!sendToTutors && course!=null){
+				groupUsers =  CourseLocalServiceUtil.getStudentsFromCourse(course);
+			}else{
+				groupUsers = UserLocalServiceUtil.getGroupUsers(getMailJob().getGroupId());
+			}
+			
+			
+		} catch (Exception e) {
 			if(log.isDebugEnabled())e.printStackTrace();
 			if(log.isErrorEnabled())log.error(e.getMessage());
 		}

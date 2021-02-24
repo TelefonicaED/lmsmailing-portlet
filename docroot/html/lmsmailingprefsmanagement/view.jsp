@@ -24,6 +24,11 @@ String footer = PrefsPropsUtil.getString(themeDisplay.getCompanyId(), MailConsta
 	<aui:fieldset label="mail.preferences.send-always-message" >
 		<aui:input type="checkbox" name="sendAlwaysMessage" label="mail.preferences.send-always-message-info" value="${sendAlwaysMessage}" checked="${sendAlwaysMessage}"/>
 	</aui:fieldset>
+	
+	<aui:fieldset label="mail.preferences.send-mail-tutor" >
+		<aui:input type="checkbox" name="sendMailsToTutors" label="mail.preferences.send-mail-to-tutors" value="${sendMailsToTutors}" checked="${sendMailsToTutors}"/>
+	</aui:fieldset>
+	
 	<aui:fieldset label="mail.preferences.configure-deregister-expando" >
 		<aui:input name="deregisterMailExpando" label="mail.preferences.deregister-mail-expando" value="${deregisterMailExpando}"/>
 	</aui:fieldset>
