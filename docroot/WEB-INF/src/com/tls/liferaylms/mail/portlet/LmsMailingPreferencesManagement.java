@@ -87,11 +87,13 @@ public class LmsMailingPreferencesManagement extends MVCPortlet {
 		boolean internalMessagingActive = false;
 		boolean sendAlwaysMessage = false;
 		String deregisterMailExpando = "deregister-mail";
+		boolean sendMailsToTutors= false;
 		
 		try {
 			internalMessagingActive = PrefsPropsUtil.getBoolean(themeDisplay.getCompanyId(), MailStringPool.INTERNAL_MESSAGING_KEY);
 			sendAlwaysMessage = PrefsPropsUtil.getBoolean(themeDisplay.getCompanyId(), MailStringPool.SEND_ALWAYS_MESSAGE_KEY);
 			deregisterMailExpando = PrefsPropsUtil.getString(themeDisplay.getCompanyId(), MailStringPool.DEREGISTER_MAIL_KEY);
+			sendMailsToTutors = PrefsPropsUtil.getBoolean(themeDisplay.getCompanyId(), MailStringPool.SEND_TO_TUTORS_KEY,true);
 			if(log.isDebugEnabled()){
 				log.debug("Company Id "+themeDisplay.getCompanyId());
 				log.debug("Initial Value 1 " +  PropsUtil.get(MailStringPool.INTERNAL_MESSAGING_KEY));
@@ -110,7 +112,7 @@ public class LmsMailingPreferencesManagement extends MVCPortlet {
 		renderRequest.setAttribute("internalMessagingActive",internalMessagingActive);
 		renderRequest.setAttribute("sendAlwaysMessage",sendAlwaysMessage);
 		renderRequest.setAttribute("deregisterMailExpando", deregisterMailExpando);
-		
+		renderRequest.setAttribute("sendMailsToTutors", sendMailsToTutors);
 		//Envio de copia de email a relaci�n social
 		try {
 			List<Integer> mailRelationTypeIds = MailRelationLocalServiceUtil.findRelationTypeIdsByCompanyId(themeDisplay.getCompanyId());
@@ -153,12 +155,14 @@ public class LmsMailingPreferencesManagement extends MVCPortlet {
 			long companyId = themeDisplay.getCompanyId();
 			boolean internalMessagingActive = ParamUtil.getBoolean(actionRequest,"internalMessagingActive");
 			boolean sendAlwaysMessage = ParamUtil.getBoolean(actionRequest,"sendAlwaysMessage");
+			boolean sendMailsToTutors= ParamUtil.getBoolean(actionRequest,"sendMailsToTutors");
 			String deregisterMailExpando = ParamUtil.getString(actionRequest,"deregisterMailExpando");
 			String header = ParamUtil.getString(actionRequest, "header", LanguageUtil.get(Locale.getDefault(),"mail.header"));
 			String footer = ParamUtil.getString(actionRequest, "footer", LanguageUtil.get(Locale.getDefault(),"mail.footer"));
 			boolean errorDeregisterExpando = savePreference(MailStringPool.DEREGISTER_MAIL_KEY,deregisterMailExpando , companyId);
 			boolean errorInternalMessaging = savePreference(MailStringPool.INTERNAL_MESSAGING_KEY ,String.valueOf(internalMessagingActive) , companyId);
 			boolean errorSendAlwaysMessage = savePreference(MailStringPool.SEND_ALWAYS_MESSAGE_KEY ,String.valueOf(sendAlwaysMessage) , companyId);
+			boolean errorSendMailsToTutors = savePreference(MailStringPool.SEND_TO_TUTORS_KEY ,String.valueOf(sendMailsToTutors) , companyId);
 			boolean errorHeader = savePreference(MailConstants.HEADER_PREFS, header, companyId);
 			boolean errorFooter = savePreference(MailConstants.FOOTER_PREFS, footer, companyId);
 			boolean errorActiveMailRelations = false;
@@ -200,7 +204,7 @@ public class LmsMailingPreferencesManagement extends MVCPortlet {
 			}
 			
 			if(errorDeregisterExpando || errorInternalMessaging || errorSendAlwaysMessage || errorActiveMailRelations || errorShowExpandosUser 
-					|| errorShowExpandosCourse || errorHeader || errorFooter){
+					|| errorShowExpandosCourse || errorHeader || errorFooter ||errorSendMailsToTutors){
 				SessionErrors.add(actionRequest, "update-ko");
 			}else{
 				SessionMessages.add(actionRequest, "update-ok");
