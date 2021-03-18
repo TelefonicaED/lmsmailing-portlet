@@ -7,11 +7,18 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 
+import javax.activation.DataHandler;
+import javax.activation.DataSource;
+import javax.activation.FileDataSource;
+import javax.mail.BodyPart;
 import javax.mail.MessagingException;
+import javax.mail.Multipart;
 import javax.mail.Session;
 import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
+import javax.mail.internet.MimeMultipart;
 import javax.portlet.PortletPreferences;
 
 import com.liferay.counter.service.CounterLocalServiceUtil;
@@ -19,6 +26,7 @@ import com.liferay.lms.model.Course;
 import com.liferay.lms.model.LmsPrefs;
 import com.liferay.lms.service.CourseLocalServiceUtil;
 import com.liferay.lms.service.LmsPrefsLocalServiceUtil;
+import com.liferay.mail.model.FileAttachment;
 import com.liferay.mail.service.MailServiceUtil;
 import com.liferay.portal.kernel.dao.orm.CustomSQLParam;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
@@ -781,12 +789,33 @@ public class LmsMailMessageListener implements MessageListener {
 		message.setFrom(mailm.getFrom());
 		message.setRecipients(javax.mail.Message.RecipientType.TO,mailm.getTo());
 		message.setSubject(mailm.getSubject());
-		if (mailm.isHTMLFormat()) {
-			message.setContent(mailm.getBody(), "text/html;charset=\"UTF-8\"");
+		
+		  // Create the message part
+        BodyPart messageBodyPart = new MimeBodyPart();
+        if (mailm.isHTMLFormat()) {
+        	messageBodyPart.setContent(mailm.getBody(), "text/html;charset=\"UTF-8\"");
 		}
 		else {
-			message.setContent(mailm.getBody(),"text/plain;charset=\"UTF-8\"");
+			messageBodyPart.setContent(mailm.getBody(),"text/plain;charset=\"UTF-8\"");
 		}
+       
+        // Create a multipar message
+        Multipart multipart = new MimeMultipart();
+
+        // Set text message part
+        multipart.addBodyPart(messageBodyPart);
+        DataSource source = null;
+        // Part two is attachment
+        for(FileAttachment attachment : mailm.getFileAttachments()){
+        	 messageBodyPart = new MimeBodyPart();
+             String filename = attachment.getFileName();
+             source = new FileDataSource(attachment.getFile());	 
+             messageBodyPart.setDataHandler(new DataHandler(source));
+             messageBodyPart.setFileName(filename);
+             multipart.addBodyPart(messageBodyPart);
+        }
+        // Send the complete message parts
+        message.setContent(multipart);
 		transport.sendMessage(message, mailm.getTo());
 		
 	}
