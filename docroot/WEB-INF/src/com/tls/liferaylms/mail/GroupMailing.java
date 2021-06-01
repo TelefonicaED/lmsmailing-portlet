@@ -174,6 +174,15 @@ public class GroupMailing extends MVCPortlet{
 			}
 			if(!error){
 				String subject 	= ParamUtil.getString(uploadRequest, "subject", "");
+				File[] copyAttachments = new File[attachments.length];
+				if(attachments!=null && attachments.length>0){
+					for(int i=0;i<attachments.length;i++){
+						File tempFile = FileUtil.createTempFile();
+						FileUtil.copyFile(attachments[i], tempFile);
+						copyAttachments[i] = tempFile;
+					}
+				}
+				
 				
 				_log.debug("SUBJECT "+subject);
 				
@@ -242,7 +251,7 @@ public class GroupMailing extends MVCPortlet{
 						content = MailUtil.replaceExpandosCourse(content, themeDisplay.getCompanyId(), themeDisplay.getScopeGroupId(), themeDisplay.getLocale());
 					}
 					
-					AnnouncementsEntry entry = MailUtil.createInternalMessageNotification(subject, content, themeDisplay.getScopeGroupId(), themeDisplay.getUserId(), themeDisplay.getCompanyId(), attachments, attachmentNames);
+					AnnouncementsEntry entry = MailUtil.createInternalMessageNotification(subject, content, themeDisplay.getScopeGroupId(), themeDisplay.getUserId(), themeDisplay.getCompanyId(), copyAttachments, attachmentNames);
 					if(entry!=null){
 						entryId = entry.getEntryId();
 					}
@@ -264,7 +273,7 @@ public class GroupMailing extends MVCPortlet{
 					message.put("userId",  	themeDisplay.getUserId());
 					message.put("testing", 	testing);
 					message.put("sendToRelatedUsers", sendCopyToSocialRelation);
-					message.put("attachments", attachments);
+					message.put("attachments", copyAttachments);
 					message.put("attachmentNames", attachmentNames);
 					message.put("portal", 	themeDisplay.getCompany().getName());
 					message.put("community",themeDisplay.getScopeGroupName());
@@ -301,7 +310,7 @@ public class GroupMailing extends MVCPortlet{
 						message.put("testing", 	testing);
 						message.put("sendToRelatedUsers", sendCopyToSocialRelation);
 						message.put("mailRelationTypeIds", sendCopyToTypeIds);
-						message.put("attachments", attachments);
+						message.put("attachments", copyAttachments);
 						message.put("attachmentNames", attachmentNames);
 						message.put("portal", 	themeDisplay.getCompany().getName());
 						message.put("community",community);
@@ -343,7 +352,7 @@ public class GroupMailing extends MVCPortlet{
 							message.put("sendToRelatedUsers", sendCopyToSocialRelation);
 							message.put("mailRelationTypeIds", sendCopyToTypeIds);
 							message.put("isUserRelated", false);
-							message.put("attachments", attachments);
+							message.put("attachments", copyAttachments);
 							message.put("attachmentNames", attachmentNames);
 							message.put("portal", 	themeDisplay.getCompany().getName());
 							message.put("community",community);
@@ -374,7 +383,7 @@ public class GroupMailing extends MVCPortlet{
 								message.put("isUserRelated", true);
 								message.put("mailRelationTypeIds", sendCopyToTypeIds);
 								message.put("emailSentToUsersList", teamUsers);
-								message.put("attachments", attachments);
+								message.put("attachments", copyAttachments);
 								message.put("attachmentNames", attachmentNames);
 								message.put("portal", 	themeDisplay.getCompany().getName());
 								message.put("community",community);
@@ -420,7 +429,7 @@ public class GroupMailing extends MVCPortlet{
 								message.put("sendToRelatedUsers", sendCopyToSocialRelation);
 								message.put("isUserRelated", false);
 								message.put("mailRelationTypeIds", sendCopyToTypeIds);
-								message.put("attachments", attachments);
+								message.put("attachments", copyAttachments);
 								message.put("attachmentNames", attachmentNames);
 								message.put("portal", 	themeDisplay.getCompany().getName());
 								message.put("community",community);
@@ -452,7 +461,7 @@ public class GroupMailing extends MVCPortlet{
 								message.put("isUserRelated", true);
 								message.put("mailRelationTypeIds", sendCopyToTypeIds);
 								message.put("emailSentToUsersList", sentToUsersList);
-								message.put("attachments", attachments);
+								message.put("attachments", copyAttachments);
 								message.put("attachmentNames", attachmentNames);
 								message.put("portal", 	themeDisplay.getCompany().getName());
 								message.put("community",community);

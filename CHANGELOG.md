@@ -3,6 +3,12 @@ Todos los cambios de este proyecto estarán documentados en este archivo.
 
 El formato está basado en [SemVer](https://semver.org/spec/v2.0.0.html).
 
+## [4.5.2](https://github.com/TelefonicaED/lmsmailing-portlet/releases/tag/v4.5.2)
+
+### Fixed
+
+- #202664: Se corrige que en los mailjobs se hagan las sustituciones de variables en la mensajeria interna y que cree un mensaje por usuario.
+
 ## [4.5.1](https://github.com/TelefonicaED/lmsmailing-portlet/releases/tag/v4.5.1)
 
 ### Fixed
