@@ -175,12 +175,14 @@ public class GroupMailing extends MVCPortlet{
 			if(!error){
 				String subject 	= ParamUtil.getString(uploadRequest, "subject", "");
 				File[] copyAttachments = new File[attachments.length];
-				if(attachments!=null && attachments.length>0){
+				if(attachments!=null && attachments.length>0 && attachments[0] != null){
 					for(int i=0;i<attachments.length;i++){
 						File tempFile = FileUtil.createTempFile();
 						FileUtil.copyFile(attachments[i], tempFile);
 						copyAttachments[i] = tempFile;
 					}
+				}else{
+					copyAttachments = null;
 				}
 				
 				
