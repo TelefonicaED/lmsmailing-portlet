@@ -291,7 +291,8 @@ public class LmsMailMessageListener implements MessageListener {
 			}
 			User student = UserLocalServiceUtil.fetchUserByEmailAddress(userSender.getCompanyId(), toMail);
 			
-			if(student != null && student.isActive() && Validator.isEmailAddress(student.getEmailAddress())) {
+			if(student != null && student.getStatus() != com.liferay.portal.kernel.workflow.WorkflowConstants.STATUS_INACTIVE && Validator.isEmailAddress(student.getEmailAddress())) {
+			
 				deregisterMail = false;
 				if(!sendAlwaysMessage){
 					if(student.getExpandoBridge().getAttribute(deregisterMailExpando,false)!=null){
