@@ -155,21 +155,7 @@ public class ProcessMailJob extends MVCPortlet implements MessageListener{
 							}catch(Exception e){
 								e.printStackTrace();
 							}
-							long entryId = -1;
-							try{
-								
-								boolean internalMessagingActive = PrefsPropsUtil.getBoolean(mailJob.getCompanyId(), MailStringPool.INTERNAL_MESSAGING_KEY);
-								
-								if(internalMessagingActive){
-									log.debug("Sending internal message ");
-									AnnouncementsEntry entry = MailUtil.createInternalMessageNotification(mailTemplate.getSubject(), mailTemplate.getBody(), mailJob.getGroupId(), mailJob.getUserId(), mailJob.getCompanyId(), null, null);
-									if(entry!=null){
-										entryId = entry.getEntryId();
-									}
-								}
-							}catch(Exception e){
-								e.printStackTrace();
-							}
+
 							List<User> sentToUsersList = new ArrayList<User>();
 							JSONObject extraData = mailJob.getExtraDataJSON();
 							boolean sendCopyToSocialRelation = false;
@@ -205,7 +191,6 @@ public class ProcessMailJob extends MVCPortlet implements MessageListener{
 
 										message.put("to", user.getEmailAddress());
 										message.put("tutors", tutors);
-										message.put("entryId", entryId);
 										message.put("subject", 	mailTemplate.getSubject());
 										message.put("body", 	mailTemplate.getBody());
 										message.put("groupId", 	mailJob.getGroupId());
@@ -240,11 +225,6 @@ public class ProcessMailJob extends MVCPortlet implements MessageListener{
 										//Si corresponde se buscan los usuarios con relaciones sociales con los usuarios seleccionados
 										socialRelationUsers = sendCopyToSocialRelation ? MailUtil.getSocialRelationUsers(user, sendCopyToTypeIds, socialRelationUsers, mailJob.getCompanyId()) : new ArrayList<User>();
 										
-
-										
-										
-										
-										
 //									LmsMailMessageListener.addAuditReceiverMail(auditSendMails.getAuditSendMailsId(), user.getEmailAddress(), LmsMailMessageListener.STATUS_OK);
 									}catch(Exception e){
 										e.printStackTrace();
@@ -262,7 +242,6 @@ public class ProcessMailJob extends MVCPortlet implements MessageListener{
 										Message message=new Message();
 										
 										message.put("templateId",mailTemplate.getIdTemplate());
-										message.put("entryId", entryId);
 										message.put("to", socialRelatedUser.getEmailAddress());
 										message.put("tutors", tutors);
 										message.put("userName", socialRelatedUser.getFullName());

@@ -89,9 +89,6 @@ public class LmsMailMessageListener implements MessageListener {
 		String subject 	= message.getString("subject");
 		String body 	= message.getString("body");
 		
-		
-		
-		
 		Group scopeGroup = GroupLocalServiceUtil.getGroup(groupId);
 		long companyId 	 = scopeGroup.getCompanyId();
 		
@@ -229,6 +226,7 @@ public class LmsMailMessageListener implements MessageListener {
 				body = MailUtil.replaceMessageConstants(body, portal, community, userSender.getFullName(), userSender.getScreenName(), userSender.getFirstName(), tutors, url, urlcourse,
 						MailUtil.getCourseStartDate(groupId, userSender.getLocale(), userSender.getTimeZone()), MailUtil.getCourseEndDate(groupId, userSender.getLocale(), userSender.getTimeZone(),userSender), userSender.getFullName());
 				
+				body = MailUtil.replaceStudent(body, userSender.getFullName(), userSender.getScreenName(), userSender.getFirstName());
 				//Sustituir expandos
 				if(showExpandosUser)
 					body = MailUtil.replaceExpandosUser(body, companyId, userSender, userSender.getLocale());
@@ -246,7 +244,6 @@ public class LmsMailMessageListener implements MessageListener {
 					subject = MailUtil.replaceExpandosUser(subject, companyId, userSender, userSender.getLocale());
 				if(showExpandosCourse)
 					subject = MailUtil.replaceExpandosCourse(subject, companyId, groupId, userSender.getLocale());
-				
 				
 				//Guardar una auditoria del envio de emails.
 				auditSendMails = AuditSendMailsLocalServiceUtil.createAuditSendMails(CounterLocalServiceUtil.increment(AuditSendMails.class.getName()));
@@ -316,7 +313,6 @@ public class LmsMailMessageListener implements MessageListener {
 					InternetAddress to = new InternetAddress(toMail, student.getFullName());
 					String content = MailUtil.replaceMessageConstants(body, portal, community, toFullName, toScreenName, toFirstName, tutors,url,urlcourse,
 							MailUtil.getCourseStartDate(groupId, student.getLocale(), student.getTimeZone()), MailUtil.getCourseEndDate(groupId, student.getLocale(), student.getTimeZone(),student), userSender.getFullName());
-					
 					//Sustituir expandos
 					if(showExpandosUser)
 						content = MailUtil.replaceExpandosUser(content, companyId, isUserRelated?null:student, student.getLocale());
@@ -328,7 +324,6 @@ public class LmsMailMessageListener implements MessageListener {
 						calculatedBody += MailUtil.getExtraContentSocialRelationHeader(student) + MailUtil.getExtraContentSocialRelation(emailSentToUsersList, student, sendToRelationTypeIds);
 					calculatedBody += PrefsPropsUtil.getString(companyId, MailConstants.HEADER_PREFS, LanguageUtil.get(student.getLocale(),"mail.header"));
 					calculatedBody += MailUtil.replaceMessageConstants(body, portal, community, toFullName, toScreenName, toFirstName, tutors,url,urlcourse, MailUtil.getCourseStartDate(groupId, student.getLocale(), student.getTimeZone()), MailUtil.getCourseEndDate(groupId, student.getLocale(), student.getTimeZone(), student), userSender.getFullName());
-
 					//Sustituir expandos
 					if(showExpandosUser)
 						calculatedBody = MailUtil.replaceExpandosUser(calculatedBody, companyId, isUserRelated?null:student, student.getLocale());
@@ -338,6 +333,7 @@ public class LmsMailMessageListener implements MessageListener {
 					calculatedBody += PrefsPropsUtil.getString(companyId, MailConstants.FOOTER_PREFS, LanguageUtil.get(student.getLocale(),"mail.footer"));
 					
 					String calculatedsubject = MailUtil.replaceMessageConstants(subject, portal, community, toFullName, toScreenName, toFirstName, tutors, url, urlcourse, MailUtil.getCourseStartDate(groupId, student.getLocale(), student.getTimeZone()), MailUtil.getCourseEndDate(groupId, student.getLocale(), student.getTimeZone(),student), userSender.getFullName());
+					
 					//Sustituir expandos
 					if(showExpandosUser)
 						calculatedsubject = MailUtil.replaceExpandosUser(calculatedsubject, companyId, isUserRelated?null:student, student.getLocale());
@@ -548,6 +544,8 @@ public class LmsMailMessageListener implements MessageListener {
 				me.printStackTrace();
 				throw new Exception(me);
 			}
+			
+			log.debug("users: " + users.size());
 			
 			// Se envían los correos a todos los alumnos.
 			for (User student : users) {
