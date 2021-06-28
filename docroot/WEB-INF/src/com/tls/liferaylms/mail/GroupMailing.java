@@ -79,38 +79,9 @@ public class GroupMailing extends MVCPortlet{
 				
 				String tutors = MailUtil.getTutors(themeDisplay.getScopeGroupId());
 				
-				long entryId = -1;
-				boolean internalMessagingActive = PrefsPropsUtil.getBoolean(themeDisplay.getCompanyId(), MailStringPool.INTERNAL_MESSAGING_KEY);
-	
-				if(internalMessagingActive){
-					_log.debug("Sending internal message ");
-					String content =  MailUtil.replaceMessageConstants(changeToURL(template.getBody(), themeDisplay.getURLPortal()), themeDisplay.getCompany().getName(), 
-							themeDisplay.getScopeGroupName(), themeDisplay.getUser().getFullName(), themeDisplay.getUser().getScreenName(), themeDisplay.getUser().getFirstName(), tutors, 
-							MailUtil.getURLPortal(themeDisplay.getCompany(),actionRequest), MailUtil.getURLPortal(themeDisplay.getCompany(),actionRequest)+themeDisplay.getPathFriendlyURLPublic()+themeDisplay.getScopeGroup().getFriendlyURL(),
-							MailUtil.getCourseStartDate(themeDisplay.getScopeGroupId(), themeDisplay.getLocale(), themeDisplay.getTimeZone()), MailUtil.getCourseEndDate(themeDisplay.getScopeGroupId(), themeDisplay.getLocale(),
-							themeDisplay.getTimeZone(), themeDisplay.getUser()),themeDisplay.getUser().getFullName());
-					
-					//Sustituir expandos
-					boolean showExpandosUser = PrefsPropsUtil.getBoolean(themeDisplay.getCompanyId(), MailConstants.USER_EXPANDOS_TO_SHOW, Boolean.FALSE);
-					if(showExpandosUser){
-						content = MailUtil.replaceExpandosUser(content, themeDisplay.getCompanyId(), themeDisplay.getUser(), themeDisplay.getLocale());
-					}
-					boolean showExpandosCourse = PrefsPropsUtil.getBoolean(themeDisplay.getCompanyId(), MailConstants.COURSE_EXPANDOS_TO_SHOW, Boolean.FALSE);
-					if(showExpandosCourse){
-						content = MailUtil.replaceExpandosCourse(content, themeDisplay.getCompanyId(), themeDisplay.getScopeGroupId(), themeDisplay.getLocale());
-					}
-					
-					AnnouncementsEntry entry = MailUtil.createInternalMessageNotification(template.getSubject(),content, themeDisplay.getScopeGroupId(), themeDisplay.getUserId(), themeDisplay.getCompanyId(),null,null);
-					if(entry!=null){
-						entryId = entry.getEntryId();
-					}
-				}
-				
-				
 				Message message=new Message();
 				
 				message.put("templateId",idTemplate);
-				message.put("entryId", entryId);
 				message.put("to", "all");
 				message.put("tutors", tutors);
 				message.put("ownTeam", ownTeam);
@@ -201,9 +172,6 @@ public class GroupMailing extends MVCPortlet{
 				String to 		= ParamUtil.getString(uploadRequest, "to", "");
 				String tutors 	= MailUtil.getTutors(themeDisplay.getScopeGroupId());
 				
-				long entryId = -1;
-				boolean internalMessagingActive = PrefsPropsUtil.getBoolean(themeDisplay.getCompanyId(), MailStringPool.INTERNAL_MESSAGING_KEY);
-				
 				if (_log.isDebugEnabled()) _log.debug("To: " + to);
 				if (_log.isDebugEnabled()) _log.debug("to.isEmpty(): " + to.isEmpty());
 				if (_log.isDebugEnabled()) _log.debug("to.containsteam_: " + to.contains("team_"));
@@ -234,30 +202,7 @@ public class GroupMailing extends MVCPortlet{
 				boolean sendCopyToSocialRelation = sendCopyToTypeIds.size()>0;
 				if(_log.isDebugEnabled())
 					_log.debug(":::sendCopyToSocialRelation:: " + sendCopyToSocialRelation); 
-			
-				if(internalMessagingActive){
-					_log.debug("Sending internal message ");
-					
-					String content =  MailUtil.replaceMessageConstants(changeToURL(body, themeDisplay.getURLPortal()), themeDisplay.getCompany().getName(), 
-							themeDisplay.getScopeGroupName(), themeDisplay.getUser().getFullName(), themeDisplay.getUser().getScreenName(), themeDisplay.getUser().getFirstName(), tutors, 
-							MailUtil.getURLPortal(themeDisplay.getCompany(),actionRequest), MailUtil.getURLPortal(themeDisplay.getCompany(),actionRequest)+themeDisplay.getPathFriendlyURLPublic()+themeDisplay.getScopeGroup().getFriendlyURL(), 
-							MailUtil.getCourseStartDate(themeDisplay.getScopeGroupId(), themeDisplay.getLocale(), themeDisplay.getTimeZone()), MailUtil.getCourseEndDate(themeDisplay.getScopeGroupId(), themeDisplay.getLocale(), themeDisplay.getTimeZone(), themeDisplay.getUser()),themeDisplay.getUser().getFullName());
-					
-					//Sustituir expandos
-					boolean showExpandosUser = PrefsPropsUtil.getBoolean(themeDisplay.getCompanyId(), MailConstants.USER_EXPANDOS_TO_SHOW, Boolean.FALSE);
-					if(showExpandosUser){
-						content = MailUtil.replaceExpandosUser(content, themeDisplay.getCompanyId(), themeDisplay.getUser(), themeDisplay.getLocale());
-					}
-					boolean showExpandosCourse = PrefsPropsUtil.getBoolean(themeDisplay.getCompanyId(), MailConstants.COURSE_EXPANDOS_TO_SHOW, Boolean.FALSE);
-					if(showExpandosCourse){
-						content = MailUtil.replaceExpandosCourse(content, themeDisplay.getCompanyId(), themeDisplay.getScopeGroupId(), themeDisplay.getLocale());
-					}
-					
-					AnnouncementsEntry entry = MailUtil.createInternalMessageNotification(subject, content, themeDisplay.getScopeGroupId(), themeDisplay.getUserId(), themeDisplay.getCompanyId(), copyAttachments, attachmentNames);
-					if(entry!=null){
-						entryId = entry.getEntryId();
-					}
-				}
+
 				
 				if(testMessage){
 					if (_log.isDebugEnabled()) _log.debug("Testing Mode: " + themeDisplay.getUser().getEmailAddress());
@@ -265,7 +210,6 @@ public class GroupMailing extends MVCPortlet{
 					Message message=new Message();
 					
 					message.put("templateId",-1);
-					message.put("entryId", entryId);
 					message.put("to", themeDisplay.getUser().getEmailAddress());
 					message.put("tutors", tutors);
 					message.put("userName", themeDisplay.getUser().getFullName());
@@ -304,7 +248,6 @@ public class GroupMailing extends MVCPortlet{
 						message.put("tutors", tutors);
 						message.put("ownTeam", ownTeam);
 						message.put("isOmniadmin", permissionChecker.isOmniadmin());
-						message.put("entryId", entryId);
 						message.put("subject", 	subject);
 						message.put("body", 	changeToURL(body, themeDisplay.getURLPortal()));
 						message.put("groupId", 	themeDisplay.getScopeGroupId());
@@ -342,7 +285,6 @@ public class GroupMailing extends MVCPortlet{
 							Message message=new Message();
 							
 							message.put("templateId",-1);
-							message.put("entryId", entryId);
 							message.put("to", user.getEmailAddress());
 							message.put("tutors", tutors);
 							message.put("userName", user.getFullName());
@@ -372,7 +314,6 @@ public class GroupMailing extends MVCPortlet{
 								Message message=new Message();
 								
 								message.put("templateId",-1);
-								message.put("entryId", entryId);
 								message.put("to", socialRelatedUser.getEmailAddress());
 								message.put("tutors", tutors);
 								message.put("userName", socialRelatedUser.getFullName());
@@ -419,7 +360,6 @@ public class GroupMailing extends MVCPortlet{
 								Message message=new Message();
 								
 								message.put("templateId",-1);
-								message.put("entryId", entryId);
 								message.put("to", user.getEmailAddress());
 								message.put("tutors", tutors);
 								message.put("userName", user.getFullName());
@@ -450,7 +390,6 @@ public class GroupMailing extends MVCPortlet{
 								Message message=new Message();
 								
 								message.put("templateId",-1);
-								message.put("entryId", entryId);
 								message.put("to", socialRelatedUser.getEmailAddress());
 								message.put("tutors", tutors);
 								message.put("userName", socialRelatedUser.getFullName());

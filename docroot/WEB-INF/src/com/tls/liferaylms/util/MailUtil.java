@@ -88,8 +88,6 @@ public class MailUtil {
 
 				ae = AnnouncementsEntryLocalServiceUtil
 						.updateAnnouncementsEntry(ae);
-				
-				
 
 				log.debug("Attachments "+attachments);
 				String filePaths = null;
@@ -126,81 +124,6 @@ public class MailUtil {
 		}
 
 	}
-
-	public static AnnouncementsEntry createInternalMessageNotification(
-			String title, String content, long groupId, long senderUserId,
-			long companyId, File[] attachments, String[] attachmentNames) {
-		long classNameId = PortalUtil.getClassNameId(Group.class.getName());
-		AnnouncementsEntry ae = null;
-		try {
-			String type = "announcements.type.general";
-			log.debug("-- Creating Internal Messaging Notification");
-			Date now = new Date();
-			log.debug("NOW " + now);
-			Calendar displayDate = Calendar.getInstance();
-			Calendar expirationDate = Calendar.getInstance();
-			displayDate.setTime(now);
-			expirationDate.setTime(now);
-
-			expirationDate.add(Calendar.MONTH, 1);
-
-			ae = AnnouncementsEntryLocalServiceUtil
-					.createAnnouncementsEntry(CounterLocalServiceUtil
-							.increment());
-
-			ae.setCompanyId(companyId);
-			ae.setUserId(senderUserId);
-			ae.setUserName(StringPool.BLANK);
-			ae.setCreateDate(now);
-			ae.setModifiedDate(now);
-			ae.setClassNameId(classNameId);
-			ae.setClassPK(groupId);
-			ae.setTitle(title);
-			ae.setContent(content);
-			ae.setUrl(StringPool.BLANK);
-			ae.setType(type);
-			ae.setDisplayDate(displayDate.getTime());
-			ae.setExpirationDate(expirationDate.getTime());
-			ae.setPriority(0);
-			ae.setAlert(true);
-
-			ae = AnnouncementsEntryLocalServiceUtil
-					.updateAnnouncementsEntry(ae);
-			AnnouncementsFlagLocalServiceUtil.addFlag(senderUserId,
-					ae.getEntryId(), AnnouncementsFlagConstants.NOT_HIDDEN);
-			
-			
-			
-			log.debug("Attachments "+attachments);
-			String filePaths = null;
-			File attachment = null;
-			String path = null;
-			if(attachments!=null && attachments.length>0){
-				if(attachments!=null && attachments.length>0){
-					for(int i=0; i<attachments.length; i++){
-						if(attachments[i]!=null){
-							if(Validator.isNull(filePaths)){
-								filePaths = getAttachmentPath(ae.getEntryId());
-								log.debug("Path de los adjuntos "+filePaths);
-							}
-							path=filePaths+File.separator+attachmentNames[i];
-							attachment  = new File(existsFile(path, 1));
-							log.debug("ATTACHMENT NAME "+attachmentNames[i]);
-							log.debug("ATTACHMENT "+attachments[i].length());
-							FileUtil.copyFile(attachments[i], attachment);
-						}
-						
-					}
-				}
-			}
-			
-
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return ae;
-	}
-	
 	
 	public static String getAttachmentPath(long entryId){
 		
