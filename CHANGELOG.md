@@ -3,6 +3,12 @@ Todos los cambios de este proyecto estarán documentados en este archivo.
 
 El formato está basado en [SemVer](https://semver.org/spec/v2.0.0.html).
 
+## [4.5.3](https://github.com/TelefonicaED/lmsmailing-portlet/releases/tag/v4.5.3)
+
+### Added
+
+- #181753: Se establece por configuración del portlet de emails programados, si la fecha de envio se elige con dias relativos a las actividades o seleccionando una fecha concreta del calendario.
+
 ## [4.5.2](https://github.com/TelefonicaED/lmsmailing-portlet/releases/tag/v4.5.2)
 
 ### Fixed
