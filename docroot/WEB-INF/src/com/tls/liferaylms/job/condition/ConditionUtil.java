@@ -41,6 +41,7 @@ public class ConditionUtil {
 				Constructor[] cons = c.getConstructors();
 				
 				if(cons!=null&&cons.length>0){
+					log.info("Condition added "+name);
 					classes.add((Condition)cons[0].newInstance(new Object[] { name }));
 				}
 			} catch (ClassNotFoundException e) {
@@ -49,7 +50,7 @@ public class ConditionUtil {
 			} catch (InvocationTargetException e){
 			}
         }
-        
+
         return classes;
 	}
 

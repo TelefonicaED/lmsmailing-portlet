@@ -14,6 +14,7 @@
 
 package com.tls.liferaylms.mail.service.impl;
 
+import java.util.Date;
 import java.util.List;
 
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
@@ -47,7 +48,7 @@ import com.tls.liferaylms.util.MailStringPool;
 public class MailJobLocalServiceImpl extends MailJobLocalServiceBaseImpl {
 	Log log = LogFactoryUtil.getLog(MailJobLocalServiceImpl.class);
 	
-	public MailJob addMailJob(Long template, String conditionClassName, Long conditionClassPK, String conditionStatus, String dateClassName, Long dateClassPK, Long dateShift, Long referenceState, ServiceContext serviceContext) throws SystemException, PortalException{
+	public MailJob addMailJob(Long template, String conditionClassName, Long conditionClassPK, String conditionStatus, String dateClassName, Long dateClassPK, Long dateShift, Date dateToSend,Long referenceState, ServiceContext serviceContext) throws SystemException, PortalException{
 		MailJob mailJob = mailJobPersistence.create(counterLocalService.increment(MailJob.class.getName()));
 
 		mailJob.setIdTemplate(template);
@@ -60,6 +61,7 @@ public class MailJobLocalServiceImpl extends MailJobLocalServiceBaseImpl {
 		mailJob.setDateClassName(dateClassName);
 		mailJob.setDateClassPK(dateClassPK);
 		mailJob.setDateShift(dateShift);
+		mailJob.setDateToSend(dateToSend);
 		mailJob.setDateReferenceDate(referenceState);
 		
 		return mailJobPersistence.update(mailJob, true);

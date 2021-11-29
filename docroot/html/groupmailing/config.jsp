@@ -5,6 +5,7 @@
 <%@page import="com.liferay.lms.service.CourseLocalServiceUtil"%>
 <%@page import="com.liferay.lms.model.Course"%>
 <%@include file="/init.jsp" %>
+
 <%
 
 	PortletPreferences preferences = null;

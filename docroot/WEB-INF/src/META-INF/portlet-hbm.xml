@@ -50,6 +50,7 @@
 		<property name="dateClassPK" type="com.liferay.portal.dao.orm.hibernate.LongType" />
 		<property name="dateReferenceDate" type="com.liferay.portal.dao.orm.hibernate.LongType" />
 		<property name="dateShift" type="com.liferay.portal.dao.orm.hibernate.LongType" />
+		<property name="dateToSend" type="org.hibernate.type.TimestampType" />
 		<property name="teamId" type="com.liferay.portal.dao.orm.hibernate.LongType" />
 		<property name="processed" type="com.liferay.portal.dao.orm.hibernate.BooleanType" />
 		<property name="extraData" type="com.liferay.portal.dao.orm.hibernate.StringType" />
