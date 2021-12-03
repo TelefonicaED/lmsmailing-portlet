@@ -63,6 +63,9 @@
 			<basic name="dateClassPK" />
 			<basic name="dateReferenceDate" />
 			<basic name="dateShift" />
+			<basic name="dateToSend">
+				<temporal>TIMESTAMP</temporal>
+			</basic>
 			<basic name="teamId" />
 			<basic name="processed" />
 			<basic name="extraData" />

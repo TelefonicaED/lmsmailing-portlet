@@ -45,6 +45,7 @@ public class MailStringPool {
 	public final static String REFERENCE_ACTIVITY = "ref_activity";
 	public final static String REFERENCE_STATE = "ref_state";
 	public final static String DATE_SHIFT = "dateShift";
+	public final static String DATE_TOSEND = "dateToSend";
 	public final static String ID_TEMPLATE = "idTemplate";
 	public final static String DAYS = "days";
 	public final static String TIME = "time";

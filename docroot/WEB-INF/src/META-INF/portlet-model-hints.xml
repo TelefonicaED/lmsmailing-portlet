@@ -39,6 +39,7 @@
 		<field name="dateClassPK" type="long" />
 		<field name="dateReferenceDate" type="long" />
 		<field name="dateShift" type="long" />
+		<field name="dateToSend" type="Date" />
 		<field name="teamId" type="long" />
 		<field name="processed" type="boolean" />
 		<field name="extraData" type="String" />

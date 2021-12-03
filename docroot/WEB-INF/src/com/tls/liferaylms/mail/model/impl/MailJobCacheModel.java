@@ -22,6 +22,8 @@ import com.tls.liferaylms.mail.model.MailJob;
 
 import java.io.Serializable;
 
+import java.util.Date;
+
 /**
  * The cache model class for representing MailJob in entity cache.
  *
@@ -32,7 +34,7 @@ import java.io.Serializable;
 public class MailJobCacheModel implements CacheModel<MailJob>, Serializable {
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(33);
+		StringBundler sb = new StringBundler(35);
 
 		sb.append("{uuid=");
 		sb.append(uuid);
@@ -60,6 +62,8 @@ public class MailJobCacheModel implements CacheModel<MailJob>, Serializable {
 		sb.append(dateReferenceDate);
 		sb.append(", dateShift=");
 		sb.append(dateShift);
+		sb.append(", dateToSend=");
+		sb.append(dateToSend);
 		sb.append(", teamId=");
 		sb.append(teamId);
 		sb.append(", processed=");
@@ -113,6 +117,14 @@ public class MailJobCacheModel implements CacheModel<MailJob>, Serializable {
 		mailJobImpl.setDateClassPK(dateClassPK);
 		mailJobImpl.setDateReferenceDate(dateReferenceDate);
 		mailJobImpl.setDateShift(dateShift);
+
+		if (dateToSend == Long.MIN_VALUE) {
+			mailJobImpl.setDateToSend(null);
+		}
+		else {
+			mailJobImpl.setDateToSend(new Date(dateToSend));
+		}
+
 		mailJobImpl.setTeamId(teamId);
 		mailJobImpl.setProcessed(processed);
 
@@ -141,6 +153,7 @@ public class MailJobCacheModel implements CacheModel<MailJob>, Serializable {
 	public long dateClassPK;
 	public long dateReferenceDate;
 	public long dateShift;
+	public long dateToSend;
 	public long teamId;
 	public boolean processed;
 	public String extraData;

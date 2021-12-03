@@ -1,4 +1,6 @@
 
+<%@page import="com.tls.lms.util.LiferaylmsUtil"%>
+<%@page import="java.text.SimpleDateFormat"%>
 <%@page import="com.liferay.portal.kernel.json.JSONArray"%>
 <%@page import="com.tls.liferaylms.util.MailConstants"%>
 <%@page import="com.tls.liferaylms.mail.service.MailJobLocalServiceUtil"%>
@@ -8,7 +10,7 @@
 <%@page import="com.tls.liferaylms.mail.service.MailRelationLocalServiceUtil"%>
 <%@ include file="/init.jsp"%>
 
-
+<%boolean calendar = (Boolean) request.getAttribute("calendar"); %>
 <c:choose>
 		<c:when test="${empty mailjob}">
 			<liferay-portlet:actionURL var="saveURL" name="save"/>
@@ -23,6 +25,13 @@
 <portlet:renderURL var="cancel" />
 
 <script type="text/javascript">
+
+ 	$( document ).ready(function() {
+		showModule();
+		showReferenceModule();
+		showDate();
+	}); 
+
 	var hash = {};
 	<c:forEach items="${modules}" var="module" >
 		hash['${module.moduleId}']= [
@@ -31,7 +40,7 @@
 		</c:forEach>
 		];
 	</c:forEach>
-	
+
 	function changeModule(pre,att){
 		var sel = document.getElementById(pre+"_module");
 		var act = document.getElementById(pre+"_activity");
@@ -66,6 +75,63 @@
 		
 		act.selectedIndex = sel.selectedIndex;
 	}
+	
+	function validate(){
+		var sendDateDia = document.getElementById('<portlet:namespace />sendDateDia').value;
+		var sendDateMes = document.getElementById('<portlet:namespace />sendDateMes').value ;
+		var sendDateAno = document.getElementById('<portlet:namespace />sendDateAno').value;
+		
+		var send = new Date(sendDateAno,sendDateMes,sendDateDia,0,0);	
+		var now = new Date();
+		now.setHours(0,0,0,0);
+ 		if (send.getTime()>=now){
+			document.getElementById('<portlet:namespace />fm').submit();
+		}else{
+			alert("The date must be greater than today");
+		}
+	}
+	
+	function showModule(){
+		var className = document.getElementById('conditionClassName').value
+		if (className=="ActivityCondition"){
+			document.getElementById('module').style.display = 'block';
+		}else{
+			document.getElementById('module').style.display = 'none';
+		}
+	}
+	
+	function showReferenceModule(){
+		var className = document.getElementById('referenceClassName').value
+		if (className=="ActivityCondition"){
+			document.getElementById('refmodule').style.display = 'block';
+			$("#ref_state option:[value='2']").attr("disabled","disabled");
+		}else{
+			document.getElementById('refmodule').style.display = 'none';
+			$("#ref_state option:[value='2']").removeAttr("disabled");
+		}
+	}
+
+	function showReference(){
+		var div = document.getElementById('reference');
+		var divSend = document.getElementById('dateToSend');
+		if(div.style.display&&div.style.display=='none'){
+			div.style.display='block';
+			divSend.style.display='none';
+		}else{
+			div.style.display='none';
+			divSend.style.display='block';
+		}
+	}
+
+	function showDate(){
+		var className = document.getElementById('ref_state').value
+		if (className=="2"){
+			document.getElementById('mod_date').style.display = 'none';
+		}else{
+			document.getElementById('mod_date').style.display = 'block';
+		}
+		
+	}
 </script>
 
 <aui:form method="POST" name="fm" id="fm" action="${ saveURL}">
@@ -85,29 +151,31 @@
 		<p><liferay-ui:message key="groupmailing.condition" /></p>
 		<span class="aui-field-content">
 			<label class="aui-field-label"><liferay-ui:message key="groupmailing.condition-class" /></label>
-			<select name="conditionClassName" id="conditionClassName">
+			<select name="conditionClassName" id="conditionClassName" onchange="showModule()">
 			 	<c:forEach items="${conditions}" var="contition" >
 		  			<option <c:if test="${mailjob.conditionClassName eq contition.className}"> selected="selected"</c:if> value="${contition.className}">${contition.getName(themeDisplay.locale)}</option>
 		  		</c:forEach>
 			</select>
 		</span>
-		
-		<span class="aui-field-content">
-			<label class="aui-field-label"><liferay-ui:message key="module" /></label>
-			<select name="con_module" id="con_module" onchange="changeModule('con','ref')">
-			 	<c:forEach items="${modules}" var="module" >
-		  			<option <c:if test="${condition.modConditionPK eq module.moduleId}"> selected="selected"</c:if> value="${module.moduleId}">${module.getTitle(themeDisplay.locale)}</option>
-		  		</c:forEach>
-			</select>
-		</span>
-		<span class="aui-field-content">
-			<label class="aui-field-label"><liferay-ui:message key="activity" /></label>
-			<select name="con_activity" id="con_activity"  onchange="changeActivity('con','ref')">
-			 	<c:forEach items="${activitiestemp}" var="activity" >
-		  			<option <c:if test="${condition.actConditionPK eq activity.actId}"> selected="selected"</c:if> value="${activity.actId}">${activity.getTitle(themeDisplay.locale)}</option>
-		  		</c:forEach>
-			</select>
-		</span>
+
+		<div id="module" style="display:block">
+			<span class="aui-field-content">
+				<label class="aui-field-label"><liferay-ui:message key="module" /></label>
+				<select name="con_module" id="con_module" onchange="changeModule('con','ref')">
+				 	<c:forEach items="${modules}" var="module" >
+			  			<option <c:if test="${condition.modConditionPK eq module.moduleId}"> selected="selected"</c:if> value="${module.moduleId}">${module.getTitle(themeDisplay.locale)}</option>
+			  		</c:forEach>
+				</select>
+			</span>
+			<span class="aui-field-content">
+				<label class="aui-field-label"><liferay-ui:message key="activity" /></label>
+				<select name="con_activity" id="con_activity"  onchange="changeActivity('con','ref')">
+				 	<c:forEach items="${activitiestemp}" var="activity" >
+			  			<option <c:if test="${condition.actConditionPK eq activity.actId}"> selected="selected"</c:if> value="${activity.actId}">${activity.getTitle(themeDisplay.locale)}</option>
+			  		</c:forEach>
+				</select>
+			</span>
+		</div>
 		<span class="aui-field-content">
 			<label class="aui-field-label"><liferay-ui:message key="state" /></label>
 			<select multiple="multiple" name="con_state" id="con_state" required="required">
@@ -135,91 +203,121 @@
 			</select>
 		</span>
 	</div>
-	<h2><liferay-ui:message key="reference" /></h2>
-	<div class="aui-fieldset">
-		<p><liferay-ui:message key="groupmailing.reference" /></p>
-		<span class="aui-field-content">
-			<label class="aui-field-label"><liferay-ui:message key="groupmailing.reference-class" /></label>
-			<select name="referenceClassName" id="referenceClassName" class="aui-field-input aui-field-input-select aui-field-input-menu">
-			 	<c:forEach items="${conditions}" var="contition" >
-		  			<option <c:if test="${mailjob.dateClassName eq contition.className}"> selected="selected"</c:if> value="${contition.className}">${contition.getName(themeDisplay.locale)}</option>
-		  		</c:forEach>
-			</select>
-		</span>
+<%-- 	<input type="checkbox" id="<portlet:namespace />calendar" name="<portlet:namespace />calendar" onclick="showReference()" checked="<%=calendar%>"><label><liferay-ui:message key="mailjob.preferences.calendar"/></label> --%>
+	<aui:input type="checkbox" name="calendar" label="mailjob.preferences.calendar" value='<%=calendar %>' onChange='showReference()'/>
+	<%
+	Date dateToSend = (Date) request.getAttribute("dateToSend");
 	
-		<span class="aui-field-content">
-			<label class="aui-field-label"><liferay-ui:message key="module" /></label>
-			<select name="ref_module" id="ref_module" onchange="changeModule('ref')">
-			 	<c:forEach items="${modules}" var="module" >
-		  			<option <c:if test="${reference.modReferencePK eq module.moduleId}"> selected="selected"</c:if> value="${module.moduleId}">${module.getTitle(themeDisplay.locale)}</option>
-		  		</c:forEach>
-			</select>
-		</span>
-		<span class="aui-field-content">
-			<label class="aui-field-label"><liferay-ui:message key="activity" /></label>
-			<select name="ref_activity" id="ref_activity">
-			 	<c:forEach items="${activitiestempref}" var="activity" >
-		  			<option <c:if test="${reference.actReferencePK eq activity.actId}"> selected="selected"</c:if> value="${activity.actId}">${activity.getTitle(themeDisplay.locale)}</option>
-		  		</c:forEach>
-			</select>
-		</span>
-		<span class="aui-field-content">
-			<label class="aui-field-label"><liferay-ui:message key="state" /></label>
-			<select name="ref_state" id="ref_state">
-				<option <c:if test="${mailjob.dateReferenceDate eq 0}"> selected="selected"</c:if> value="0"><liferay-ui:message key="groupmailing.init-date" /></option>
-				<option <c:if test="${mailjob.dateReferenceDate eq 1}"> selected="selected"</c:if> value="1"><liferay-ui:message key="groupmailing.end-date" /></option>
-				<option <c:if test="${mailjob.dateReferenceDate eq 2}"> selected="selected"</c:if> value="2"><liferay-ui:message key="groupmailing.inscription-date" /></option>
-			</select>
-		</span>
-		<span class="aui-field-content">
-			<aui:input value="${days}" name="days" title="days"  >
-				<aui:validator name="number"/>
-			</aui:input>
-						
-			<select id="dateShift" name="dateShift">
-				<option value="-1"><liferay-ui:message key="before" /></option>
-				<option <c:if test="${time eq 1}"> selected="selected"</c:if> value="1"><liferay-ui:message key="after" /></option>
-			</select>
-		</span>
-		
-		<%
-	List<Integer> mailRelationTypeIds = MailRelationLocalServiceUtil.findRelationTypeIdsByCompanyId(themeDisplay.getCompanyId());
-	Long id = ParamUtil.getLong(renderRequest, MailStringPool.MAIL_JOB, 0);
-	MailJob mailJob = MailJobLocalServiceUtil.fetchMailJob(id);
+	//if (calendar && dateToSend!=null){ 
 	
-	List<Integer> selectedMailRelations = new ArrayList<Integer>();
-	if(mailJob!=null){
-		JSONArray selectedRelations = mailJob.getExtraDataJSON().getJSONArray(MailConstants.EXTRA_DATA_RELATION_ARRAY);
-		if(selectedRelations!=null && selectedRelations.length()>0){
-			for(int i = 0;i<selectedRelations.length(); i++){
-				selectedMailRelations.add(selectedRelations.getInt(i));
-				System.out.println("ADDING RELATION "+selectedRelations.getInt(i));
+				SimpleDateFormat formatAno = new SimpleDateFormat("yyyy");
+				Date now = new Date();
+				Calendar cal = Calendar.getInstance();
+				cal.setTime(dateToSend);
+	%>
+			<div id="dateToSend" style='display:<%=calendar?"block":"none"%>'>
+				<p><liferay-ui:message key="groupmailing.release-date" /></p>
+					<liferay-ui:input-date  yearRangeEnd="<%=LiferaylmsUtil.defaultEndYear %>" yearRangeStart="<%=Integer.parseInt(formatAno.format(now)) %>"
+						dayParam="sendDateDia" dayValue="<%=cal.get(Calendar.DAY_OF_MONTH) %>"
+						monthParam="sendDateMes" monthValue="<%=cal.get(Calendar.MONTH) %>"
+						yearParam="sendDateAno" yearValue="<%=cal.get(Calendar.YEAR) %>"  yearNullable="false" 
+						dayNullable="false" monthNullable="false"></liferay-ui:input-date>
+			</div>
+	<%//}else{ %>
+		<div id ="reference" style='display:<%=calendar?"none":"block"%>'>
+			<h2><liferay-ui:message key="reference" /></h2>
+			<div class="aui-fieldset">
+				<p><liferay-ui:message key="groupmailing.reference" /></p>
+				<span class="aui-field-content">
+					<label class="aui-field-label"><liferay-ui:message key="groupmailing.reference-class" /></label>
+					<select name="referenceClassName" id="referenceClassName" class="aui-field-input aui-field-input-select aui-field-input-menu" onchange="showReferenceModule()">
+					 	<c:forEach items="${conditions}" var="contition" >
+				  			<option <c:if test="${mailjob.dateClassName eq contition.className}"> selected="selected"</c:if> value="${contition.className}">${contition.getName(themeDisplay.locale)}</option>
+				  		</c:forEach>
+					</select>
+				</span>
+
+				<div id="refmodule" style="display:block">
+					<span class="aui-field-content">
+						<label class="aui-field-label"><liferay-ui:message key="module" /></label>
+						<select name="ref_module" id="ref_module" onchange="changeModule('ref')">
+						 	<c:forEach items="${modules}" var="module" >
+					  			<option <c:if test="${reference.modReferencePK eq module.moduleId}"> selected="selected"</c:if> value="${module.moduleId}">${module.getTitle(themeDisplay.locale)}</option>
+					  		</c:forEach>
+						</select>
+					</span>
+					<span class="aui-field-content">
+						<label class="aui-field-label"><liferay-ui:message key="activity" /></label>
+						<select name="ref_activity" id="ref_activity">
+						 	<c:forEach items="${activitiestempref}" var="activity" >
+					  			<option <c:if test="${reference.actReferencePK eq activity.actId}"> selected="selected"</c:if> value="${activity.actId}">${activity.getTitle(themeDisplay.locale)}</option>
+					  		</c:forEach>
+						</select>
+					</span>
+				</div>
+				<span class="aui-field-content">
+					<label class="aui-field-label"><liferay-ui:message key="state" /></label>
+					<select name="ref_state" id="ref_state" onchange="showDate()">
+						<option <c:if test="${mailjob.dateReferenceDate eq 0}"> selected="selected"</c:if> value="0"><liferay-ui:message key="groupmailing.init-date" /></option>
+						<option <c:if test="${mailjob.dateReferenceDate eq 1}"> selected="selected"</c:if> value="1"><liferay-ui:message key="groupmailing.end-date" /></option>
+						<option <c:if test="${mailjob.dateReferenceDate eq 2}"> selected="selected"</c:if> value="2"><liferay-ui:message key="groupmailing.inscription-date" /></option>
+					</select>
+				</span>
+				<div id="mod_date">
+					<span class="aui-field-content">
+						<aui:input value="${days}" name="days" title="days"  >
+							<aui:validator name="number"/>
+						</aui:input>									
+						<select id="dateShift" name="dateShift">						
+							<option value="-1"><liferay-ui:message key="before" /></option>						
+							<option <c:if test="${time eq 1}"> selected="selected"</c:if> value="1"><liferay-ui:message key="after" /></option>
+						</select>
+					</span>
+				</div>
+				<%
+			List<Integer> mailRelationTypeIds = MailRelationLocalServiceUtil.findRelationTypeIdsByCompanyId(themeDisplay.getCompanyId());
+			Long id = ParamUtil.getLong(renderRequest, MailStringPool.MAIL_JOB, 0);
+			MailJob mailJob = MailJobLocalServiceUtil.fetchMailJob(id);
+			
+			List<Integer> selectedMailRelations = new ArrayList<Integer>();
+			if(mailJob!=null){
+				JSONArray selectedRelations = mailJob.getExtraDataJSON().getJSONArray(MailConstants.EXTRA_DATA_RELATION_ARRAY);
+				if(selectedRelations!=null && selectedRelations.length()>0){
+					for(int i = 0;i<selectedRelations.length(); i++){
+						selectedMailRelations.add(selectedRelations.getInt(i));
+						System.out.println("ADDING RELATION "+selectedRelations.getInt(i));
+					}
+				}
 			}
-		}
-	}
-	
-	if(Validator.isNotNull(mailRelationTypeIds) && mailRelationTypeIds.size()>0){
-		String mailRelationTypePref = StringPool.BLANK;
-		String sendMailToRelationType = StringPool.BLANK;
-		String labelSendMailToType = StringPool.BLANK;
-		for(int mailRelationTypeId:mailRelationTypeIds){
-			mailRelationTypePref = "mailType_"+mailRelationTypeId;
-			if(PrefsPropsUtil.getBoolean(themeDisplay.getCompanyId(), mailRelationTypePref)){
-				sendMailToRelationType = "sendMailToType_"+mailRelationTypeId;
-				labelSendMailToType = "groupmailing.messages.send-copy-to-"+mailRelationTypeId;
-				System.out.println("RELATION SELECTED " + selectedMailRelations.contains(mailRelationTypeId));
-%>
-				<aui:input type="checkbox" label="<%=labelSendMailToType %>" name="<%=sendMailToRelationType %>" checked="<%=selectedMailRelations.contains(mailRelationTypeId) %>"/>
-<%				
+			
+			if(Validator.isNotNull(mailRelationTypeIds) && mailRelationTypeIds.size()>0){
+				String mailRelationTypePref = StringPool.BLANK;
+				String sendMailToRelationType = StringPool.BLANK;
+				String labelSendMailToType = StringPool.BLANK;
+				for(int mailRelationTypeId:mailRelationTypeIds){
+					mailRelationTypePref = "mailType_"+mailRelationTypeId;
+					if(PrefsPropsUtil.getBoolean(themeDisplay.getCompanyId(), mailRelationTypePref)){
+						sendMailToRelationType = "sendMailToType_"+mailRelationTypeId;
+						labelSendMailToType = "groupmailing.messages.send-copy-to-"+mailRelationTypeId;
+						System.out.println("RELATION SELECTED " + selectedMailRelations.contains(mailRelationTypeId));
+		%>
+						<aui:input type="checkbox" label="<%=labelSendMailToType %>" name="<%=sendMailToRelationType %>" checked="<%=selectedMailRelations.contains(mailRelationTypeId) %>"/>
+		<%				
+					}
+				}
 			}
-		}
-	}
-%>
-		
-	</div>
+		%>			
+			</div>
+		</div>
+	<%//} %>
 </div>
+
 <aui:button-row>
-		<aui:button type="submit" />
+	<%if (calendar){ %>
+		<aui:button type="button" onclick="javascript:validate()" value="save"/>
+	<%}else{ %>
+		<aui:button type="submit"/> 
+	<%} %>
 	<aui:button onClick="${cancel}" type="cancel" />
 </aui:button-row>
 </aui:form>
