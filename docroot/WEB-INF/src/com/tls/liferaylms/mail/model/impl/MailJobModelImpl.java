@@ -35,6 +35,7 @@ import java.io.Serializable;
 
 import java.sql.Types;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -73,11 +74,12 @@ public class MailJobModelImpl extends BaseModelImpl<MailJob>
 			{ "dateClassPK", Types.BIGINT },
 			{ "dateReferenceDate", Types.BIGINT },
 			{ "dateShift", Types.BIGINT },
+			{ "dateToSend", Types.TIMESTAMP },
 			{ "teamId", Types.BIGINT },
 			{ "processed", Types.BOOLEAN },
 			{ "extraData", Types.VARCHAR }
 		};
-	public static final String TABLE_SQL_CREATE = "create table lmsmail_MailJob (uuid_ VARCHAR(75) null,idJob LONG not null primary key,companyId LONG,groupId LONG,userId LONG,idTemplate LONG,conditionClassName VARCHAR(75) null,conditionClassPK LONG,conditionStatus VARCHAR(75) null,dateClassName VARCHAR(75) null,dateClassPK LONG,dateReferenceDate LONG,dateShift LONG,teamId LONG,processed BOOLEAN,extraData VARCHAR(75) null)";
+	public static final String TABLE_SQL_CREATE = "create table lmsmail_MailJob (uuid_ VARCHAR(75) null,idJob LONG not null primary key,companyId LONG,groupId LONG,userId LONG,idTemplate LONG,conditionClassName VARCHAR(75) null,conditionClassPK LONG,conditionStatus VARCHAR(75) null,dateClassName VARCHAR(75) null,dateClassPK LONG,dateReferenceDate LONG,dateShift LONG,dateToSend DATE null,teamId LONG,processed BOOLEAN,extraData VARCHAR(75) null)";
 	public static final String TABLE_SQL_DROP = "drop table lmsmail_MailJob";
 	public static final String DATA_SOURCE = "liferayDataSource";
 	public static final String SESSION_FACTORY = "liferaySessionFactory";
@@ -143,6 +145,7 @@ public class MailJobModelImpl extends BaseModelImpl<MailJob>
 		attributes.put("dateClassPK", getDateClassPK());
 		attributes.put("dateReferenceDate", getDateReferenceDate());
 		attributes.put("dateShift", getDateShift());
+		attributes.put("dateToSend", getDateToSend());
 		attributes.put("teamId", getTeamId());
 		attributes.put("processed", getProcessed());
 		attributes.put("extraData", getExtraData());
@@ -228,6 +231,12 @@ public class MailJobModelImpl extends BaseModelImpl<MailJob>
 
 		if (dateShift != null) {
 			setDateShift(dateShift);
+		}
+
+		Date dateToSend = (Date)attributes.get("dateToSend");
+
+		if (dateToSend != null) {
+			setDateToSend(dateToSend);
 		}
 
 		Long teamId = (Long)attributes.get("teamId");
@@ -425,6 +434,14 @@ public class MailJobModelImpl extends BaseModelImpl<MailJob>
 		_dateShift = dateShift;
 	}
 
+	public Date getDateToSend() {
+		return _dateToSend;
+	}
+
+	public void setDateToSend(Date dateToSend) {
+		_dateToSend = dateToSend;
+	}
+
 	public long getTeamId() {
 		return _teamId;
 	}
@@ -515,6 +532,7 @@ public class MailJobModelImpl extends BaseModelImpl<MailJob>
 		mailJobImpl.setDateClassPK(getDateClassPK());
 		mailJobImpl.setDateReferenceDate(getDateReferenceDate());
 		mailJobImpl.setDateShift(getDateShift());
+		mailJobImpl.setDateToSend(getDateToSend());
 		mailJobImpl.setTeamId(getTeamId());
 		mailJobImpl.setProcessed(getProcessed());
 		mailJobImpl.setExtraData(getExtraData());
@@ -647,6 +665,15 @@ public class MailJobModelImpl extends BaseModelImpl<MailJob>
 
 		mailJobCacheModel.dateShift = getDateShift();
 
+		Date dateToSend = getDateToSend();
+
+		if (dateToSend != null) {
+			mailJobCacheModel.dateToSend = dateToSend.getTime();
+		}
+		else {
+			mailJobCacheModel.dateToSend = Long.MIN_VALUE;
+		}
+
 		mailJobCacheModel.teamId = getTeamId();
 
 		mailJobCacheModel.processed = getProcessed();
@@ -664,7 +691,7 @@ public class MailJobModelImpl extends BaseModelImpl<MailJob>
 
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(33);
+		StringBundler sb = new StringBundler(35);
 
 		sb.append("{uuid=");
 		sb.append(getUuid());
@@ -692,6 +719,8 @@ public class MailJobModelImpl extends BaseModelImpl<MailJob>
 		sb.append(getDateReferenceDate());
 		sb.append(", dateShift=");
 		sb.append(getDateShift());
+		sb.append(", dateToSend=");
+		sb.append(getDateToSend());
 		sb.append(", teamId=");
 		sb.append(getTeamId());
 		sb.append(", processed=");
@@ -704,7 +733,7 @@ public class MailJobModelImpl extends BaseModelImpl<MailJob>
 	}
 
 	public String toXmlString() {
-		StringBundler sb = new StringBundler(52);
+		StringBundler sb = new StringBundler(55);
 
 		sb.append("<model><model-name>");
 		sb.append("com.tls.liferaylms.mail.model.MailJob");
@@ -763,6 +792,10 @@ public class MailJobModelImpl extends BaseModelImpl<MailJob>
 		sb.append(getDateShift());
 		sb.append("]]></column-value></column>");
 		sb.append(
+			"<column><column-name>dateToSend</column-name><column-value><![CDATA[");
+		sb.append(getDateToSend());
+		sb.append("]]></column-value></column>");
+		sb.append(
 			"<column><column-name>teamId</column-name><column-value><![CDATA[");
 		sb.append(getTeamId());
 		sb.append("]]></column-value></column>");
@@ -805,6 +838,7 @@ public class MailJobModelImpl extends BaseModelImpl<MailJob>
 	private long _dateClassPK;
 	private long _dateReferenceDate;
 	private long _dateShift;
+	private Date _dateToSend;
 	private long _teamId;
 	private boolean _processed;
 	private boolean _originalProcessed;

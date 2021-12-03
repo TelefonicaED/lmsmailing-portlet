@@ -557,6 +557,7 @@ public class MailJobPersistenceImpl extends BasePersistenceImpl<MailJob>
 		mailJobImpl.setDateClassPK(mailJob.getDateClassPK());
 		mailJobImpl.setDateReferenceDate(mailJob.getDateReferenceDate());
 		mailJobImpl.setDateShift(mailJob.getDateShift());
+		mailJobImpl.setDateToSend(mailJob.getDateToSend());
 		mailJobImpl.setTeamId(mailJob.getTeamId());
 		mailJobImpl.setProcessed(mailJob.isProcessed());
 		mailJobImpl.setExtraData(mailJob.getExtraData());

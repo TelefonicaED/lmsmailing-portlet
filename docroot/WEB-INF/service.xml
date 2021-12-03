@@ -71,6 +71,7 @@
 	    <column name="dateClassPK" type="long"></column>
       	<column name="dateReferenceDate" type="long"></column> <!-- La fecha que se escoge. 0 fecha de inicio, 1 fecha de fin. 2 fecha de inscripción (Solo para curso).-->
       	<column name="dateShift" type="long"></column> <!-- Dias antes o despues de la fecha -->
+      	<column name="dateToSend" type="Date"></column> <!-- fecha elegida en calendario -->
       	<column name="teamId" type="long"></column>
       	<column name="processed" type="boolean"></column> <!--  Si ha sido enviado -->
       	<column name="extraData" type="String"></column>

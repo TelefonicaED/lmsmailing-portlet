@@ -1,11 +1,17 @@
 package com.tls.liferaylms.job;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
+import java.io.File;
 
 import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
+
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.filefilter.TrueFileFilter;
 
 import com.liferay.counter.service.CounterLocalServiceUtil;
 import com.liferay.lms.model.Course;
@@ -20,7 +26,8 @@ import com.liferay.portal.kernel.messaging.Message;
 import com.liferay.portal.kernel.messaging.MessageBusUtil;
 import com.liferay.portal.kernel.messaging.MessageListener;
 import com.liferay.portal.kernel.messaging.MessageListenerException;
-import com.liferay.portal.kernel.util.PrefsPropsUtil;
+import com.liferay.portal.kernel.util.FileUtil;
+import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.model.Company;
 import com.liferay.portal.model.Group;
@@ -28,7 +35,6 @@ import com.liferay.portal.model.User;
 import com.liferay.portal.service.CompanyLocalServiceUtil;
 import com.liferay.portal.service.GroupLocalServiceUtil;
 import com.liferay.portal.util.PortalUtil;
-import com.liferay.portlet.announcements.model.AnnouncementsEntry;
 import com.liferay.util.bridges.mvc.MVCPortlet;
 import com.tls.liferaylms.job.condition.Condition;
 import com.tls.liferaylms.job.condition.ConditionUtil;
@@ -75,15 +81,25 @@ public class ProcessMailJob extends MVCPortlet implements MessageListener{
 				if(log.isDebugEnabled())e.printStackTrace();
 			}
 			
+		
 			Condition date = null;
-			try {
-				date = ConditionUtil.instance(mailJob.getDateClassName(), mailJob);
-				if(log.isDebugEnabled())log.debug(date);
-			} catch (ClassNotFoundException e) {
-				if(log.isDebugEnabled())e.printStackTrace();
+			boolean isToSend = false;
+			if (mailJob.getDateToSend() == null){		
+				try {
+					date = ConditionUtil.instance(mailJob.getDateClassName(), mailJob);
+					if(log.isDebugEnabled())log.debug(date);
+				} catch (ClassNotFoundException e) {
+					if(log.isDebugEnabled())e.printStackTrace();
+				}
+			}else{
+				Date now = new Date();
+				String pattern = "yyyy-MM-dd";
+				SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
+				String today = simpleDateFormat.format(now);
+				String dayToSend = simpleDateFormat.format(mailJob.getDateToSend());
+				isToSend = today.equals(dayToSend)? true : false;
 			}
-			
-			if(condition!=null && date!=null){
+			if(condition!=null){
 				try {
 					if(log.isDebugEnabled()){
 						log.debug(mailJob.getIdJob());
@@ -93,11 +109,9 @@ public class ProcessMailJob extends MVCPortlet implements MessageListener{
 								log.debug(user.getFullName());
 							}
 						}
-						
-						log.debug(date.shouldBeProcessed());
 					}
 					
-					if(date.shouldBeProcessed()){
+					if((date != null && date.shouldBeProcessed()) || (isToSend)){
 						Set<User> users = condition.getUsersToSend();
 
 						MailTemplate mailTemplate = null;
@@ -199,7 +213,6 @@ public class ProcessMailJob extends MVCPortlet implements MessageListener{
 
 										message.put("portal", 	companyName);
 										
-										
 										if(course!=null){
 											message.put("community",course.getTitle(user.getLocale()));
 										}else{
@@ -213,7 +226,22 @@ public class ProcessMailJob extends MVCPortlet implements MessageListener{
 										portalUrl = urls[0] + ":" +urls[1];  // http:prueba.es:8080		
 										log.debug("url: " + portalUrl);
 										
-										
+										File atachDir = new File (PropsUtil.get("liferay.home")+"/data/mailtemplate/"+mailTemplate.getIdTemplate());
+										if (atachDir.exists()){
+											List<File> files = (List<File>) FileUtils.listFiles(atachDir, TrueFileFilter.INSTANCE, TrueFileFilter.INSTANCE);
+											File[] copyAttachments = new File[files.size()];
+											String[] attachmentNames = new String[files.size()];
+											for(int i=0;i<files.size();i++){
+												
+												File tempFile = FileUtil.createTempFile();
+												FileUtil.copyFile(files.get(i), tempFile);
+												copyAttachments[i] = tempFile;
+												attachmentNames[i]= files.get(i).getName();
+											}
+												
+											message.put("attachments", copyAttachments);
+											message.put("attachmentNames", attachmentNames);
+										}
 										message.put("url", 		portalUrl);
 										message.put("urlcourse",portalUrl+PortalUtil.getPathFriendlyURLPublic()+group.getFriendlyURL());
 
@@ -271,7 +299,21 @@ public class ProcessMailJob extends MVCPortlet implements MessageListener{
 										message.put("mailRelationTypeIds", sendCopyToTypeIds);
 										message.put("emailSentToUsersList", sentToUsersList);
 										
-										
+										File atachDir = new File (PropsUtil.get("liferay.home")+"/data/mailtemplate/"+mailTemplate.getIdTemplate());
+										if (atachDir.exists()){
+											List<File> files = (List<File>) FileUtils.listFiles(atachDir, TrueFileFilter.INSTANCE, TrueFileFilter.INSTANCE);
+											File[] copyAttachments = new File[files.size()];
+											String[] attachmentNames = new String[files.size()];
+											for(int i=0;i<files.size();i++){
+												File tempFile = FileUtil.createTempFile();
+												FileUtil.copyFile(files.get(i), tempFile);
+												copyAttachments[i] = tempFile;
+												attachmentNames[i]= files.get(i).getName();
+											}
+												
+											message.put("attachments", copyAttachments);
+											message.put("attachmentNames", attachmentNames);
+										}
 										
 										
 										MessageBusUtil.sendMessage("lms/mailing", message);

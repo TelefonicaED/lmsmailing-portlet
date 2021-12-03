@@ -1,14 +1,18 @@
 package com.tls.liferaylms.job;
 
 import java.io.IOException;
-import java.util.ArrayList;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 
 import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
 import javax.portlet.PortletException;
+import javax.portlet.PortletPreferences;
 import javax.portlet.PortletRequestDispatcher;
 import javax.portlet.ProcessAction;
 import javax.portlet.RenderRequest;
@@ -20,24 +24,25 @@ import com.liferay.lms.model.Module;
 import com.liferay.lms.service.CourseLocalServiceUtil;
 import com.liferay.lms.service.LearningActivityLocalServiceUtil;
 import com.liferay.lms.service.ModuleLocalServiceUtil;
-import com.liferay.portal.kernel.dao.orm.Session;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.messaging.MessageListenerException;
 import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.servlet.SessionMessages;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
+import com.liferay.portal.security.permission.PermissionChecker;
 import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.service.ServiceContextFactory;
 import com.liferay.portal.theme.ThemeDisplay;
+import com.liferay.portlet.PortletPreferencesFactoryUtil;
 import com.liferay.util.bridges.mvc.MVCPortlet;
 import com.tls.liferaylms.job.condition.Condition;
 import com.tls.liferaylms.job.condition.ConditionUtil;
@@ -78,6 +83,20 @@ public class MailJobPortlet extends MVCPortlet {
 		if(course==null)
 			return;
 		
+		//PermissionChecker permissionChecker = themeDisplay.getPermissionChecker();
+		PortletPreferences preferences = null;
+		String portletResource = ParamUtil.getString(renderRequest, "portletResource");
+		if (Validator.isNotNull(portletResource)) {
+			try {
+				preferences = PortletPreferencesFactoryUtil.getPortletSetup(renderRequest, portletResource);
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} 
+		}else{
+			preferences = renderRequest.getPreferences();
+		}
+		boolean calendar = false;
 		if(!view.equals(StringPool.BLANK)){
 			if(view.equals(MailStringPool.EDIT)){
 				
@@ -92,7 +111,11 @@ public class MailJobPortlet extends MVCPortlet {
 						mailJob = MailJobLocalServiceUtil.getMailJob(id);
 						conditionStatus = mailJob.getConditionStatus().split(StringPool.COMMA);
 						condition = ConditionUtil.instance(mailJob.getConditionClassName(), mailJob);
-						reference = ConditionUtil.instance(mailJob.getDateClassName(), mailJob);
+						calendar = mailJob.getDateClassName().equals(StringPool.BLANK) || mailJob.getDateToSend()!= null?true:false;
+						log.info("calendar "+calendar);
+						if (!calendar){
+							reference = ConditionUtil.instance(mailJob.getDateClassName(), mailJob);
+						}
 					} catch (PortalException e) {
 						if(log.isDebugEnabled())e.printStackTrace();
 						if(log.isErrorEnabled())log.error(e.getMessage());
@@ -125,9 +148,8 @@ public class MailJobPortlet extends MVCPortlet {
 					if(modules!=null){
 						for(Module module : modules){
 							List<LearningActivity> learningActivities = LearningActivityLocalServiceUtil.getLearningActivitiesOfModule(module.getModuleId());
-							
 							if(tempActivities==null){
-								if(condition!=null){
+								if(condition!=null && !condition.getConditionName().equals(LanguageUtil.format(Locale.getDefault(), "com.liferay.lms.model.Course", ""))){
 									for(LearningActivity la : learningActivities){
 										if(la.getPrimaryKey()==condition.getActConditionPK()){
 											tempActivities = learningActivities;
@@ -140,7 +162,7 @@ public class MailJobPortlet extends MVCPortlet {
 							}
 
 							if(tempActivitiesReference==null){
-								if(reference!=null){
+								if(reference!=null && !reference.getConditionName().equals(LanguageUtil.format(Locale.getDefault(), "com.liferay.lms.model.Course", ""))){
 									for(LearningActivity la : learningActivities){
 										if(la.getPrimaryKey()==reference.getActReferencePK()){
 											tempActivitiesReference = learningActivities;
@@ -159,23 +181,31 @@ public class MailJobPortlet extends MVCPortlet {
 					if(log.isDebugEnabled())e.printStackTrace();
 					if(log.isErrorEnabled())log.error(e.getMessage());
 				}
+				
+				Date dateToSend = new Date();
+				if (mailJob != null && mailJob.getDateToSend()!= null){
+					dateToSend = mailJob.getDateToSend();
+				}
 
+				renderRequest.setAttribute(MailStringPool.DATE_TOSEND, dateToSend);
+								
 				Integer days = 0;
 				Integer time = -1;
 				if(mailJob!=null){
 					if(mailJob.getDateShift()>=0){
-						days = ((Long)mailJob.getDateShift()).intValue();
-						time = 1;
+							days = ((Long)mailJob.getDateShift()).intValue();
+							time = 1;
 					}else{
-						days = ((Long)(mailJob.getDateShift()*-1)).intValue();
+							days = ((Long)(mailJob.getDateShift()*-1)).intValue();
 					}
 				}
+				renderRequest.setAttribute(MailStringPool.DAYS, days);
+				renderRequest.setAttribute(MailStringPool.TIME, time);
+				
 				
 				renderRequest.setAttribute(MailStringPool.CONDITION_STATUS, conditionStatus);
 				renderRequest.setAttribute(MailStringPool.CONDITION, condition);
 				renderRequest.setAttribute(MailStringPool.REFERENCE, reference);
-				renderRequest.setAttribute(MailStringPool.DAYS, days);
-				renderRequest.setAttribute(MailStringPool.TIME, time);
 				renderRequest.setAttribute(MailStringPool.MAIL_JOB, mailJob); 
 				renderRequest.setAttribute(MailStringPool.ACTIVITIES_TEMP_REF, tempActivitiesReference);
 				renderRequest.setAttribute(MailStringPool.ACTIVITIES_TEMP, tempActivities);
@@ -184,6 +214,7 @@ public class MailJobPortlet extends MVCPortlet {
 				renderRequest.setAttribute(MailStringPool.COURSE, course); 
 				renderRequest.setAttribute(MailStringPool.CONDITIONS, conditions);
 				renderRequest.setAttribute(MailStringPool.TEMPLATES, templates);
+				renderRequest.setAttribute("calendar", calendar);
 								
 				include(editJSP, renderRequest, renderResponse);
 			}
@@ -215,7 +246,6 @@ public class MailJobPortlet extends MVCPortlet {
 			renderRequest.setAttribute(MailStringPool.PENDING_COUNT, count);
 			
 			renderRequest.setAttribute(MailStringPool.TAB, tab);
-			
 			
 			
 			include(viewJSP, renderRequest, renderResponse);
@@ -279,7 +309,25 @@ public class MailJobPortlet extends MVCPortlet {
 		}
 		//Enviar email a usuarios relacionados
 		boolean sendCopyToSocialRelation = sendCopyToTypeIds.length()>0;
-		
+		Date dateToSend = null;
+		boolean isCalendar = ParamUtil.getBoolean(request, "calendar",false);
+		if (isCalendar){
+			int sendDateAno = ParamUtil.getInteger(request, "sendDateAno",0);
+			int sendDateMes = ParamUtil.getInteger(request, "sendDateMes",0);
+			int sendDateDia = ParamUtil.getInteger(request, "sendDateDia",0);
+			
+			if (sendDateAno>0){
+				Calendar calendar = Calendar.getInstance();
+				calendar.set(sendDateAno, sendDateMes, sendDateDia);
+				calendar.set(Calendar.HOUR_OF_DAY,0);
+				calendar.set(Calendar.MINUTE,0);
+				calendar.set(Calendar.SECOND,0);
+				calendar.set(Calendar.MILLISECOND,0);
+				dateToSend = calendar.getTime();
+			}
+			referenceClassName=StringPool.BLANK;
+		}
+		log.info("dateTosend "+dateToSend);
 		if(log.isDebugEnabled()){
 			log.debug("UPDATE");
 			log.debug(template);
@@ -325,6 +373,7 @@ public class MailJobPortlet extends MVCPortlet {
 				mailJob.setDateClassPK(referenceActivity);
 				mailJob.setDateShift(days*dateShift);
 				mailJob.setDateReferenceDate(referenceState);
+				mailJob.setDateToSend(dateToSend);
 				
 				JSONObject extraData = JSONFactoryUtil.createJSONObject();
 				extraData.put(MailConstants.EXTRA_DATA_SEND_COPY, sendCopyToSocialRelation);
@@ -389,8 +438,26 @@ public class MailJobPortlet extends MVCPortlet {
 		Long referenceState = ParamUtil.getLong(request, MailStringPool.REFERENCE_STATE, 0);
 		Long dateShift = ParamUtil.getLong(request, MailStringPool.DATE_SHIFT, 0);
 		Long template = ParamUtil.getLong(request, MailStringPool.ID_TEMPLATE, 0);
+		Date dateToSend = null;
 		
+		boolean isCalendar = ParamUtil.getBoolean(request, "calendar",false);
+		if (isCalendar){
+			int sendDateAno = ParamUtil.getInteger(request, "sendDateAno",0);
+			int sendDateMes = ParamUtil.getInteger(request, "sendDateMes",0);
+			int sendDateDia = ParamUtil.getInteger(request, "sendDateDia",0);
 		
+			if (sendDateAno>0){
+				Calendar calendar = Calendar.getInstance();
+				calendar.set(sendDateAno, sendDateMes, sendDateDia);
+				calendar.set(Calendar.HOUR_OF_DAY,0);
+				calendar.set(Calendar.MINUTE,0);
+				calendar.set(Calendar.SECOND,0);
+				calendar.set(Calendar.MILLISECOND,0);
+				dateToSend = calendar.getTime();
+			}
+			referenceClassName=StringPool.BLANK;
+		}
+		log.info("dateTosend "+dateToSend);
 		
 		
 		//Envío de copia a usuarios relacionados
@@ -408,12 +475,10 @@ public class MailJobPortlet extends MVCPortlet {
 			}
 		}
 		
-		
-		
+
 		//Enviar email a usuarios relacionados
 		boolean sendCopyToSocialRelation = sendCopyToTypeIds.length()>0;
-		
-			
+
 		
 		if(log.isDebugEnabled()){
 			log.debug("SAVE");
@@ -445,7 +510,7 @@ public class MailJobPortlet extends MVCPortlet {
 		}
 		
 		try {
-			MailJob mailJob =  MailJobLocalServiceUtil.addMailJob(template, conditionClassName, conditionActivity, conditionState.toString(), referenceClassName, referenceActivity, days*dateShift, referenceState, serviceContext);
+			MailJob mailJob =  MailJobLocalServiceUtil.addMailJob(template, conditionClassName, conditionActivity, conditionState.toString(), referenceClassName, referenceActivity, days*dateShift, dateToSend, referenceState, serviceContext);
 			JSONObject extraData = JSONFactoryUtil.createJSONObject();
 			extraData.put(MailConstants.EXTRA_DATA_SEND_COPY, sendCopyToSocialRelation);
 			extraData.put(MailConstants.EXTRA_DATA_RELATION_ARRAY, sendCopyToTypeIds);
