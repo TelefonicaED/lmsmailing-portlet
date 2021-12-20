@@ -61,6 +61,9 @@
 		}
 		
 		%>
+	<div>
+	*Se admiten ficheros <%=MailConstants.ATTACHMENTS_DEFAULT_ACCEPTED_FILES %>
+	</div>
 	<script src="/lmsmailing-portlet/js/jquery.MultiFile.js"></script>
  	<div class="col-md-4 file-wrap">
  		<input name="maxFile" id="maxFile" type="hidden" value="<%= maxSize%>"/>

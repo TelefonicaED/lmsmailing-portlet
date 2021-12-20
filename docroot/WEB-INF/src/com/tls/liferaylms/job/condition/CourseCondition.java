@@ -140,7 +140,7 @@ public class CourseCondition extends MainCondition{
 					break;
 				//inscription date
 				case 2:
-					process=false;
+					process=true;
 					break;
 			}
 			

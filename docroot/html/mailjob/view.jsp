@@ -72,7 +72,7 @@ $(document).ready(function(){
 			</liferay-ui:search-container-column-text>
 			<liferay-ui:search-container-column-text name="condition">
 				<%if(condition!=null){ 
-					String conditionName = condition.getName(locale).equals("Course")? condition.getName(locale) : condition.getName(locale)+" "+condition.getConditionName(locale);			
+					String conditionName = condition.getClassName().startsWith("Course")||condition.getClassName().startsWith("Inscription")? condition.getName(locale) : condition.getName(locale)+" "+condition.getConditionName(locale);			
 				%>
 				<c:choose>
 					<c:when test="${!mailJob.processed}">
@@ -86,7 +86,7 @@ $(document).ready(function(){
 			</liferay-ui:search-container-column-text>
 				<liferay-ui:search-container-column-text name="reference">
 					<%if(reference!=null){ 
-						String referenceName = reference.getName(locale).equals("Course")? reference.getName(locale) : reference.getName(locale)+" "+reference.getReferenceName(locale);	
+						String referenceName = reference.getClassName().startsWith("Course")? reference.getName(locale) : reference.getName(locale)+" "+reference.getReferenceName(locale);	
 					%>
 					<c:choose>
 						<c:when test="${!mailJob.processed}">
@@ -96,10 +96,12 @@ $(document).ready(function(){
 							<span class="mailJob"><%=referenceName%></span>
 						</c:otherwise>
 					</c:choose>
-				<%}%>
+				<%}else if (condition.getName().startsWith("Inscription")){%>
+					<span class="mailJob"><liferay-ui:message key="mailjob.reference.inscription"/></span>
+				<%} %>
 				</liferay-ui:search-container-column-text>
 				<liferay-ui:search-container-column-text name="days">
-				<%if(reference!=null){  %>
+				<%if(reference!=null && !condition.getClassName().startsWith("Inscription")){%>
 						<c:choose>
 							<c:when test="${mailJob.dateShift lt 0}">
 								${mailJob.dateShift*-1} <liferay-ui:message key="days-before" />
@@ -113,7 +115,7 @@ $(document).ready(function(){
 				<liferay-ui:search-container-column-text name="groupmailing.release-date">
 				<%if(reference!=null){ %>
 					<%= reference.getFormatDate() %>
-				<%}else{ %>
+				<%}else if (Validator.isNotNull(mailJob.getDateToSend())){ %>
 					<%= sdf.format(mailJob.getDateToSend()) %>
 				<%} %>
 				</liferay-ui:search-container-column-text>
@@ -168,7 +170,7 @@ nonProcessedURL.setParameter("tab","non-processed-plural");
 			</liferay-ui:search-container-column-text>
 			<liferay-ui:search-container-column-text name="condition">
 				<%if(condition!=null){ 
-					String conditionName = condition.getName(locale).equals("Course")? condition.getName(locale) : condition.getName(locale)+" "+condition.getConditionName(locale);	
+					String conditionName = condition.getClassName().startsWith("Course")||condition.getClassName().startsWith("Inscription")? condition.getName(locale) : condition.getName(locale)+" "+condition.getConditionName(locale);	
 				%>
 				<c:choose>
 					<c:when test="${!mailJob.processed}">
@@ -181,8 +183,9 @@ nonProcessedURL.setParameter("tab","non-processed-plural");
 				<%} %>
 			</liferay-ui:search-container-column-text>
 					<liferay-ui:search-container-column-text name="reference">
-					<%if(reference!=null){ 
-						String referenceName = reference.getName(locale).equals("Course")? reference.getName(locale) : reference.getName(locale)+" "+reference.getReferenceName(locale);
+					<%
+					if(reference!=null){ 
+						String referenceName = reference.getClassName().startsWith("Course")? reference.getName(locale) : reference.getName(locale)+" "+reference.getReferenceName(locale);
 					%>
 						<c:choose>
 							<c:when test="${!mailJob.processed}">
@@ -192,10 +195,15 @@ nonProcessedURL.setParameter("tab","non-processed-plural");
 								<span class="mailJob"><%= referenceName%></span>
 							</c:otherwise>
 						</c:choose>
-						<%} %>
+						<%}
+						if(condition.getClassName().startsWith("Inscription")){
+							%>
+							<span class="mailJob"><liferay-ui:message key="mailjob.reference.inscription"/></span>
+						<%
+						}%>
 					</liferay-ui:search-container-column-text>
 					<liferay-ui:search-container-column-text name="days">
-					<%if(reference!=null){  %>
+					<%if(reference!=null && !condition.getClassName().startsWith("Inscription")){  %>
 						<c:choose>
 							<c:when test="${mailJob.dateShift lt 0}">
 								${mailJob.dateShift*-1} <liferay-ui:message key="days-before" />
@@ -208,9 +216,9 @@ nonProcessedURL.setParameter("tab","non-processed-plural");
 					</liferay-ui:search-container-column-text>		
 
 					<liferay-ui:search-container-column-text name="groupmailing.release-date">
-				<%if(reference!=null){ %>
+				<%if(reference!=null ){ %>
 					<%= reference.getFormatDate() %>
-				<%}else{ %>
+				<%}else if (Validator.isNotNull(mailJob.getDateToSend())){ %>
 					<%= sdf.format(mailJob.getDateToSend()) %>
 				<%} %>
 				</liferay-ui:search-container-column-text>

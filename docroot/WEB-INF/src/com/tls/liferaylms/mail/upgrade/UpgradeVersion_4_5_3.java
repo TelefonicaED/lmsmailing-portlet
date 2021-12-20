@@ -21,7 +21,7 @@ public class UpgradeVersion_4_5_3 extends UpgradeProcess {
 		log.info("Actualizando version a 4.5.3");
 		log.info("Upgrading LMSMAILING Portlet ");
 
-		String layoutUpdate =  "ALTER TABLE `lmsmail_mailjob` ADD COLUMN `dateToSend` LONGTEXT NULL DEFAULT NULL AFTER `dateShift`;";
+		String layoutUpdate =  "ALTER TABLE `lmsmail_mailjob` ADD COLUMN `dateToSend` DATE NULL DEFAULT NULL AFTER `dateShift`;";
 				 				
 		 log.info("Insert extradata column "); 
 			 DB db = DBFactoryUtil.getDB();

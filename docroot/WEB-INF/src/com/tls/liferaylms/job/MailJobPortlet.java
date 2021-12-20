@@ -149,7 +149,7 @@ public class MailJobPortlet extends MVCPortlet {
 						for(Module module : modules){
 							List<LearningActivity> learningActivities = LearningActivityLocalServiceUtil.getLearningActivitiesOfModule(module.getModuleId());
 							if(tempActivities==null){
-								if(condition!=null && !condition.getConditionName().equals(LanguageUtil.format(Locale.getDefault(), "com.liferay.lms.model.Course", ""))){
+								if(condition!=null && condition.getConditionName().equals(LanguageUtil.format(Locale.getDefault(), "com.liferay.lms.model.Activity", ""))){
 									for(LearningActivity la : learningActivities){
 										if(la.getPrimaryKey()==condition.getActConditionPK()){
 											tempActivities = learningActivities;
@@ -162,7 +162,7 @@ public class MailJobPortlet extends MVCPortlet {
 							}
 
 							if(tempActivitiesReference==null){
-								if(reference!=null && !reference.getConditionName().equals(LanguageUtil.format(Locale.getDefault(), "com.liferay.lms.model.Course", ""))){
+								if(reference!=null && reference.getConditionName().equals(LanguageUtil.format(Locale.getDefault(), "com.liferay.lms.model.Activity", ""))){
 									for(LearningActivity la : learningActivities){
 										if(la.getPrimaryKey()==reference.getActReferencePK()){
 											tempActivitiesReference = learningActivities;
@@ -327,6 +327,9 @@ public class MailJobPortlet extends MVCPortlet {
 			}
 			referenceClassName=StringPool.BLANK;
 		}
+		if (conditionClassName.startsWith("Inscription")){
+			referenceClassName=StringPool.BLANK;
+		}
 		log.info("dateTosend "+dateToSend);
 		if(log.isDebugEnabled()){
 			log.debug("UPDATE");
@@ -416,6 +419,7 @@ public class MailJobPortlet extends MVCPortlet {
 
 	@ProcessAction(name = "save")
 	public void save(ActionRequest request, ActionResponse response) {	
+		log.info("Guardando");
 		ThemeDisplay themeDisplay = (ThemeDisplay) request.getAttribute(WebKeys.THEME_DISPLAY);
 		String conditionClassName = ParamUtil.getString(request, MailStringPool.CONDITION_CLASSNAME, StringPool.BLANK);
 		Long conditionModule = ParamUtil.getLong(request, MailStringPool.CONDITION_MODULE, 0);
@@ -455,6 +459,9 @@ public class MailJobPortlet extends MVCPortlet {
 				calendar.set(Calendar.MILLISECOND,0);
 				dateToSend = calendar.getTime();
 			}
+			referenceClassName=StringPool.BLANK;
+		}
+		if (conditionClassName.startsWith("Inscription")){
 			referenceClassName=StringPool.BLANK;
 		}
 		log.info("dateTosend "+dateToSend);
