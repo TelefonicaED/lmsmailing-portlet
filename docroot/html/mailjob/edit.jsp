@@ -98,6 +98,15 @@
 		}else{
 			document.getElementById('module').style.display = 'none';
 		}
+		if (className=="InscriptionCondition"){
+			document.getElementById('reference').style.display = 'none';
+			document.getElementById('state').style.display = 'none';
+			document.getElementById('calendario').style.display = 'none';			
+		}else{
+			document.getElementById('reference').style.display = 'block';
+			document.getElementById('state').style.display = 'block';
+			document.getElementById('calendario').style.display = 'block';	
+		}
 	}
 	
 	function showReferenceModule(){
@@ -176,33 +185,36 @@
 				</select>
 			</span>
 		</div>
-		<span class="aui-field-content">
-			<label class="aui-field-label"><liferay-ui:message key="state" /></label>
-			<select multiple="multiple" name="con_state" id="con_state" required="required">
-				<option
-				<c:forEach items="${conditionStatus}" var="conditionSta">
-					<c:if test="${conditionSta eq '0'}">selected="selected"</c:if>
-				</c:forEach>
-				 value="0"><liferay-ui:message key="groupmailing.not-started" /></option>
-				<option 
-				<c:forEach items="${conditionStatus}" var="conditionSta">
-					<c:if test="${conditionSta eq '1'}">selected="selected"</c:if>
-				</c:forEach>
-				 value="1"><liferay-ui:message key="groupmailing.started" /></option>
-				<option 
-				<c:forEach items="${conditionStatus}" var="conditionSta">
-					<c:if test="${conditionSta eq '2'}">selected="selected"</c:if>
-				</c:forEach>
-				 value="2"><liferay-ui:message key="not-passed" /></option>
-				<option 
-				<c:forEach items="${conditionStatus}" var="conditionSta">
-					<c:if test="${conditionSta eq '3'}">selected="selected"</c:if>
-				</c:forEach>
-				 value="3"><liferay-ui:message key="passed" /></option>
-		
-			</select>
-		</span>
+		<div id="state">
+			<span class="aui-field-content">
+				<label class="aui-field-label"><liferay-ui:message key="state" /></label>
+				<select multiple="multiple" name="con_state" id="con_state">
+					<option
+					<c:forEach items="${conditionStatus}" var="conditionSta">
+						<c:if test="${conditionSta eq '0'}">selected="selected"</c:if>
+					</c:forEach>
+					 value="0"><liferay-ui:message key="groupmailing.not-started" /></option>
+					<option 
+					<c:forEach items="${conditionStatus}" var="conditionSta">
+						<c:if test="${conditionSta eq '1'}">selected="selected"</c:if>
+					</c:forEach>
+					 value="1"><liferay-ui:message key="groupmailing.started" /></option>
+					<option 
+					<c:forEach items="${conditionStatus}" var="conditionSta">
+						<c:if test="${conditionSta eq '2'}">selected="selected"</c:if>
+					</c:forEach>
+					 value="2"><liferay-ui:message key="not-passed" /></option>
+					<option 
+					<c:forEach items="${conditionStatus}" var="conditionSta">
+						<c:if test="${conditionSta eq '3'}">selected="selected"</c:if>
+					</c:forEach>
+					 value="3"><liferay-ui:message key="passed" /></option>
+			
+				</select>
+			</span>
+		</div>
 	</div>
+	<div id="calendario">
 <%-- 	<input type="checkbox" id="<portlet:namespace />calendar" name="<portlet:namespace />calendar" onclick="showReference()" checked="<%=calendar%>"><label><liferay-ui:message key="mailjob.preferences.calendar"/></label> --%>
 	<aui:input type="checkbox" name="calendar" label="mailjob.preferences.calendar" value='<%=calendar %>' onChange='showReference()'/>
 	<%
@@ -223,6 +235,7 @@
 						yearParam="sendDateAno" yearValue="<%=cal.get(Calendar.YEAR) %>"  yearNullable="false" 
 						dayNullable="false" monthNullable="false"></liferay-ui:input-date>
 			</div>
+		</div>
 	<%//}else{ %>
 		<div id ="reference" style='display:<%=calendar?"none":"block"%>'>
 			<h2><liferay-ui:message key="reference" /></h2>
@@ -232,7 +245,9 @@
 					<label class="aui-field-label"><liferay-ui:message key="groupmailing.reference-class" /></label>
 					<select name="referenceClassName" id="referenceClassName" class="aui-field-input aui-field-input-select aui-field-input-menu" onchange="showReferenceModule()">
 					 	<c:forEach items="${conditions}" var="contition" >
-				  			<option <c:if test="${mailjob.dateClassName eq contition.className}"> selected="selected"</c:if> value="${contition.className}">${contition.getName(themeDisplay.locale)}</option>
+					 		<c:if test="${contition.className ne 'InscriptionCondition'}">
+				  				<option <c:if test="${mailjob.dateClassName eq contition.className}"> selected="selected"</c:if> value="${contition.className}">${contition.getName(themeDisplay.locale)}</option>
+				  			</c:if>
 				  		</c:forEach>
 					</select>
 				</span>
@@ -256,12 +271,14 @@
 					</span>
 				</div>
 				<span class="aui-field-content">
-					<label class="aui-field-label"><liferay-ui:message key="state" /></label>
+					<label class="aui-field-label"><liferay-ui:message key="state" />   <span style="font-style:italic;font-size:0.8em;">(*Si se usa por fecha de inscripción, el mail programado se enviará todos los días)</span></label>
+					
 					<select name="ref_state" id="ref_state" onchange="showDate()">
 						<option <c:if test="${mailjob.dateReferenceDate eq 0}"> selected="selected"</c:if> value="0"><liferay-ui:message key="groupmailing.init-date" /></option>
 						<option <c:if test="${mailjob.dateReferenceDate eq 1}"> selected="selected"</c:if> value="1"><liferay-ui:message key="groupmailing.end-date" /></option>
 						<option <c:if test="${mailjob.dateReferenceDate eq 2}"> selected="selected"</c:if> value="2"><liferay-ui:message key="groupmailing.inscription-date" /></option>
 					</select>
+					
 				</span>
 				<div id="mod_date">
 					<span class="aui-field-content">

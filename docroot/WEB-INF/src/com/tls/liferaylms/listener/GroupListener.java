@@ -91,8 +91,7 @@ public class GroupListener extends BaseModelListener<Group> {
 		log.info("Group "+groupId);
 		List<MailJob> mailjobs = MailJobLocalServiceUtil.getMailJobsInGroupId(groupId, -1, -1);
 		for (MailJob mj : mailjobs){
-			log.info("Hay mj "+mj.isProcessed()+" dd "+mj.getDateClassName()+" date "+mj.getDateReferenceDate() );
-			if (mj.getDateClassName().equals("CourseCondition") &&  mj.getDateReferenceDate()==2){
+			if (mj.getConditionClassName().equals("InscriptionCondition")){
 				try{
 					log.info("HAY QUE MANDAR MAIL DE INSCRIPCION");
 					Message message=new Message();
