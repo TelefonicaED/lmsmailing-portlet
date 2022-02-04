@@ -62,7 +62,7 @@
 		
 		%>
 	<div>
-	*Se admiten ficheros <%=MailConstants.ATTACHMENTS_DEFAULT_ACCEPTED_FILES %>
+	<liferay-ui:message key="mailtemplate.aviso" arguments="<%=new String[]{MailConstants.ATTACHMENTS_DEFAULT_ACCEPTED_FILES,String.valueOf(maxSize)}%>"/>
 	</div>
 	<script src="/lmsmailing-portlet/js/jquery.MultiFile.js"></script>
  	<div class="col-md-4 file-wrap">
@@ -124,6 +124,7 @@
 		    		<li>[$TITLE_COURSE$] - <%=LanguageUtil.get(pageContext,"groupmailing.messages.course")%></li>
 		    		<li>[$USER_FULLNAME$] - <%=LanguageUtil.get(pageContext,"groupmailing.messages.student")%></li>
 		    		<li>[$USER_SCREENNAME$] - <%=LanguageUtil.get(pageContext,"the-user-screen-name")%></li>
+		    		<li>[$USER_FIRSTNAME$] - <%=LanguageUtil.get(pageContext,"groupmailing.messages.student.first-name")%></li>
 		    		<li>[$TEACHER$] - <%=LanguageUtil.get(pageContext,"groupmailing.messages.teacher")%></li>
 		    		<li>[$USER_SENDER$] - <%=LanguageUtil.get(pageContext,"groupmailing.messages.user-sender")%></li>
 		    		<li>[$PAGE_URL$] - <%=LanguageUtil.get(pageContext,"groupmailing.messages.urlcourse")%></li>

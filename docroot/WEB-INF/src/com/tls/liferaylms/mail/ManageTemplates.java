@@ -120,8 +120,17 @@ public class ManageTemplates extends MVCPortlet {
 			mailTemplate.setGroupId(themeDisplay.getScopeGroupId());
 			mailTemplate.setCompanyId(themeDisplay.getCompanyId());
 			mailTemplate.setUserId(themeDisplay.getUserId());
+	
 			MailTemplateLocalServiceUtil.addMailTemplate(mailTemplate);
-			
+			if(!error){
+				if(attachments!=null && attachments.length>0 && attachments[0] != null){
+					_log.info(">>>> "+attachments.length);
+					for(int i=0;i<attachments.length;i++){
+						File newFile = new File(PropsUtil.get("liferay.home")+"/data/mailtemplate/"+mailTemplate.getIdTemplate()+"/"+attachmentNames[i]);
+						FileUtils.copyFile(attachments[i], newFile);
+					}
+				}
+			}
 			if(_log.isInfoEnabled())
 				_log.trace("ManageTemplates: addMailTemplate " + mailTemplate.getSubject());
 		}		
