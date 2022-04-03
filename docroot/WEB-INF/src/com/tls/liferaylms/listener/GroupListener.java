@@ -6,8 +6,12 @@ import java.util.List;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.TrueFileFilter;
 
+import com.liferay.lms.model.AsynchronousProcessAudit;
 import com.liferay.lms.model.Course;
+import com.liferay.lms.model.LearningActivity;
+import com.liferay.lms.service.AsynchronousProcessAuditLocalServiceUtil;
 import com.liferay.lms.service.CourseLocalServiceUtil;
+import com.liferay.lms.service.LearningActivityLocalServiceUtil;
 import com.liferay.portal.ModelListenerException;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
@@ -43,7 +47,7 @@ public class GroupListener extends BaseModelListener<Group> {
 
 	@Override
 	public void onAfterCreate(Group group) throws ModelListenerException {
-	/*	Course course=null;
+		Course course=null;
 		Course parent=null;
 		try {
 			course = CourseLocalServiceUtil.fetchByGroupCreatedId(group.getGroupId());
@@ -51,31 +55,20 @@ public class GroupListener extends BaseModelListener<Group> {
 				parent = CourseLocalServiceUtil.fetchCourse(course.getParentCourseId());
 				if (parent!=null){
 					List<MailJob> mailjobs = MailJobLocalServiceUtil.getMailJobsInGroupId(parent.getGroupCreatedId(), -1, -1);
-					ServiceContext serviceContext = new com.liferay.portal.service.ServiceContext();
-					for (MailJob mj : mailjobs){
-						try {
-							MailJob mailJob = MailJobLocalServiceUtil.addMailJob(mj.getIdTemplate(), mj.getConditionClassName(), mj.getConditionClassPK(), mj.getConditionStatus(), mj.getDateClassName(), mj.getDateClassPK(), mj.getDateShift(), mj.getDateToSend(), mj.getDateReferenceDate(), serviceContext);
-							
-							JSONObject extraOrig = mj.getExtraDataJSON();
-							JSONObject extraData = JSONFactoryUtil.createJSONObject();
-							extraData.put(MailConstants.EXTRA_DATA_SEND_COPY, extraOrig.getBoolean(MailConstants.EXTRA_DATA_SEND_COPY));
-							extraData.put(MailConstants.EXTRA_DATA_RELATION_ARRAY, extraOrig.getJSONArray(MailConstants.EXTRA_DATA_RELATION_ARRAY));
-							mailJob.setExtraData(extraData.toString());
-							MailJobLocalServiceUtil.updateMailJob(mailJob);
-						
-						} catch (PortalException e) {
-							if(log.isinfoEnabled())e.printStackTrace();
-							if(log.isErrorEnabled())log.error(e.getMessage());
-						} catch (SystemException e) {
-							if(log.isinfoEnabled())e.printStackTrace();
-							if(log.isErrorEnabled())log.error(e.getMessage());
-						}
-					}
+					if (mailjobs.size()>0){
+						AsynchronousProcessAudit process = AsynchronousProcessAuditLocalServiceUtil.addAsynchronousProcessAudit(course.getCompanyId(), course.getUserId(), MailJob.class.getName(), "tls/scolartic/cloneMailJob");
+						Message message=new Message();
+						message.put("asynchronousProcessAuditId", process.getAsynchronousProcessAuditId());
+						message.put("courseId",course.getCourseId());
+						message.put("parentId",parent.getCourseId());
+						log.debug("send message");
+						MessageBusUtil.sendMessage("tls/liferaylms/job/cloneMailJob", message);				
+					}					
 				}
 			}
 		} catch (SystemException e1) {
 			e1.printStackTrace();
-		}*/
+		}
 	
 	}
 
