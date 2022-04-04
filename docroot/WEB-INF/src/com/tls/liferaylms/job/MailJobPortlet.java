@@ -149,7 +149,7 @@ public class MailJobPortlet extends MVCPortlet {
 						for(Module module : modules){
 							List<LearningActivity> learningActivities = LearningActivityLocalServiceUtil.getLearningActivitiesOfModule(module.getModuleId());
 							if(tempActivities==null){
-								if(condition!=null && condition.getConditionName().equals(LanguageUtil.format(Locale.getDefault(), "com.liferay.lms.model.Activity", ""))){
+								if(condition!=null){
 									for(LearningActivity la : learningActivities){
 										if(la.getPrimaryKey()==condition.getActConditionPK()){
 											tempActivities = learningActivities;
@@ -162,7 +162,7 @@ public class MailJobPortlet extends MVCPortlet {
 							}
 
 							if(tempActivitiesReference==null){
-								if(reference!=null && reference.getConditionName().equals(LanguageUtil.format(Locale.getDefault(), "com.liferay.lms.model.Activity", ""))){
+								if(reference!=null){
 									for(LearningActivity la : learningActivities){
 										if(la.getPrimaryKey()==reference.getActReferencePK()){
 											tempActivitiesReference = learningActivities;
