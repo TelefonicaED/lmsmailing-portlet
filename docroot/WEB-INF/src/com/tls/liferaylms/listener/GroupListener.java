@@ -6,17 +6,11 @@ import java.util.List;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.TrueFileFilter;
 
-import com.liferay.lms.model.AsynchronousProcessAudit;
 import com.liferay.lms.model.Course;
-import com.liferay.lms.model.LearningActivity;
-import com.liferay.lms.service.AsynchronousProcessAuditLocalServiceUtil;
 import com.liferay.lms.service.CourseLocalServiceUtil;
-import com.liferay.lms.service.LearningActivityLocalServiceUtil;
 import com.liferay.portal.ModelListenerException;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.json.JSONFactoryUtil;
-import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.messaging.Message;
@@ -31,47 +25,17 @@ import com.liferay.portal.model.Group;
 import com.liferay.portal.model.User;
 import com.liferay.portal.service.CompanyLocalServiceUtil;
 import com.liferay.portal.service.GroupLocalServiceUtil;
-import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.service.UserLocalServiceUtil;
 import com.liferay.portal.util.PortalUtil;
 import com.tls.liferaylms.mail.model.MailJob;
 import com.tls.liferaylms.mail.model.MailTemplate;
 import com.tls.liferaylms.mail.service.MailJobLocalServiceUtil;
 import com.tls.liferaylms.mail.service.MailTemplateLocalServiceUtil;
-import com.tls.liferaylms.util.MailConstants;
 import com.tls.liferaylms.util.MailUtil;
 
 
 public class GroupListener extends BaseModelListener<Group> {
 	Log log = LogFactoryUtil.getLog(GroupListener.class);
-
-	@Override
-	public void onAfterCreate(Group group) throws ModelListenerException {
-		Course course=null;
-		Course parent=null;
-		try {
-			course = CourseLocalServiceUtil.fetchByGroupCreatedId(group.getGroupId());
-			if (course!=null){
-				parent = CourseLocalServiceUtil.fetchCourse(course.getParentCourseId());
-				if (parent!=null){
-					List<MailJob> mailjobs = MailJobLocalServiceUtil.getMailJobsInGroupId(parent.getGroupCreatedId(), -1, -1);
-					if (mailjobs.size()>0){
-						AsynchronousProcessAudit process = AsynchronousProcessAuditLocalServiceUtil.addAsynchronousProcessAudit(course.getCompanyId(), course.getUserId(), MailJob.class.getName(), "tls/scolartic/cloneMailJob");
-						Message message=new Message();
-						message.put("asynchronousProcessAuditId", process.getAsynchronousProcessAuditId());
-						message.put("courseId",course.getCourseId());
-						message.put("parentId",parent.getCourseId());
-						log.debug("send message");
-						MessageBusUtil.sendMessage("tls/liferaylms/job/cloneMailJob", message);				
-					}					
-				}
-			}
-		} catch (SystemException e1) {
-			e1.printStackTrace();
-		}
-	
-	}
-
 	
 	@Override
 	public void onAfterAddAssociation(Object classPK,
