@@ -1,7 +1,6 @@
 package com.tls.liferaylms.listener;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 
@@ -12,15 +11,10 @@ import com.liferay.lms.model.AsynchronousProcessAudit;
 import com.liferay.lms.model.Course;
 import com.liferay.lms.model.LearningActivity;
 import com.liferay.lms.service.AsynchronousProcessAuditLocalServiceUtil;
-import com.liferay.lms.service.ClpSerializer;
 import com.liferay.lms.service.CourseLocalServiceUtil;
 import com.liferay.lms.service.LearningActivityLocalServiceUtil;
 import com.liferay.lms.util.LmsConstant;
 import com.liferay.portal.ModelListenerException;
-import com.liferay.portal.kernel.bean.PortletBeanLocatorUtil;
-import com.liferay.portal.kernel.dao.orm.DynamicQuery;
-import com.liferay.portal.kernel.dao.orm.DynamicQueryFactoryUtil;
-import com.liferay.portal.kernel.dao.orm.PropertyFactoryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
@@ -29,10 +23,8 @@ import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.StringPool;
-import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.BaseModelListener;
 import com.liferay.portal.service.ServiceContext;
-import com.liferay.portal.util.PortalUtil;
 import com.tls.liferaylms.mail.model.MailJob;
 import com.tls.liferaylms.mail.model.MailTemplate;
 import com.tls.liferaylms.mail.service.MailJobLocalServiceUtil;
@@ -55,30 +47,18 @@ public class AsynchronousProcessAuditListener extends BaseModelListener<Asynchro
    			if (as.getType().equals("liferay/lms/createEdition") && course.getParentCourseId()>0){
    				parent = CourseLocalServiceUtil.fetchCourse(course.getParentCourseId());
    				log.debug("parent "+course.getParentCourseId());
-   			}else{
-   				// dynamicquery para sacar el curso de donde se clona
-   				ClassLoader cl2= (ClassLoader)PortletBeanLocatorUtil.locate(ClpSerializer.getServletContextName(), "portletClassLoader");
-   				DynamicQuery dq = DynamicQueryFactoryUtil.forClass(AsynchronousProcessAudit.class, cl2);
-   		    	dq.add(PropertyFactoryUtil.forName("companyId").eq(course.getCompanyId()));
-   		    	dq.add(PropertyFactoryUtil.forName("classPK").eq(course.getCourseId()));
-   		    	dq.add(PropertyFactoryUtil.forName("type_").eq("liferay/lms/courseClone"));
-   		    	dq.add(PropertyFactoryUtil.forName("status").eq( LmsConstant.STATUS_FINISH));
-   		            
-   		    	List<AsynchronousProcessAudit> asynchronousProcessAuditList = (List<AsynchronousProcessAudit>) AsynchronousProcessAuditLocalServiceUtil.dynamicQuery(dq);
-   			/*	List<AsynchronousProcessAudit> asynchronousProcessAuditList = AsynchronousProcessAuditLocalServiceUtil.getByCompanyIdClassNameIdClassPKStatus(course.getCompanyId(), Long.parseLong(Course.class.getName()), courseId, LmsConstant.STATUS_FINISH,-1, -1);		*/		
-   		        
-   				if (Validator.isNotNull(asynchronousProcessAuditList) && asynchronousProcessAuditList.size()>0){
-   					String extra = asynchronousProcessAuditList.get(0).getExtraContent();
-   					if (extra.indexOf("courseId")>0){
-   						String sCourseId=extra.substring(extra.indexOf("courseId")+9,extra.length()).trim();
-   						log.debug("courseId parent "+sCourseId);
-   						try	{
-   							parent = CourseLocalServiceUtil.fetchCourse(Long.parseLong(sCourseId));
-   						}catch(Exception e){
-   					
-   						}
-   					}
-   				}	
+   			}else if (as.getType().equals("liferay/lms/courseClone")){
+   				String extra = as.getExtraContent();
+				if (extra.indexOf("courseId")>0){
+					String sCourseId=extra.substring(extra.indexOf("courseId")+9,extra.length()).trim();
+					sCourseId= sCourseId.substring(0,sCourseId.length()-2);
+					log.debug("courseId parent "+sCourseId);
+					try	{
+						parent = CourseLocalServiceUtil.fetchCourse(Long.parseLong(sCourseId));
+					}catch(Exception e){
+						log.error("NO SE PUDO SACAR EL CURSO DEL QUE SE HA DUPLICADO "+e.getMessage());
+					}
+				}
    			}	
    			if (parent!=null){
    				try {
@@ -172,7 +152,7 @@ public class AsynchronousProcessAuditListener extends BaseModelListener<Asynchro
         }    
 
 	}
-	//Para im�genes
+	//Para imagenes
 	private String changeToURL(String text, String url){
 	
 		text =  text.contains("img") ? 
