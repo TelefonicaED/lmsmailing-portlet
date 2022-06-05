@@ -1,8 +1,11 @@
 package com.tls.liferaylms.listener;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.io.FileUtils;
 
@@ -67,7 +70,7 @@ public class AsynchronousProcessAuditListener extends BaseModelListener<Asynchro
    					ServiceContext serviceContext = new com.liferay.portal.service.ServiceContext();
    					serviceContext.setCompanyId(course.getCompanyId());
    					serviceContext.setScopeGroupId(course.getGroupCreatedId());
-   				
+   				    Map<Long, Long> templateid=new HashMap<Long, Long>();
    					for (MailJob mj : mailjobs){
    						try {
    							log.debug("mail "+mj.getGroupId());
@@ -88,7 +91,7 @@ public class AsynchronousProcessAuditListener extends BaseModelListener<Asynchro
    								List<LearningActivity> listactivities = LearningActivityLocalServiceUtil.getLearningActivitiesOfGroupAndType(course.getGroupCreatedId(), actref.getTypeId());
    								for (LearningActivity la: listactivities){
    									if (actref.getTitle().equals(la.getTitle())){
-   										classpk= la.getActId();
+   										referenceclasspk= la.getActId();
    										break;
    									}
    								}
@@ -102,25 +105,32 @@ public class AsynchronousProcessAuditListener extends BaseModelListener<Asynchro
 
 
    							MailTemplate mailTemplateParent = MailTemplateLocalServiceUtil.fetchMailTemplate(mj.getIdTemplate());
-   							log.debug("mailTemplateParent "+mailTemplateParent);
-   							MailTemplate mailTemplate = MailTemplateLocalServiceUtil.createMailTemplate(CounterLocalServiceUtil.increment(MailTemplate.class.getName()));
-   							mailTemplate.setSubject(mailTemplateParent.getSubject());
-   							mailTemplate.setBody(changeToURL(mailTemplateParent.getBody(), serviceContext.getPortalURL()));
-   							mailTemplate.setGroupId(course.getGroupCreatedId());
-   							mailTemplate.setCompanyId(course.getCompanyId());
-   							mailTemplate.setUserId(course.getUserId());
-   					
-   							MailTemplateLocalServiceUtil.addMailTemplate(mailTemplate);
-   							log.debug("Creado el template");
-   							File atachDir = new File (PropsUtil.get("liferay.home")+"/data/mailtemplate/"+mj.getIdTemplate());
-   							if (atachDir.exists()){
-   								File origin = new File(PropsUtil.get("liferay.home")+"/data/mailtemplate/"+mj.getIdTemplate());
-   								File dest = new File (PropsUtil.get("liferay.home")+"/data/mailtemplate/"+mailTemplate.getIdTemplate());
-   								FileUtils.copyDirectoryToDirectory(origin, dest);
-   								log.debug("se copia");
+   							long idTemplate=0;
+   							if (!templateid.containsKey(mj.getIdTemplate())){
+	   							log.debug("mailTemplateParent "+mailTemplateParent);
+	   							MailTemplate mailTemplate = MailTemplateLocalServiceUtil.createMailTemplate(CounterLocalServiceUtil.increment(MailTemplate.class.getName()));
+	   							mailTemplate.setSubject(mailTemplateParent.getSubject());
+	   							mailTemplate.setBody(changeToURL(mailTemplateParent.getBody(), serviceContext.getPortalURL()));
+	   							mailTemplate.setGroupId(course.getGroupCreatedId());
+	   							mailTemplate.setCompanyId(course.getCompanyId());
+	   							mailTemplate.setUserId(course.getUserId());
+	   					
+	   							MailTemplateLocalServiceUtil.addMailTemplate(mailTemplate);
+	   							templateid.put(mj.getIdTemplate(), mailTemplate.getIdTemplate());
+	   							idTemplate=mailTemplate.getIdTemplate();
+	   							log.debug("Creado el template");
+	   							File atachDir = new File (PropsUtil.get("liferay.home")+"/data/mailtemplate/"+mj.getIdTemplate());
+	   							if (atachDir.exists()){
+	   								File origin = new File(PropsUtil.get("liferay.home")+"/data/mailtemplate/"+mj.getIdTemplate());
+	   								File dest = new File (PropsUtil.get("liferay.home")+"/data/mailtemplate/"+mailTemplate.getIdTemplate());
+	   								FileUtils.copyDirectoryToDirectory(origin, dest);
+	   								log.debug("se copia");
+	   							}
+   							}else{
+   								idTemplate = templateid.get(mj.getIdTemplate());
    							}
-   							
-   							MailJob mailJob = MailJobLocalServiceUtil.addMailJob(mailTemplate.getIdTemplate(), mj.getConditionClassName(), classpk, mj.getConditionStatus(), mj.getDateClassName(), referenceclasspk, mj.getDateShift(), dateToSend, mj.getDateReferenceDate(), serviceContext);
+			
+   							MailJob mailJob = MailJobLocalServiceUtil.addMailJob(idTemplate, mj.getConditionClassName(), classpk, mj.getConditionStatus(), mj.getDateClassName(), referenceclasspk, mj.getDateShift(), dateToSend, mj.getDateReferenceDate(), serviceContext);
    							log.debug("Creado mail "+mailJob.getUuid());
    							JSONObject extraOrig = mj.getExtraDataJSON();
    							JSONObject extraData = JSONFactoryUtil.createJSONObject();
