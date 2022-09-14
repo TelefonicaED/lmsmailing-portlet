@@ -8,17 +8,11 @@
 >
   <bean id="messageListener.lmsmailing_listener"     
       class="com.tls.liferaylms.mail.message.LmsMailMessageListener" />
-  <bean id="messageListener.liferay.lms.cloneMailJob_listener"
-		class="com.tls.liferaylms.CloneMailJob" />
   <bean id="destination.lmsmailing"            
       class="com.liferay.portal.kernel.messaging.ParallelDestination">
     <property name="name" value="lms/mailing" />
     <property name="workersMaxSize" value="10" />
   </bean>
-  	<bean id="destination.liferay.lms.cloneMailJob"
-		class="com.liferay.portal.kernel.messaging.SerialDestination">
-		<property name="name" value="liferay/lms/cloneMailJob" />
-	</bean>
   <bean id="messagingConfigurator"
       class="com.liferay.portal.kernel.messaging.config.PluginMessagingConfigurator">                 
     <property name="messageListeners">
@@ -28,17 +22,11 @@
             <ref bean="messageListener.lmsmailing_listener" />
           </list>
         </entry>
-        <entry key="liferay/lms/cloneMailJob">
-			<list value-type="com.liferay.portal.kernel.messaging.MessageListener">
-				<ref bean="messageListener.liferay.lms.cloneMailJob_listener" />
-			</list>
-		</entry>
       </map>
     </property>
     <property name="destinations">
       <list>
         <ref bean="destination.lmsmailing"/>
-        <ref bean="destination.liferay.lms.cloneMailJob" />
       </list>
     </property>
   </bean>
