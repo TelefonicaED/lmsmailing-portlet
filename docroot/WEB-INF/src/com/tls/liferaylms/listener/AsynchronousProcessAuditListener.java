@@ -137,6 +137,7 @@ public class AsynchronousProcessAuditListener extends BaseModelListener<Asynchro
    							extraData.put(MailConstants.EXTRA_DATA_SEND_COPY, extraOrig.getBoolean(MailConstants.EXTRA_DATA_SEND_COPY));
    							extraData.put(MailConstants.EXTRA_DATA_RELATION_ARRAY, extraOrig.getJSONArray(MailConstants.EXTRA_DATA_RELATION_ARRAY));
    							mailJob.setExtraData(extraData.toString());
+							mailJob.setUserId(course.getUserId());
    							MailJobLocalServiceUtil.updateMailJob(mailJob);
    						
    						} catch (PortalException e1) {
