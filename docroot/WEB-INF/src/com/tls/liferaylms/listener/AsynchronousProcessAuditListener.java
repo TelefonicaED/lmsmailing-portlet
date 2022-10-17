@@ -148,6 +148,21 @@ public class AsynchronousProcessAuditListener extends BaseModelListener<Asynchro
    							log.error(e2.getMessage());
    						}
    					}
+					List<MailTemplate> listTemplates = MailTemplateLocalServiceUtil.getMailTemplateByGroupId(parent.getGroupCreatedId());
+   					for (MailTemplate mt : listTemplates){
+   						if (!templateid.containsKey(mt.getIdTemplate())){
+   							MailTemplate mailTemplate = MailTemplateLocalServiceUtil.createMailTemplate(CounterLocalServiceUtil.increment(MailTemplate.class.getName()));
+   							mailTemplate.setSubject(mt.getSubject());
+   							mailTemplate.setBody(changeToURL(mt.getBody(), serviceContext.getPortalURL()));
+   							mailTemplate.setGroupId(course.getGroupCreatedId());
+   							mailTemplate.setCompanyId(course.getCompanyId());
+   							mailTemplate.setUserId(course.getUserId());
+   					
+   							MailTemplateLocalServiceUtil.addMailTemplate(mailTemplate);
+   							log.debug("se copia plantilla sin email programado "+mt.getIdTemplate());
+   							templateid.put(mt.getIdTemplate(), mailTemplate.getIdTemplate());
+   						}
+   					}
    				}catch(Exception e){
    					log.error("NO SE PUDO COPIAR LOS EMAILS PROGRAMADOS");
    				}
