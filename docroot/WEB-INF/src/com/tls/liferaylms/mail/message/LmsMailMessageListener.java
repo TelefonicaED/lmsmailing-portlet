@@ -690,9 +690,9 @@ public class LmsMailMessageListener implements MessageListener {
 									content = MailUtil.replaceExpandosUser(content, companyId, null, socialRelatedUser.getLocale());
 								
 								String extraContentSocialRelation = MailUtil.getExtraContentSocialRelation(users, socialRelatedUser, sendToRelationTypeIds);
-								//calculatedBody = MailUtil.getExtraContentSocialRelationHeader(socialRelatedUser) + extraContentSocialRelation;
+								calculatedBody = MailUtil.getExtraContentSocialRelationHeader(socialRelatedUser) + extraContentSocialRelation;
 								//calculatedBody += MailUtil.getExtraContentSocialRelation(users, socialRelatedUser, sendToRelationTypeIds);
-								calculatedBody = PrefsPropsUtil.getString(companyId, MailConstants.HEADER_PREFS, LanguageUtil.get(socialRelatedUser.getLocale(),"mail.header"));
+								calculatedBody += PrefsPropsUtil.getString(companyId, MailConstants.HEADER_PREFS, LanguageUtil.get(socialRelatedUser.getLocale(),"mail.header"));
 								calculatedBody += content;
 								calculatedBody += PrefsPropsUtil.getString(companyId, MailConstants.FOOTER_PREFS, LanguageUtil.get(socialRelatedUser.getLocale(),"mail.footer"));
 								
